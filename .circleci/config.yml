@@ -1,0 +1,123 @@
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.0.5
+
+executors:
+  my-executor:
+    docker:
+      - image: humancompatibleai/benchmark-environments:base
+    working_directory: /benchmark-environments
+    environment:
+      # If you change these, also change ci/code_checks.sh
+      SRC_FILES: src/ tests/ setup.py
+      TYPECHECK_FILES: src/  # tests often do weird things with types, exclude
+      NUM_CPUS: 2  # more CPUs visible but we're throttled to 2, which breaks auto-detect
+
+commands:
+  dependencies:
+    # You must still manually update the Docker image if any
+    # binary (non-Python) dependencies change.
+    description: "Check out and update Python dependencies."
+    steps:
+      - checkout
+      # Download and cache dependencies
+      # Note you will still need to manually update the Docker image if any
+      # binary (non-Python) dependencies change.
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "setup.py" }}
+
+      - run:
+          name: install dependencies
+          # MUJOCO_KEY is defined in a CircleCI context
+          # Do some sanity checks to make sure key works
+          command: |
+            curl -o /root/.mujoco/mjkey.txt ${MUJOCO_KEY}
+            md5sum /root/.mujoco/mjkey.txt
+            [[ -d /venv ]] || /benchmark-environments/ci/build_venv.sh /venv
+            python -c "import mujoco_py"
+
+      - save_cache:
+          paths:
+            - /venv
+          key: v1-dependencies-{{ checksum "setup.py" }}
+
+      - run:
+          name: install evaluating_rewards
+          # Build a wheel then install to avoid copying whole directory (pip issue #2195)
+          command: |
+            python setup.py sdist bdist_wheel
+            pip install --upgrade dist/benchmark_environments-*.whl
+
+jobs:
+  lintandtype:
+    executor: my-executor
+
+    steps:
+      - dependencies
+      - run:
+          name: flake8
+          command: flake8 ${SRC_FILES}
+
+      - run:
+          name: black
+          command: black --check ${SRC_FILES}
+
+      - run:
+          name: codespell
+          command: codespell -I .codespell.skip --skip='*.pyc' ${SRC_FILES}
+
+      - run:
+          name: sphinx
+          command: pushd docs/ && make clean && make html && popd
+
+      - run:
+          name: pytype
+          command: pytype ${TYPECHECK_FILES}
+
+  unit-test:
+    executor: my-executor
+    parallelism: 3
+    steps:
+      - dependencies
+
+      - run:
+          name: Memory Monitor
+          command: |
+            mkdir /tmp/resource-usage
+            export FILE=/tmp/resource-usage/memory.txt
+            while true; do
+              ps -u root eo pid,%cpu,%mem,args,uname --sort=-%mem >> $FILE
+              echo "----------" >> $FILE
+              sleep 1
+            done
+          background: true
+
+      - run:
+          name: run tests
+          command: |
+            export DISPLAY=:0
+            pytest --cov=/venv/lib/python3.7/site-packages/benchmark_environments --cov=tests \
+                   --junitxml=/tmp/test-reports/junit.xml \
+                   --shard-id=${CIRCLE_NODE_INDEX} --num-shards=${CIRCLE_NODE_TOTAL} \
+                    -n ${NUM_CPUS} -vv tests/
+            mv .coverage .coverage.bench
+            coverage combine  # rewrite paths from virtualenv to src/
+      - codecov/upload
+
+      - store_artifacts:
+          path: /tmp/test-reports
+          destination: test-reports
+      - store_test_results:
+          path: /tmp/test-reports
+          unit-test:
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - lintandtype:
+          context: MuJoCo
+      - unit-test:
+          context: MuJoCo
