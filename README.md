@@ -2,6 +2,14 @@
 
 **Status**: alpha, pre-release.
 
+benchmark-environments is a suite of benchmarks for imitation-learning and
+reward-learning algorithms. It is currently a work-in-progress, but we intend for it to eventually
+contain a suite of diagnostic tasks for reward-learning, wrappers around common RL benchmark
+environments that help to avoid common pitfalls in benchmarking (e.g. by masking visible score
+counters in Gym Atari tasks), and new challenge tasks for imitation- and reward-learning. This
+benchmark suite is a complement to our  [https://github.com/humancompatibleai/imitation/](imitation)
+package of baseline algorithms for imitation learning.
+
 # Usage
 
 To install the latest release from PyPi, run:
@@ -10,12 +18,10 @@ To install the latest release from PyPi, run:
 pip install benchmark-environments
 ```
 
-To install from source code:
+To install from Git master:
 
 ```
-git clone git@github.com:HumanCompatibleAI/benchmark-environments.git
-cd benchmark-environments
-pip install .
+pip install git+https://github.com/HumanCompatibleAI/benchmark-environments.git
 ```
 
 # Contributing
@@ -26,7 +32,7 @@ For development, clone the source code and create a virtual environment for this
 git clone git@github.com:HumanCompatibleAI/benchmark-environments.git
 cd benchmark-environments
 ./ci/build_venv.sh
-pip install .[dev]  # install extra tools useful for development
+pip install -e .[dev]  # install extra tools useful for development
 ```
 
 ## Code style
