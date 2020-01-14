@@ -12,7 +12,7 @@ package of baseline algorithms for imitation learning.
 
 # Usage
 
-To install the latest release from PyPi, run:
+To install the latest release from PyPI, run:
  
 ```bash
 pip install benchmark-environments
