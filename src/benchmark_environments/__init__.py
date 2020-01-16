@@ -2,8 +2,6 @@
 
 import gym
 
-__version__ = "0.01"
-
 def get_gym_v3_max_episode_steps(env_base):
     return gym.envs.registry.env_specs[f'{env_base}-v3'].max_episode_steps
 
@@ -13,3 +11,5 @@ for env_base in ['HalfCheetah', 'Ant', 'Hopper', 'Humanoid', 'Swimmer', 'Walker2
         entry_point=f'benchmark_environments.mujoco:{env_base}Env',
         max_episode_steps=get_gym_v3_max_episode_steps(env_base)
     )
+
+__version__ = "0.01"

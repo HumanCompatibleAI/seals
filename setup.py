@@ -1,3 +1,5 @@
+"""setup.py for benchmark_environments project."""
+
 from setuptools import find_packages, setup
 import src.benchmark_environments  # pytype: disable=import-error
 
@@ -13,7 +15,9 @@ TESTS_REQUIRE = [
     "flake8-blind-except",
     "flake8-builtins",
     "flake8-debugger",
+    "flake8-docstrings",
     "flake8-isort",
+    "pydocstyle",
     "pytest",
     "pytest-cov",
     "pytest-shard",
