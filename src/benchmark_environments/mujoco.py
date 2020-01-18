@@ -1,5 +1,4 @@
-"""Adaptation of MuJoCo environments for IRL.
-"""
+"""Adaptation of MuJoCo environments for IRL."""
 
 import gym
 from gym.envs.mujoco import (
