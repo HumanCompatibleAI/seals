@@ -1,13 +1,12 @@
 """Test MuJoCo adaptations."""
 
+import gym
+import pytest
 from stable_baselines import PPO2
 from stable_baselines.common.evaluation import evaluate_policy
 from stable_baselines.common.policies import MlpPolicy
 
-import gym
-from gym.wrappers.time_limit import TimeLimit
-import benchmark_environments.mujoco
-import pytest
+import benchmark_environments.mujoco  # noqa: F401 Import required for env registration
 
 
 @pytest.mark.expensive
