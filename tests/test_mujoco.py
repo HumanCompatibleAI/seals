@@ -6,7 +6,7 @@ from stable_baselines.common.policies import MlpPolicy
 
 import gym
 from gym.wrappers.time_limit import TimeLimit
-import benchmark_environments
+import benchmark_environments.mujoco
 import pytest
 
 
