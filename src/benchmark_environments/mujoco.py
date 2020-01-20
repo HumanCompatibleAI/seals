@@ -1,6 +1,7 @@
 """Adaptation of MuJoCo environments for IRL."""
 
 import gym
+import gym.envs
 from gym.envs.mujoco import (
     ant_v3,
     half_cheetah_v3,
