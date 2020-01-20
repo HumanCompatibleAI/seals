@@ -15,7 +15,7 @@ def _include_position_in_observation(cls):
     old_init = cls.__init__
 
     def new_init(*args, **kwargs):
-        kwargs['exclude_current_positions_from_observation'] = False
+        kwargs["exclude_current_positions_from_observation"] = False
         old_init(*args, **kwargs)
 
     cls.__init__ = new_init
@@ -64,12 +64,12 @@ class Walker2dEnv(walker2d_v3.Walker2dEnv):
 
 
 def _get_gym_v3_max_episode_steps(env_base_):
-    return gym.envs.registry.env_specs[f'{env_base_}-v3'].max_episode_steps
+    return gym.envs.registry.env_specs[f"{env_base_}-v3"].max_episode_steps
 
 
-for env_base in ['HalfCheetah', 'Ant', 'Hopper', 'Humanoid', 'Swimmer', 'Walker2d']:
+for env_base in ["HalfCheetah", "Ant", "Hopper", "Humanoid", "Swimmer", "Walker2d"]:
     gym.register(
-        id=f'benchmark_environments/{env_base}-v0',
-        entry_point=f'benchmark_environments.mujoco:{env_base}Env',
+        id=f"benchmark_environments/{env_base}-v0",
+        entry_point=f"benchmark_environments.mujoco:{env_base}Env",
         max_episode_steps=_get_gym_v3_max_episode_steps(env_base),
     )
