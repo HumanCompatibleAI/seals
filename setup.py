@@ -26,6 +26,7 @@ TESTS_REQUIRE = [
     "sphinx",
     "sphinxcontrib-napoleon",
     "stable-baselines>=2.8.0",
+    "tensorflow>=1.8.0,<2.0.0",
 ]
 
 setup(
