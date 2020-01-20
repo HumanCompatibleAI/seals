@@ -25,7 +25,7 @@ TESTS_REQUIRE = [
     "pytype",
     "sphinx",
     "sphinxcontrib-napoleon",
-    "stable-baselines",
+    "stable-baselines>=2.8.0",
 ]
 
 setup(
