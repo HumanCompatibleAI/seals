@@ -18,7 +18,7 @@ ENV_NAMES = [
 DETERMINISTIC_ENVS = []
 
 
-def make_env_fixture(skip_fn):
+def _make_env_fixture(skip_fn):
     def f(env_name):
         env = None
         try:
@@ -36,7 +36,7 @@ def make_env_fixture(skip_fn):
     return f
 
 
-env = pytest.fixture(make_env_fixture(skip_fn=pytest.skip))
+env = pytest.fixture(_make_env_fixture(skip_fn=pytest.skip))
 
 
 @pytest.mark.parametrize("env_name", ENV_NAMES)
@@ -46,9 +46,9 @@ class TestEnvs:
     def test_seed(self, env, env_name):
         """Tests environment seeding.
 
-    If non-deterministic, different seeds should produce different transitions.
-    If deterministic, should be invariant to seed.
-    """
+        If non-deterministic, different seeds should produce different transitions.
+        If deterministic, should be invariant to seed.
+        """
 
         def get_rollout(env, actions):
             step_results = [(env.reset(), None, None, None)]

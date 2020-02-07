@@ -4,6 +4,7 @@ import pytest
 
 
 def pytest_addoption(parser):
+    """Add --expensive option."""
     parser.addoption(
         "--expensive",
         action="store_true",
@@ -14,6 +15,7 @@ def pytest_addoption(parser):
 
 
 def pytest_collection_modifyitems(config, items):
+    """Make expensive tests be skipped without an --expensive flag."""
     if config.getoption("--expensive"):
         return
     skip_expensive = pytest.mark.skip(reason="needs --expensive option to run")
