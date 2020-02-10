@@ -1,4 +1,6 @@
-"""Test MuJoCo adaptations."""
+"""Test RL on MuJoCo adaptated environments."""
+
+from typing import Tuple
 
 import gym
 import pytest
@@ -9,11 +11,19 @@ from stable_baselines.common.policies import MlpPolicy
 import benchmark_environments.mujoco  # noqa: F401 Import required for env registration
 
 
+def _eval_env(env_name: str, total_timesteps: int) -> Tuple[float, int]:
+    """Train PPO2 for `total_timesteps` on `env_name` and evaluate returns."""
+    env = gym.make(env_name)
+    model = PPO2(MlpPolicy, env)
+    model.learn(total_timesteps=total_timesteps)
+    return evaluate_policy(model, env)
+
+
 @pytest.mark.expensive
 @pytest.mark.parametrize(
     "env_base", ["HalfCheetah", "Ant", "Hopper", "Humanoid", "Swimmer", "Walker2d"]
 )
-def test_fixed_env_model_as_good_as_gym_env_model(env_base):
+def test_fixed_env_model_as_good_as_gym_env_model(env_base: str):
     """Compare original and modified MuJoCo v3 envs."""
     train_timesteps = 200000
 
@@ -25,10 +35,3 @@ def test_fixed_env_model_as_good_as_gym_env_model(env_base):
     epsilon = 0.1
     sign = 1 if gym_reward > 0 else -1
     assert (1 - sign * epsilon) * gym_reward <= fixed_reward
-
-
-def _eval_env(env_name, total_timesteps):
-    env = gym.make(env_name)
-    model = PPO2(MlpPolicy, env)
-    model.learn(total_timesteps=total_timesteps)
-    return evaluate_policy(model, env)
