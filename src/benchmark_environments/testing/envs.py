@@ -171,7 +171,7 @@ def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
     Args:
         env: The environment to test.
         skip_fn: called when the environment is incompatible with the test.
-        exception_fn: Context manager to check exception is thrown.
+        raises_fn: Context manager to check exception is thrown.
 
     Raises:
         AssertionError if test fails.
