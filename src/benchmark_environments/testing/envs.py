@@ -221,7 +221,7 @@ class CountingEnv(gym.Env):
         if self.timestep is None:
             raise RuntimeError("Need to reset before first step().")
         if self.timestep > self.episode_length:
-            raise RuntimeError("Episode is over. Need to step().")
+            raise RuntimeError("Episode is over. Need to reset().")
         if np.array(action) not in self.action_space:
             raise ValueError(f"Invalid action {action}")
 
