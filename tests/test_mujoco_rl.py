@@ -1,4 +1,4 @@
-"""Test RL on MuJoCo adaptated environments."""
+"""Test RL on MuJoCo adapted environments."""
 
 from typing import Tuple
 
