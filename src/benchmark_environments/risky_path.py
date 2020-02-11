@@ -56,7 +56,7 @@ class RiskyPathEnv(gym.Env):
         self._width = 6
         self._height = 6
 
-        self.observation_space = MultiDiscrete((self._width, self._height))
+        self.observation_space = MultiDiscrete((self._height, self._width))
         self.action_space = Discrete(4)
 
         self._pos = None
