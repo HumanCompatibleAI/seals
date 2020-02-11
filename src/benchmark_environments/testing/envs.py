@@ -184,3 +184,40 @@ def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
     act = env.action_space.sample()
     with raises_fn(Exception):  # need to call env.reset() first
         env.step(act)
+
+
+class CountingEnv(gym.Env):  # pragma: no cover
+    """At timestep `t` of each episode, has `t == obs == reward / 10`.
+
+    Episodes finish after `episode_length` calls to `step()`, or equivalently
+    `episode_length` actions. For example, if we have `episode_length=5`,
+    then an episode has the following observations and rewards:
+
+    ```
+    obs = [0, 1, 2, 3, 4, 5]
+    rews = [10, 20, 30, 40, 50]
+    ```
+    """
+
+    def __init__(self, episode_length=5):
+        assert episode_length >= 1
+        self.observation_space = gym.spaces.Box(low=0, high=np.inf, shape=())
+        self.action_space = gym.spaces.Box(low=0, high=np.inf, shape=())
+        self.episode_length = episode_length
+        self.timestep = None
+
+    def reset(self):
+        t, self.timestep = 0, 1
+        return t
+
+    def step(self, action):
+        if self.timestep is None:
+            raise RuntimeError("Need to reset before first step().")
+        if self.timestep > self.episode_length:
+            raise RuntimeError("Episode is over. Need to step().")
+        if np.array(action) not in self.action_space:
+            raise ValueError(f"Invalid action {action}")
+
+        t, self.timestep = self.timestep, self.timestep + 1
+        done = t == self.episode_length
+        return t, t * 10, done, {}
