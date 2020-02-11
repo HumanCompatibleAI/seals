@@ -186,7 +186,7 @@ def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
         env.step(act)
 
 
-class CountingEnv(gym.Env):  # pragma: no cover
+class CountingEnv(gym.Env):
     """At timestep `t` of each episode, has `t == obs == reward / 10`.
 
     Episodes finish after `episode_length` calls to `step()`, or equivalently

@@ -23,8 +23,7 @@ def test_auto_reset_wrapper(episode_length=3, n_steps=100, n_manual_reset=2):
             assert obs == expected_obs
             assert done is False
 
-            # End of episode
-            if expected_obs == 0:
+            if expected_obs == 0:  # End of episode
                 assert info.get("terminal_observation", None) == episode_length
                 assert rew == episode_length * 10
             else:
