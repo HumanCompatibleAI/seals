@@ -199,7 +199,12 @@ class CountingEnv(gym.Env):  # pragma: no cover
     ```
     """
 
-    def __init__(self, episode_length=5):
+    def __init__(self, episode_length: int = 5):
+        """Initialize a CountingEnv.
+
+        Params:
+            episode_length: The number of actions before each episode ends.
+        """
         assert episode_length >= 1
         self.observation_space = gym.spaces.Box(low=0, high=np.inf, shape=())
         self.action_space = gym.spaces.Box(low=0, high=np.inf, shape=())
@@ -207,10 +212,12 @@ class CountingEnv(gym.Env):  # pragma: no cover
         self.timestep = None
 
     def reset(self):
+        """Reset method for CountingEnv."""
         t, self.timestep = 0, 1
         return t
 
     def step(self, action):
+        """Step method for CountingEnv."""
         if self.timestep is None:
             raise RuntimeError("Need to reset before first step().")
         if self.timestep > self.episode_length:
