@@ -37,7 +37,7 @@ pip install -e .[dev]  # install extra tools useful for development
 
 ## Code style
 
-We follow a PEP8 code style with line width 88, and typically follow the [Google Code Style Guide](http://google.github.io/styleguide/pyguide.html),
+We follow a PEP8 code style with line length 88, and typically follow the [Google Code Style Guide](http://google.github.io/styleguide/pyguide.html),
 but defer to PEP8 where they conflict. We use the `black` autoformatter to avoid arguing over formatting.
 Docstrings follow the Google docstring convention defined [here](http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings),
 with an extensive example in the [Sphinx docs](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
