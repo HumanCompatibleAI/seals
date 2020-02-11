@@ -20,6 +20,7 @@ import gym
 import numpy as np
 
 Rollout = Sequence[Tuple[Any, Optional[float], bool, Mapping[str, Any]]]
+"""A sequence of 4-tuples (obs, rew, done, info) as returned by `get_rollout`."""
 
 
 def make_env_fixture(
