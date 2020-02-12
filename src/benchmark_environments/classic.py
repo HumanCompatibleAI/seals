@@ -8,12 +8,12 @@ register = util.curried_gym_register_as_decorator(__name__)
 
 @register("CartPole-v0")
 def cart_pole():
-    """Fixed-length variant of CartPole-v0."""
-    env = util.make_env_no_wrappers("CartPole-v0")
+    """Fixed-length variant of CartPole-v1."""
+    env = util.make_env_no_wrappers("CartPole-v1")
     env = util.EpisodeEndRewardWrapper(env, -1)
     env = util.AutoResetWrapper(env)
 
-    max_steps = util.get_gym_max_episode_steps("CartPole-v0")
+    max_steps = util.get_gym_max_episode_steps("CartPole-v1")
     if max_steps is not None:
         env = TimeLimit(env, max_steps)
     return env
