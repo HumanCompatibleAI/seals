@@ -35,7 +35,6 @@ def test_auto_reset_wrapper(episode_length=3, n_steps=100, n_manual_reset=2):
 @pytest.mark.parametrize("episode_end_reward", [-10, 0, 3.3])
 def test_ep_end_rew_wrapper(episode_end_reward, episode_length=3, n_steps=100):
     """Check that EpisodeEndRewardWrapper returns the correct rewards."""
-
     env = EpisodeEndRewardWrapper(
         CountingEnv(episode_length=episode_length), episode_end_reward)
     env.reset()
