@@ -26,7 +26,7 @@ def mountain_car():
     env = util.EpisodeEndRewardWrapper(env, 1)
     env = util.AutoResetWrapper(env)
 
-    max_steps = util.get_gym_max_episode_steps("CartPole-v0")
+    max_steps = util.get_gym_max_episode_steps("MountainCar-v0")
     if max_steps is not None:
         env = TimeLimit(env, max_steps)
     return env
