@@ -5,16 +5,7 @@ projects such as `imitation`, and may be useful in other codebases.
 """
 
 import re
-from typing import (
-    Any,
-    Callable,
-    Iterable,
-    Iterator,
-    Mapping,
-    Optional,
-    Sequence,
-    Tuple,
-)
+from typing import Any, Callable, Iterable, Iterator, Mapping, Optional, Sequence, Tuple
 
 import gym
 import numpy as np
