@@ -12,7 +12,7 @@ import benchmark_environments.mujoco  # noqa: F401 Import required for env regis
 
 
 def _eval_env(
-    env_name: str, total_timesteps: int
+    env_name: str, total_timesteps: int,
 ) -> Tuple[float, int]:  # pragma: no cover
     """Train PPO2 for `total_timesteps` on `env_name` and evaluate returns."""
     env = gym.make(env_name)
@@ -23,7 +23,7 @@ def _eval_env(
 
 @pytest.mark.expensive
 @pytest.mark.parametrize(
-    "env_base", ["HalfCheetah", "Ant", "Hopper", "Humanoid", "Swimmer", "Walker2d"]
+    "env_base", ["HalfCheetah", "Ant", "Hopper", "Humanoid", "Swimmer", "Walker2d"],
 )
 def test_fixed_env_model_as_good_as_gym_env_model(env_base: str):  # pragma: no cover
     """Compare original and modified MuJoCo v3 envs."""
@@ -31,7 +31,7 @@ def test_fixed_env_model_as_good_as_gym_env_model(env_base: str):  # pragma: no 
 
     gym_reward, _ = _eval_env(f"{env_base}-v3", total_timesteps=train_timesteps)
     fixed_reward, _ = _eval_env(
-        f"benchmark_environments/{env_base}-v0", total_timesteps=train_timesteps
+        f"benchmark_environments/{env_base}-v0", total_timesteps=train_timesteps,
     )
 
     epsilon = 0.1
