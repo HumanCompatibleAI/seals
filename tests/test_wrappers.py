@@ -1,12 +1,9 @@
 """Tests for wrapper classes."""
+
 import pytest
 
-from benchmark_environments.testing.envs import CountingEnv
-from benchmark_environments.util import (
-    AbsorbAfterDoneWrapper,
-    AutoResetWrapper,
-    FixedRewardAfterDoneWrapper,
-)
+from benchmark_environments import util
+from benchmark_environments.testing import envs
 
 
 def test_auto_reset_wrapper(episode_length=3, n_steps=100, n_manual_reset=2):
@@ -14,7 +11,7 @@ def test_auto_reset_wrapper(episode_length=3, n_steps=100, n_manual_reset=2):
 
     Also check that calls to .reset() do not interfere with automatic resets.
     """
-    env = AutoResetWrapper(CountingEnv(episode_length=episode_length))
+    env = util.AutoResetWrapper(envs.CountingEnv(episode_length=episode_length))
 
     for _ in range(n_manual_reset):
         obs = env.reset()
@@ -40,8 +37,8 @@ def test_auto_reset_wrapper(episode_length=3, n_steps=100, n_manual_reset=2):
 def test_ep_fixed_reward_after_done_wrapper(
         episode_end_reward, episode_length=3, n_steps=100):
     """Check that EpisodeEndRewardWrapper returns the correct rewards."""
-    env = FixedRewardAfterDoneWrapper(
-        CountingEnv(episode_length=episode_length),
+    env = util.FixedRewardAfterDoneWrapper(
+        envs.CountingEnv(episode_length=episode_length),
         episode_end_reward,
     )
     env.reset()
@@ -63,8 +60,8 @@ def test_absorb_repeat_custom_state(absorb_reward=-4,
                                     n_steps=100,
                                     n_manual_reset=3):
     """Check that AbsorbAfterDoneWrapper returns custom state."""
-    env = CountingEnv(episode_length=episode_length)
-    env = AbsorbAfterDoneWrapper(
+    env = envs.CountingEnv(episode_length=episode_length)
+    env = util.AbsorbAfterDoneWrapper(
         env, absorb_reward=absorb_reward, absorb_obs=absorb_obs)
 
     obs_list = []
@@ -88,8 +85,8 @@ def test_absorb_repeat_custom_state(absorb_reward=-4,
 
 def test_absorb_repeat_final_state(episode_length=6, n_steps=100, n_manual_reset=3):
     """Check that AbsorbAfterDoneWrapper can repeat final state."""
-    env = CountingEnv(episode_length=episode_length)
-    env = AbsorbAfterDoneWrapper(env, absorb_reward=-1, absorb_obs=None)
+    env = envs.CountingEnv(episode_length=episode_length)
+    env = util.AbsorbAfterDoneWrapper(env, absorb_reward=-1, absorb_obs=None)
 
     for _ in range(n_manual_reset):
         env.reset()

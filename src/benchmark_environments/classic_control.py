@@ -1,5 +1,6 @@
 """Adaptation of classic Gym environments for IRL."""
-from gym.wrappers import TimeLimit
+
+import gym.wrappers
 
 from benchmark_environments import util
 
@@ -17,7 +18,7 @@ def cart_pole():
     """
     env = util.make_env_no_wrappers("CartPole-v1")
     env = util.FixedRewardAfterDoneWrapper(env)
-    env = TimeLimit(env, 500)
+    env = gym.wrappers.TimeLimit(env, 500)
     return env
 
 
@@ -32,5 +33,5 @@ def mountain_car():
     """
     env = util.make_env_no_wrappers("MountainCar-v0")
     env = util.AbsorbAfterDoneWrapper(env)
-    env = TimeLimit(env, 200)
+    env = gym.wrappers.TimeLimit(env, 200)
     return env
