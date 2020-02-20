@@ -15,7 +15,7 @@ Rollout = Sequence[Tuple[Any, Optional[float], bool, Mapping[str, Any]]]
 
 
 def make_env_fixture(
-    skip_fn: Callable[[str], None]
+    skip_fn: Callable[[str], None],
 ) -> Callable[[str], Iterator[gym.Env]]:
     """Creates a fixture function, calling `skip_fn` when dependencies are missing.
 
