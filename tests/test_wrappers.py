@@ -35,11 +35,11 @@ def test_auto_reset_wrapper(episode_length=3, n_steps=100, n_manual_reset=2):
 
 @pytest.mark.parametrize("episode_end_reward", [-10, 0, 3.3])
 def test_ep_fixed_reward_after_done_wrapper(
-        episode_end_reward, episode_length=3, n_steps=100):
+    episode_end_reward, episode_length=3, n_steps=100
+):
     """Check that EpisodeEndRewardWrapper returns the correct rewards."""
     env = util.FixedRewardAfterDoneWrapper(
-        envs.CountingEnv(episode_length=episode_length),
-        episode_end_reward,
+        envs.CountingEnv(episode_length=episode_length), episode_end_reward,
     )
     env.reset()
 
@@ -54,15 +54,14 @@ def test_ep_fixed_reward_after_done_wrapper(
         assert rew == expected_rew
 
 
-def test_absorb_repeat_custom_state(absorb_reward=-4,
-                                    absorb_obs=-3.0,
-                                    episode_length=6,
-                                    n_steps=100,
-                                    n_manual_reset=3):
+def test_absorb_repeat_custom_state(
+    absorb_reward=-4, absorb_obs=-3.0, episode_length=6, n_steps=100, n_manual_reset=3
+):
     """Check that AbsorbAfterDoneWrapper returns custom state."""
     env = envs.CountingEnv(episode_length=episode_length)
     env = util.AbsorbAfterDoneWrapper(
-        env, absorb_reward=absorb_reward, absorb_obs=absorb_obs)
+        env, absorb_reward=absorb_reward, absorb_obs=absorb_obs
+    )
 
     obs_list = []
 
