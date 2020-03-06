@@ -25,7 +25,10 @@ class AutoResetWrapper(gym.Wrapper):
 
 
 class AbsorbAfterDoneWrapper(gym.Wrapper):
-    """Goes to absorb state after done=True. Always returns done=False.
+    """Transition into absorbing state instead of episode termination.
+    
+    When the environment being wrapped returns `done=True`, we return an absorbing observation.
+    This wrapper always returns `done=False`.
 
     A convenient way to add absorbing states to environments like MountainCar.
     """

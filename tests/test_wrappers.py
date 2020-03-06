@@ -57,7 +57,7 @@ def test_ep_fixed_reward_after_done_wrapper(
 def test_absorb_repeat_custom_state(
     absorb_reward=-4, absorb_obs=-3.0, episode_length=6, n_steps=100, n_manual_reset=3,
 ):
-    """Check that AbsorbAfterDoneWrapper returns custom state."""
+    """Check that AbsorbAfterDoneWrapper returns custom state and reward."""
     env = envs.CountingEnv(episode_length=episode_length)
     env = util.AbsorbAfterDoneWrapper(
         env, absorb_reward=absorb_reward, absorb_obs=absorb_obs,
