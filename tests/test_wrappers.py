@@ -63,14 +63,11 @@ def test_absorb_repeat_custom_state(
         env, absorb_reward=absorb_reward, absorb_obs=absorb_obs,
     )
 
-    obs_list = []
-
     for r in range(n_manual_reset):
         env.reset()
         for t in range(1, n_steps + 1):
             act = env.action_space.sample()
             obs, rew, done, _ = env.step(act)
-            obs_list.append(obs)  # DEBUG
             assert done is False
             if t > episode_length:
                 expected_obs = absorb_obs
