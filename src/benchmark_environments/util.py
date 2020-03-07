@@ -94,41 +94,6 @@ class AbsorbAfterDoneWrapper(gym.Wrapper):
         return obs, rew, False, info
 
 
-class FixedRewardAfterDoneWrapper(gym.Wrapper):
-    """After the inner environment returns done=True, modify the returned reward.
-
-    Always returns done=False so that the episode can continue until reset().
-    """
-
-    def __init__(self, env: gym.Env, end_reward: float = 0.0):
-        """Initialize wrapper.
-
-        Args:
-            env: The wrapped Env.
-            end_reward: The reward returned after the inner environment returns
-                done=True from `step()`.
-        """
-        super().__init__(env)
-        self.saw_done = None
-        self.end_reward = end_reward
-
-    def reset(self, *args, **kwargs):
-        """Reset the environment."""
-        self.saw_done = False
-        return self.env.reset(*args, **kwargs)
-
-    def step(self, action):
-        """Advance the environment by one step.
-
-        This wrapped `step()` always returns done=False.
-        """
-        obs, rew, done, info = self.env.step(action)
-        if self.saw_done:
-            rew = self.end_reward
-        self.saw_done = self.saw_done or done
-        return obs, rew, False, info
-
-
 def make_env_no_wrappers(env_name: str, **kwargs) -> gym.Env:
     """Gym sometimes wraps envs in TimeLimit before returning from gym.make().
 
@@ -180,7 +145,7 @@ def _gym_register_as_decorator(
     return func
 
 
-def curried_gym_register_as_decorator(module_name: str) -> Callable[[str], Callable]:
+def curried_gym_register_as_decorator(module_name: str) -> Callable[..., Callable]:
     """Two-staged curry that builds a easy-to-use `gym.register` decorator.
 
     See `benchmark_environments.classic` for example usage.

@@ -1,7 +1,5 @@
 """Tests for wrapper classes."""
 
-import pytest
-
 from benchmark_environments import util
 from benchmark_environments.testing import envs
 
@@ -31,27 +29,6 @@ def test_auto_reset_wrapper(episode_length=3, n_steps=100, n_manual_reset=2):
             else:
                 assert "terminal_observation" not in info
                 assert rew == expected_obs * 10
-
-
-@pytest.mark.parametrize("episode_end_reward", [-10, 0, 3.3])
-def test_ep_fixed_reward_after_done_wrapper(
-    episode_end_reward, episode_length=3, n_steps=100,
-):
-    """Check that EpisodeEndRewardWrapper returns the correct rewards."""
-    env = util.FixedRewardAfterDoneWrapper(
-        envs.CountingEnv(episode_length=episode_length), episode_end_reward,
-    )
-    env.reset()
-
-    for t in range(1, n_steps + 1):
-        act = env.action_space.sample()
-        _, rew, done, _ = env.step(act)
-        assert done is False
-        if t > episode_length:
-            expected_rew = episode_end_reward
-        else:
-            expected_rew = t * 10.0
-        assert rew == expected_rew
 
 
 def test_absorb_repeat_custom_state(

@@ -1,25 +1,46 @@
 """Adaptation of classic Gym environments for IRL."""
 
+import warnings
+
+import gym.envs.classic_control
 import gym.wrappers
+import numpy as np
 
 from benchmark_environments import util
 
 register = util.curried_gym_register_as_decorator(__name__)
 
 
-@register("CartPole-v0")
-def cart_pole():
+@register("CartPole-v0", max_episode_steps=500)
+class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
     """Fixed-length variant of CartPole-v1.
 
-    If the agent fails (i.e. pole falls over or CartPole exits the screen),
-    all rewards become 0 for the duration of the episode.
+    Reward is 1.0 whenever the CartPole is an "ok" state (i.e. the pole is upright
+    and the cart is on the screen). Otherwise reward is 0.0.
 
-    Done is always returned on timestep 500 only.
+    Done is always False. (Though note that by default, this environment is wrapped
+    in `TimeLimit` with max steps 500.)
     """
-    env = util.make_env_no_wrappers("CartPole-v1")
-    env = util.FixedRewardAfterDoneWrapper(env)
-    env = gym.wrappers.TimeLimit(env, 500)
-    return env
+
+    def step(self, action):
+        """Step function for FixedHorizonCartPole."""
+        with warnings.catch_warnings():
+            # Filter out CartPoleEnv warning for calling step() beyond done=True.
+            warnings.filterwarnings("ignore", "You are calling")
+            super().step(action)
+
+        self.state = list(self.state)
+        self.state[2] %= 2 * np.pi  # Normalize pole theta.
+        x, _, theta, _ = self.state
+        state_fail = bool(
+            x < -self.x_threshold
+            or x > self.x_threshold
+            or theta < -self.theta_threshold_radians
+            or theta > self.theta_threshold_radians,
+        )
+
+        rew = 0.0 if state_fail else 1.0
+        return np.array(self.state), rew, False, {}
 
 
 @register("MountainCar-v0")
