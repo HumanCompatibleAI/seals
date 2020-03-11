@@ -97,7 +97,7 @@ class AbsorbAfterDoneWrapper(gym.Wrapper):
 def make_env_no_wrappers(env_name: str, **kwargs) -> gym.Env:
     """Gym sometimes wraps envs in TimeLimit before returning from gym.make().
 
-    This helper method builds directly from step to avoid this wrapper.
+    This helper method builds directly from spec to avoid this wrapper.
     """
     return gym.envs.registry.env_specs[env_name].make(**kwargs)
 
