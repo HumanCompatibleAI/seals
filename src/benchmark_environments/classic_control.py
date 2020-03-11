@@ -36,7 +36,7 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
         theta = (theta + np.pi) % (2 * np.pi) - np.pi
 
         state_ok = bool(
-            abs(x) < self.x_threshold and abs(theta) < self.theta_threshold_radians
+            abs(x) < self.x_threshold and abs(theta) < self.theta_threshold_radians,
         )
 
         rew = 1.0 if state_ok else 0.0
