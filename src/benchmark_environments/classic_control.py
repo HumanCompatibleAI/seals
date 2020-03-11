@@ -26,7 +26,7 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
         """Step function for FixedHorizonCartPole."""
         with warnings.catch_warnings():
             # Filter out CartPoleEnv warning for calling step() beyond done=True.
-            warnings.filterwarnings("ignore", "You are calling")
+            warnings.filterwarnings("ignore", ".*You are calling.*")
             super().step(action)
 
         self.state = list(self.state)
