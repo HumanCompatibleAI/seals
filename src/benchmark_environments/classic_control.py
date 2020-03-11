@@ -33,18 +33,13 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
         x, _, theta, _ = self.state
 
         # Normalize theta to [-pi, pi] range.
-        theta += np.pi
-        theta %= 2 * np.pi
-        theta -= np.pi
+        theta = (theta + np.pi) % (2 * np.pi) - np.pi
 
-        state_fail = bool(
-            x < -self.x_threshold
-            or x > self.x_threshold
-            or theta < -self.theta_threshold_radians
-            or theta > self.theta_threshold_radians,
+        state_ok = bool(
+            abs(x) < self.x_threshold and abs(theta) < self.theta_threshold_radians
         )
 
-        rew = 0.0 if state_fail else 1.0
+        rew = 1.0 if state_ok else 0.0
         return np.array(self.state), rew, False, {}
 
 
