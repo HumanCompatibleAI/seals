@@ -34,7 +34,7 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
 
         # Normalize theta to [-pi, pi] range.
         theta += np.pi
-        theta %= 2*np.pi
+        theta %= 2 * np.pi
         theta -= np.pi
 
         state_fail = bool(
