@@ -11,6 +11,8 @@ from gym.envs.mujoco import (
     walker2d_v3,
 )
 
+from benchmark_environments import util
+
 
 def _include_position_in_observation(cls):
     old_init = cls.__init__
@@ -64,13 +66,9 @@ class Walker2dEnv(walker2d_v3.Walker2dEnv):
     """Walker2d with position observation and no early termination."""
 
 
-def _get_gym_v3_max_episode_steps(env_base_):
-    return gym.envs.registry.env_specs[f"{env_base_}-v3"].max_episode_steps
-
-
 for env_base in ["HalfCheetah", "Ant", "Hopper", "Humanoid", "Swimmer", "Walker2d"]:
     gym.register(
         id=f"benchmark_environments/{env_base}-v0",
         entry_point=f"benchmark_environments.mujoco:{env_base}Env",
-        max_episode_steps=_get_gym_v3_max_episode_steps(env_base),
+        max_episode_steps=util.get_gym_max_episode_steps(f"{env_base}-v3"),
     )

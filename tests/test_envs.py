@@ -3,7 +3,9 @@
 import gym
 import pytest
 
-import benchmark_environments.mujoco  # noqa: F401 Import required for env registration
+# Unused (noqa: F401) imports required for env registration.
+import benchmark_environments.classic_control  # noqa: F401
+import benchmark_environments.mujoco  # noqa: F401
 from benchmark_environments.testing import envs
 
 ENV_NAMES = [
