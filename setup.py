@@ -50,14 +50,12 @@ TESTS_REQUIRE = [
 setup(
     name="benchmark_environments",
     version=get_version(),
-    description=("Implementation of modern IRL and imitation learning algorithms."),
-    author="Center for Human-Compatible AI and Google",
+    description="Benchmark environments for reward and imitation learning",
+    author="Center for Human-Compatible AI",
     python_requires=">=3.7.0",
     packages=find_packages("src"),
     package_dir={"": "src"},
-    package_data={
-        "benchmark_environments": ["py.typed", "envs/examples/airl_envs/assets/*.xml"],
-    },
+    package_data={"benchmark_environments": ["py.typed"]},
     install_requires=["gym[mujoco]"],
     tests_require=TESTS_REQUIRE,
     extras_require={
