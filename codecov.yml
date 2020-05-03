@@ -5,17 +5,21 @@ coverage:
       main:
         paths:
           - "src/benchmark_environments/"
+          - "!src/benchmark_environments/testing/"
       tests:
         # Should not have dead code in our tests
         target: 100%
         paths:
           - "tests/"
+          - "src/benchmark_environments/testing/"
     patch:
       default: false
       main:
         paths:
           - "src/benchmark_environments/"
+          - "!src/benchmark_environments/testing/"
       tests:
         target: 100%
         paths:
           - "tests/"
+          - "src/benchmark_environments/testing/"
