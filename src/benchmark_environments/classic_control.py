@@ -8,10 +8,7 @@ import numpy as np
 
 from benchmark_environments import util
 
-register = util.curried_gym_register_as_decorator(__name__)
 
-
-@register("CartPole-v0", max_episode_steps=500)
 class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
     """Fixed-length variant of CartPole-v1.
 
@@ -43,7 +40,6 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
         return np.array(self.state), rew, False, {}
 
 
-@register("MountainCar-v0")
 def mountain_car():
     """Fixed-length variant of MountainCar-v0.
 
@@ -55,5 +51,4 @@ def mountain_car():
     """
     env = util.make_env_no_wrappers("MountainCar-v0")
     env = util.AbsorbAfterDoneWrapper(env)
-    env = gym.wrappers.TimeLimit(env, 200)
     return env
