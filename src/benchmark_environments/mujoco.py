@@ -1,5 +1,7 @@
 """Adaptation of MuJoCo environments for IRL."""
 
+import functools
+
 import gym
 import gym.envs
 from gym.envs.mujoco import (
@@ -15,25 +17,20 @@ from benchmark_environments import util
 
 
 def _include_position_in_observation(cls):
-    old_init = cls.__init__
-
-    def new_init(*args, **kwargs):
-        kwargs["exclude_current_positions_from_observation"] = False
-        old_init(*args, **kwargs)
-
-    cls.__init__ = new_init
+    cls.__init__ = functools.partialmethod(
+        cls.__init__, exclude_current_positions_from_observation=False,
+    )
     return cls
 
 
 def _no_early_termination(cls):
-    cls.done = False
+    cls.__init__ = functools.partialmethod(cls.__init__, terminate_when_unhealthy=False)
     return cls
 
 
 @_include_position_in_observation
-@_no_early_termination
 class HalfCheetahEnv(half_cheetah_v3.HalfCheetahEnv):
-    """HalfCheetah with position observation and no early termination."""
+    """HalfCheetah with position observation. Naturally does not terminate early."""
 
 
 @_include_position_in_observation
@@ -55,9 +52,8 @@ class HumanoidEnv(humanoid_v3.HumanoidEnv):
 
 
 @_include_position_in_observation
-@_no_early_termination
 class SwimmerEnv(swimmer_v3.SwimmerEnv):
-    """Swimmer with position observation and no early termination."""
+    """Swimmer with position observation. Naturally does not terminate early."""
 
 
 @_include_position_in_observation
