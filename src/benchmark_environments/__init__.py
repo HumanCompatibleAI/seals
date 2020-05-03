@@ -1,3 +1,32 @@
 """Benchmark environments for reward modeling and imitation."""
 
-__version__ = "0.01"
+import gym
+
+from benchmark_environments import util
+from benchmark_environments.version import VERSION as __version__  # noqa: F401
+
+GYM_ID_PREFIX = "benchmark_environments"
+
+
+# Classic control
+
+gym.register(
+    id=f"{GYM_ID_PREFIX}/CartPole-v0",
+    entry_point="benchmark_environments.classic_control:FixedHorizonCartPole",
+    max_episode_steps=500,
+)
+
+gym.register(
+    id=f"{GYM_ID_PREFIX}/MountainCar-v0",
+    entry_point="benchmark_environments.classic_control:mountain_car",
+    max_episode_steps=200,
+)
+
+# MuJoCo
+
+for env_base in ["Ant", "HalfCheetah", "Hopper", "Humanoid", "Swimmer", "Walker2d"]:
+    gym.register(
+        id=f"{GYM_ID_PREFIX}/{env_base}-v0",
+        entry_point=f"benchmark_environments.mujoco:{env_base}Env",
+        max_episode_steps=util.get_gym_max_episode_steps(f"{env_base}-v3"),
+    )
