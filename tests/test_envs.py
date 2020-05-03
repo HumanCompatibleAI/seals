@@ -3,7 +3,7 @@
 import gym
 import pytest
 
-import benchmark_environments  # noqa: F401
+import benchmark_environments  # noqa: F401 required for env registration
 from benchmark_environments.testing import envs
 
 ENV_NAMES = [
