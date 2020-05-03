@@ -3,15 +3,13 @@
 import gym
 import pytest
 
-# Unused (noqa: F401) imports required for env registration.
-import benchmark_environments.classic_control  # noqa: F401
-import benchmark_environments.mujoco  # noqa: F401
+import benchmark_environments  # noqa: F401
 from benchmark_environments.testing import envs
 
 ENV_NAMES = [
     env_spec.id
     for env_spec in gym.envs.registration.registry.all()
-    if env_spec.id.startswith("benchmark_environments/")
+    if env_spec.id.startswith(f"{benchmark_environments.GYM_ID_PREFIX}/")
 ]
 
 DETERMINISTIC_ENVS = []

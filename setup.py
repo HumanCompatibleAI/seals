@@ -1,7 +1,24 @@
 """setup.py for benchmark_environments project."""
 
+import os
+import sys
+
 from setuptools import find_packages, setup
-import src.benchmark_environments  # pytype: disable=import-error
+
+
+def get_version() -> str:
+    """Load version from version.py.
+
+    Changes system path internally to avoid missing dependencies breaking imports.
+    """
+    sys.path.insert(
+        0, os.path.join(os.path.dirname(__file__), "src", "benchmark_environments"),
+    )
+    from version import VERSION  # pytype:disable=import-error
+
+    del sys.path[0]
+    return VERSION
+
 
 TF_VERSION = ">=1.15.0,<2.0"
 TESTS_REQUIRE = [
@@ -32,7 +49,7 @@ TESTS_REQUIRE = [
 
 setup(
     name="benchmark_environments",
-    version=src.benchmark_environments.__version__,
+    version=get_version(),
     description=("Implementation of modern IRL and imitation learning algorithms."),
     author="Center for Human-Compatible AI and Google",
     python_requires=">=3.7.0",
