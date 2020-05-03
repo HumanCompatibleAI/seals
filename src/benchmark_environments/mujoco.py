@@ -2,8 +2,6 @@
 
 import functools
 
-import gym
-import gym.envs
 from gym.envs.mujoco import (
     ant_v3,
     half_cheetah_v3,
@@ -12,8 +10,6 @@ from gym.envs.mujoco import (
     swimmer_v3,
     walker2d_v3,
 )
-
-from benchmark_environments import util
 
 
 def _include_position_in_observation(cls):
@@ -29,14 +25,14 @@ def _no_early_termination(cls):
 
 
 @_include_position_in_observation
-class HalfCheetahEnv(half_cheetah_v3.HalfCheetahEnv):
-    """HalfCheetah with position observation. Naturally does not terminate early."""
-
-
-@_include_position_in_observation
 @_no_early_termination
 class AntEnv(ant_v3.AntEnv):
     """Ant with position observation and no early termination."""
+
+
+@_include_position_in_observation
+class HalfCheetahEnv(half_cheetah_v3.HalfCheetahEnv):
+    """HalfCheetah with position observation and no early termination."""
 
 
 @_include_position_in_observation
@@ -60,11 +56,3 @@ class SwimmerEnv(swimmer_v3.SwimmerEnv):
 @_no_early_termination
 class Walker2dEnv(walker2d_v3.Walker2dEnv):
     """Walker2d with position observation and no early termination."""
-
-
-for env_base in ["HalfCheetah", "Ant", "Hopper", "Humanoid", "Swimmer", "Walker2d"]:
-    gym.register(
-        id=f"benchmark_environments/{env_base}-v0",
-        entry_point=f"benchmark_environments.mujoco:{env_base}Env",
-        max_episode_steps=util.get_gym_max_episode_steps(f"{env_base}-v3"),
-    )
