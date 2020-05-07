@@ -139,17 +139,12 @@ def test_rollout_schema(
 ) -> None:
     """Check custom environments have correct types on `step` and `reset`.
 
-    Note this may continue taking `step()` action after `done` is True. This is
-    an abuse of the Gym API but we would like environments to handle this case
-    gracefully in any case.
-
     Args:
         env: The environment to test.
         steps_after_done: The number of steps to take after `done` is True, the nominal
             episode termination. This is an abuse of the Gym API, but we would like the
             environments to handle this case gracefully.
-        max_steps: If we do not get `done` after this many timesteps, stop and raise an
-            error.
+        max_steps: Test fails if we do not get `done` after this many timesteps.
 
     Raises:
         AssertionError if test fails.
