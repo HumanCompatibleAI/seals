@@ -22,14 +22,14 @@ env = pytest.fixture(envs.make_env_fixture(skip_fn=pytest.skip))
 class TestEnvs:
     """Battery of simple tests for environments."""
 
-    def test_seed(self, env, env_name):
+    def test_seed(self, env: gym.Env, env_name: str):
         """Tests environment seeding."""
         envs.test_seed(env, env_name, DETERMINISTIC_ENVS)
 
-    def test_premature_step(self, env):
+    def test_premature_step(self, env: gym.Env):
         """Tests if step() before reset() raises error."""
         envs.test_premature_step(env, skip_fn=pytest.skip, raises_fn=pytest.raises)
 
-    def test_rollout_schema(self, env):
+    def test_rollout_schema(self, env: gym.Env):
         """Tests if environments have correct types on `step()` and `reset()`."""
         envs.test_rollout_schema(env)

@@ -134,8 +134,17 @@ def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) ->
     assert same_obs == is_deterministic
 
 
-def test_rollout_schema(env: gym.Env, num_steps: int = 4) -> None:
+def test_rollout_schema(
+    env: gym.Env, steps_after_done: int = 10, max_steps: int = 10000,
+) -> None:
     """Check custom environments have correct types on `step` and `reset`.
+
+    Args:
+        env: The environment to test.
+        steps_after_done: The number of steps to take after `done` is True, the nominal
+            episode termination. This is an abuse of the Gym API, but we would like the
+            environments to handle this case gracefully.
+        max_steps: Test fails if we do not get `done` after this many timesteps.
 
     Raises:
         AssertionError if test fails.
@@ -144,13 +153,25 @@ def test_rollout_schema(env: gym.Env, num_steps: int = 4) -> None:
     obs = env.reset()
     assert obs in obs_space
 
-    for _ in range(num_steps):
+    def _sample_and_check():
         act = env.action_space.sample()
         obs, rew, done, info = env.step(act)
         assert obs in obs_space
         assert isinstance(rew, float)
         assert isinstance(done, bool)
         assert isinstance(info, dict)
+        return done
+
+    for _ in range(max_steps):
+        done = _sample_and_check()
+        if done:
+            break
+
+    assert done is True, "did not get to end of episode"
+
+    for _ in range(steps_after_done):
+        done = _sample_and_check()
+        assert done is True, "episode restarted without explicit reset"
 
 
 def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
