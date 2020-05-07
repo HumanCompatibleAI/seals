@@ -10,6 +10,8 @@ from typing import Any, Callable, Iterable, Iterator, Mapping, Optional, Sequenc
 import gym
 import numpy as np
 
+from benchmark_environments import util
+
 Rollout = Sequence[Tuple[Any, Optional[float], bool, Mapping[str, Any]]]
 """A sequence of 4-tuples (obs, rew, done, info) as returned by `get_rollout`."""
 
@@ -134,12 +136,33 @@ def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) ->
     assert same_obs == is_deterministic
 
 
-def test_rollout_schema(env: gym.Env, num_steps: int = 4) -> None:
+def test_rollout_schema(
+    env: gym.Env, env_name: Optional[str] = None, num_steps: int = 100,
+) -> None:
     """Check custom environments have correct types on `step` and `reset`.
+
+    Note this may continue taking `step()` action after `done` is True. This is
+    an abuse of the Gym API but we would like environments to handle this case
+    gracefully in any case.
+
+    Args:
+        env: The environment to test.
+        env_name: The name of the environment in the Gym registry. If specified,
+            the maximum episode length of the environment is retrieved from the
+            registry, and a rollout is performed for this plus 10 timesteps.
+            If not specified or the registry does not contain this information,
+            falls back to `num_steps`.
+        num_steps: The default number of steps to perform the rollout for.
 
     Raises:
         AssertionError if test fails.
     """
+    if env_name is not None:
+        max_horizon = util.get_gym_max_episode_steps(env_name)
+        if max_horizon is not None:
+            # Continue a little beyond episode termination to stress-test
+            num_steps = max_horizon + 10
+
     obs_space = env.observation_space
     obs = env.reset()
     assert obs in obs_space
@@ -151,6 +174,8 @@ def test_rollout_schema(env: gym.Env, num_steps: int = 4) -> None:
         assert isinstance(rew, float)
         assert isinstance(done, bool)
         assert isinstance(info, dict)
+
+    assert done is True, "did not get to end of episode"
 
 
 def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
