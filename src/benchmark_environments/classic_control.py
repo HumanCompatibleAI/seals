@@ -2,8 +2,8 @@
 
 import warnings
 
+from gym import spaces
 import gym.envs.classic_control
-import gym.wrappers
 import numpy as np
 
 from benchmark_environments import util
@@ -19,6 +19,19 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
     in `TimeLimit` with max steps 500.)
     """
 
+    def __init__(self):
+        """Builds FixedHorizonCartPole, modifying observation_space from Gym parent."""
+        super().__init__()
+
+        high = [
+            np.finfo(np.float32).max,  # x axis
+            np.finfo(np.float32).max,  # x velocity
+            np.pi,  # theta in radians
+            np.finfo(np.float32).max,  # theta velocity
+        ]
+        high = np.array(high)
+        self.observation_space = spaces.Box(-high, high, dtype=np.float32)
+
     def step(self, action):
         """Step function for FixedHorizonCartPole."""
         with warnings.catch_warnings():
@@ -31,6 +44,7 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
 
         # Normalize theta to [-pi, pi] range.
         theta = (theta + np.pi) % (2 * np.pi) - np.pi
+        self.state[2] = theta
 
         state_ok = bool(
             abs(x) < self.x_threshold and abs(theta) < self.theta_threshold_radians,
