@@ -4,7 +4,6 @@ import gym
 import pytest
 
 import benchmark_environments  # noqa: F401 required for env registration
-from benchmark_environments import util
 from benchmark_environments.testing import envs
 
 ENV_NAMES = [
@@ -31,7 +30,6 @@ class TestEnvs:
         """Tests if step() before reset() raises error."""
         envs.test_premature_step(env, skip_fn=pytest.skip, raises_fn=pytest.raises)
 
-    def test_rollout_schema(self, env: gym.Env, env_name: str):
+    def test_rollout_schema(self, env: gym.Env):
         """Tests if environments have correct types on `step()` and `reset()`."""
-        max_episode = util.get_gym_max_episode_steps(env_name) or 100
-        envs.test_rollout_schema(env, num_steps=max_episode + 10)
+        envs.test_rollout_schema(env)

@@ -10,8 +10,6 @@ from typing import Any, Callable, Iterable, Iterator, Mapping, Optional, Sequenc
 import gym
 import numpy as np
 
-from benchmark_environments import util
-
 Rollout = Sequence[Tuple[Any, Optional[float], bool, Mapping[str, Any]]]
 """A sequence of 4-tuples (obs, rew, done, info) as returned by `get_rollout`."""
 
@@ -137,7 +135,7 @@ def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) ->
 
 
 def test_rollout_schema(
-    env: gym.Env, env_name: Optional[str] = None, num_steps: int = 100,
+    env: gym.Env, steps_after_done: int = 10, max_steps: int = 10000,
 ) -> None:
     """Check custom environments have correct types on `step` and `reset`.
 
@@ -147,35 +145,38 @@ def test_rollout_schema(
 
     Args:
         env: The environment to test.
-        env_name: The name of the environment in the Gym registry. If specified,
-            the maximum episode length of the environment is retrieved from the
-            registry, and a rollout is performed for this plus 10 timesteps.
-            If not specified or the registry does not contain this information,
-            falls back to `num_steps`.
-        num_steps: The default number of steps to perform the rollout for.
+        steps_after_done: The number of steps to take after `done` is True, the nominal
+            episode termination. This is an abuse of the Gym API, but we would like the
+            environments to handle this case gracefully.
+        max_steps: If we do not get `done` after this many timesteps, stop and raise an
+            error.
 
     Raises:
         AssertionError if test fails.
     """
-    if env_name is not None:
-        max_horizon = util.get_gym_max_episode_steps(env_name)
-        if max_horizon is not None:
-            # Continue a little beyond episode termination to stress-test
-            num_steps = max_horizon + 10
-
     obs_space = env.observation_space
     obs = env.reset()
     assert obs in obs_space
 
-    for _ in range(num_steps):
+    def _sample_and_check():
         act = env.action_space.sample()
         obs, rew, done, info = env.step(act)
         assert obs in obs_space
         assert isinstance(rew, float)
         assert isinstance(done, bool)
         assert isinstance(info, dict)
+        return done
+
+    for _ in range(max_steps):
+        done = _sample_and_check()
+        if done:
+            break
 
     assert done is True, "did not get to end of episode"
+
+    for _ in range(steps_after_done):
+        done = _sample_and_check()
+        assert done is True, "episode restarted without explicit reset"
 
 
 def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
