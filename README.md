@@ -37,7 +37,7 @@ import seals
 env = gym.make('seals/CartPole-v0')
 ```
 
-We make releases periodically, but if you wish to use the latest versino of the code, you can
+We make releases periodically, but if you wish to use the latest version of the code, you can
 install directly from Git master:
 
 ```bash
