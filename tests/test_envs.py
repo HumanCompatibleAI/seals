@@ -3,13 +3,13 @@
 import gym
 import pytest
 
-import benchmark_environments  # noqa: F401 required for env registration
-from benchmark_environments.testing import envs
+import seals  # noqa: F401 required for env registration
+from seals.testing import envs
 
 ENV_NAMES = [
     env_spec.id
     for env_spec in gym.envs.registration.registry.all()
-    if env_spec.id.startswith(f"{benchmark_environments.GYM_ID_PREFIX}/")
+    if env_spec.id.startswith(f"{seals.GYM_ID_PREFIX}/")
 ]
 
 DETERMINISTIC_ENVS = []

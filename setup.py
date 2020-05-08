@@ -1,4 +1,4 @@
-"""setup.py for benchmark_environments project."""
+"""setup.py for seals project."""
 
 import os
 import sys
@@ -12,7 +12,7 @@ def get_version() -> str:
     Changes system path internally to avoid missing dependencies breaking imports.
     """
     sys.path.insert(
-        0, os.path.join(os.path.dirname(__file__), "src", "benchmark_environments"),
+        0, os.path.join(os.path.dirname(__file__), "src", "seals"),
     )
     from version import VERSION  # pytype:disable=import-error
 
@@ -48,14 +48,14 @@ TESTS_REQUIRE = [
 ]
 
 setup(
-    name="benchmark_environments",
+    name="seals",
     version=get_version(),
-    description="Benchmark environments for reward and imitation learning",
+    description="Suite of Environments for Algorithms that Learn Specifications",
     author="Center for Human-Compatible AI",
     python_requires=">=3.7.0",
     packages=find_packages("src"),
     package_dir={"": "src"},
-    package_data={"benchmark_environments": ["py.typed"]},
+    package_data={"seals": ["py.typed"]},
     install_requires=["gym[mujoco]"],
     tests_require=TESTS_REQUIRE,
     extras_require={

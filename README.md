@@ -2,26 +2,46 @@
 
 **Status**: alpha, pre-release.
 
-benchmark-environments is a suite of benchmarks for imitation-learning and
-reward-learning algorithms. It is currently a work-in-progress, but we intend for it to eventually
-contain a suite of diagnostic tasks for reward-learning, wrappers around common RL benchmark
-environments that help to avoid common pitfalls in benchmarking (e.g. by masking visible score
-counters in Gym Atari tasks), and new challenge tasks for imitation- and reward-learning. This
-benchmark suite is a complement to our  [https://github.com/humancompatibleai/imitation/](imitation)
-package of baseline algorithms for imitation learning.
+The [CHAI](https://humancompatible.ai/) Suite of Environments for Algorithms that Learn 
+Specifications (SEALS) is a toolkit for evaluating specification learning algorithms, such as
+reward or imitation learning. The environments are compatible with [Gym](https://github.com/openai/gym),
+but are designed to test algorithms that learn from user data, without requiring a procedurally
+specified reward function.
 
-# Usage
+This is currently a work-in progress. While you are welcome to use the repository, we may make
+breaking changes at any time without prior notice. We intend for it to eventually contain:
+
+  - A suite of diagnostic tasks for reward learning.
+  - Wrappers around common RL benchmark environments that help to avoid common pitfalls in
+    benchmarking (e.g. by masking visible score counters in Gym Atari tasks).
+  - New challenge tasks for specification learning algorithms.
+ 
+You may also be interested in our sister project [https://github.com/humancompatibleai/imitation/](imitation),
+providing implementations of a variety of imitation and reward learning algorithms.
+
+# Quickstart
 
 To install the latest release from PyPI, run:
  
 ```bash
-pip install benchmark-environments
+pip install seals
 ```
 
-To install from Git master:
+All SEALS environments are available in the Gym registry. Simply import it and then use as you
+would with your usual RL or specification learning algroithm:
 
 ```
-pip install git+https://github.com/HumanCompatibleAI/benchmark-environments.git
+import gym
+import seals
+
+env = gym.make('seals/CartPole-v0')
+```
+
+We make releases periodically, but if you wish to use the latest versino of the code, you can
+install directly from Git master:
+
+```
+pip install git+https://github.com/HumanCompatibleAI/seals.git
 ```
 
 # Contributing
@@ -29,8 +49,8 @@ pip install git+https://github.com/HumanCompatibleAI/benchmark-environments.git
 For development, clone the source code and create a virtual environment for this project:
 
  ```
-git clone git@github.com:HumanCompatibleAI/benchmark-environments.git
-cd benchmark-environments
+git clone git@github.com:HumanCompatibleAI/seals.git
+cd seals
 ./ci/build_venv.sh
 pip install -e .[dev]  # install extra tools useful for development
 ```
