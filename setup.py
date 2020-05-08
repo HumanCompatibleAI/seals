@@ -20,6 +20,12 @@ def get_version() -> str:
     return VERSION
 
 
+def get_readme() -> str:
+    """Retrieve content from README."""
+    with open("README.md", "r") as f:
+        return f.read()
+
+
 TF_VERSION = ">=1.15.0,<2.0"
 TESTS_REQUIRE = [
     # remove pin once https://github.com/nedbat/coveragepy/issues/881 fixed
@@ -51,6 +57,8 @@ setup(
     name="seals",
     version=get_version(),
     description="Suite of Environments for Algorithms that Learn Specifications",
+    long_description=get_readme(),
+    long_description_content_type="text/markdown",
     author="Center for Human-Compatible AI",
     python_requires=">=3.7.0",
     packages=find_packages("src"),
@@ -75,5 +83,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
     ],
 )
