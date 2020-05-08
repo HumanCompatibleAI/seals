@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/HumanCompatibleAI/benchmark-environments.svg?style=svg)](https://circleci.com/gh/HumanCompatibleAI/benchmark-environments) [![codecov](https://codecov.io/gh/HumanCompatibleAI/benchmark-environments/branch/master/graph/badge.svg)](https://codecov.io/gh/HumanCompatibleAI/benchmark-environments) 
+[![CircleCI](https://circleci.com/gh/HumanCompatibleAI/seals.svg?style=svg)](https://circleci.com/gh/HumanCompatibleAI/seals) [![codecov](https://codecov.io/gh/HumanCompatibleAI/seals/branch/master/graph/badge.svg)](https://codecov.io/gh/HumanCompatibleAI/seals)
 
 **Status**: alpha, pre-release.
 
