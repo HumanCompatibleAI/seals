@@ -30,7 +30,7 @@ pip install seals
 All SEALS environments are available in the Gym registry. Simply import it and then use as you
 would with your usual RL or specification learning algroithm:
 
-```
+```python
 import gym
 import seals
 
@@ -40,7 +40,7 @@ env = gym.make('seals/CartPole-v0')
 We make releases periodically, but if you wish to use the latest versino of the code, you can
 install directly from Git master:
 
-```
+```bash
 pip install git+https://github.com/HumanCompatibleAI/seals.git
 ```
 
@@ -48,7 +48,7 @@ pip install git+https://github.com/HumanCompatibleAI/seals.git
 
 For development, clone the source code and create a virtual environment for this project:
 
- ```
+```bash
 git clone git@github.com:HumanCompatibleAI/seals.git
 cd seals
 ./ci/build_venv.sh
