@@ -1,7 +1,7 @@
 """Tests for wrapper classes."""
 
-from benchmark_environments import util
-from benchmark_environments.testing import envs
+from seals import util
+from seals.testing import envs
 
 
 def test_auto_reset_wrapper(episode_length=3, n_steps=100, n_manual_reset=2):

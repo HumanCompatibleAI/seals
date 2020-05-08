@@ -6,7 +6,7 @@ from gym import spaces
 import gym.envs.classic_control
 import numpy as np
 
-from benchmark_environments import util
+from seals import util
 
 
 class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):

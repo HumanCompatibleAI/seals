@@ -48,7 +48,7 @@ commands:
           # Build a wheel then install to avoid copying whole directory (pip issue #2195)
           command: |
             python setup.py sdist bdist_wheel
-            pip install --upgrade dist/benchmark_environments-*.whl
+            pip install --upgrade dist/seals-*.whl
 
 jobs:
   lintandtype:
@@ -98,7 +98,7 @@ jobs:
           name: run tests
           command: |
             export DISPLAY=:0
-            pytest --cov=/venv/lib/python3.7/site-packages/benchmark_environments --cov=tests \
+            pytest --cov=/venv/lib/python3.7/site-packages/seals --cov=tests \
                    --junitxml=/tmp/test-reports/junit.xml \
                    --shard-id=${CIRCLE_NODE_INDEX} --num-shards=${CIRCLE_NODE_TOTAL} \
                     -n ${NUM_CPUS} -vv tests/
