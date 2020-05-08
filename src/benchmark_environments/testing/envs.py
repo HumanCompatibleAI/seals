@@ -170,8 +170,7 @@ def test_rollout_schema(
     assert done is True, "did not get to end of episode"
 
     for _ in range(steps_after_done):
-        done = _sample_and_check()
-        assert done is True, "episode restarted without explicit reset"
+        _sample_and_check()
 
 
 def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
