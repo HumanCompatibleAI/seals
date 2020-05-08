@@ -16,7 +16,7 @@ breaking changes at any time without prior notice. We intend for it to eventuall
     benchmarking (e.g. by masking visible score counters in Gym Atari tasks).
   - New challenge tasks for specification learning algorithms.
  
-You may also be interested in our sister project [https://github.com/humancompatibleai/imitation/](imitation),
+You may also be interested in our sister project [imitation](https://github.com/humancompatibleai/imitation/),
 providing implementations of a variety of imitation and reward learning algorithms.
 
 # Quickstart
