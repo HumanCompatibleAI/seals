@@ -26,7 +26,6 @@ def get_readme() -> str:
         return f.read()
 
 
-TF_VERSION = ">=1.15.0,<2.0"
 TESTS_REQUIRE = [
     # remove pin once https://github.com/nedbat/coveragepy/issues/881 fixed
     "black",
@@ -50,7 +49,6 @@ TESTS_REQUIRE = [
     "stable-baselines>=2.8.0",
     "tensorflow>=1.8.0,<2.0.0",
 ]
-
 DOCS_REQUIRE = [
     "sphinx",
     "sphinxcontrib-napoleon",
