@@ -47,10 +47,13 @@ TESTS_REQUIRE = [
     "pytest-shard",
     "pytest-xdist",
     "pytype",
-    "sphinx",
-    "sphinxcontrib-napoleon",
     "stable-baselines>=2.8.0",
     "tensorflow>=1.8.0,<2.0.0",
+]
+
+DOCS_REQUIRE = [
+    "sphinx",
+    "sphinxcontrib-napoleon",
 ]
 
 setup(
@@ -68,7 +71,8 @@ setup(
     tests_require=TESTS_REQUIRE,
     extras_require={
         # recommended packages for development
-        "dev": ["ipdb", "jupyter", *TESTS_REQUIRE],
+        "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE],
+        "docs": DOCS_REQUIRE,
         "test": TESTS_REQUIRE,
     },
     url="https://github.com/HumanCompatibleAI/benchmark-environments",
