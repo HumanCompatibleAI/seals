@@ -9,4 +9,4 @@ fi
 
 virtualenv -p python3.7 ${venv}
 source ${venv}/bin/activate
-pip install .[cpu,test]
+pip install .[cpu,docs,mujoco,test]

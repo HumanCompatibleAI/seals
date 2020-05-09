@@ -1,4 +1,7 @@
-[![CircleCI](https://circleci.com/gh/HumanCompatibleAI/seals.svg?style=svg)](https://circleci.com/gh/HumanCompatibleAI/seals) [![codecov](https://codecov.io/gh/HumanCompatibleAI/seals/branch/master/graph/badge.svg)](https://codecov.io/gh/HumanCompatibleAI/seals)
+[![CircleCI](https://circleci.com/gh/HumanCompatibleAI/seals.svg?style=svg)](https://circleci.com/gh/HumanCompatibleAI/seals)
+[![Documentation Status](https://readthedocs.org/projects/chai-seals/badge/?version=latest)](https://chai-seals.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/HumanCompatibleAI/seals/branch/master/graph/badge.svg)](https://codecov.io/gh/HumanCompatibleAI/seals)
+[![PyPI version](https://badge.fury.io/py/seals.svg)](https://badge.fury.io/py/seals)
 
 **Status**: alpha, pre-release.
 

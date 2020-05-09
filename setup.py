@@ -26,7 +26,6 @@ def get_readme() -> str:
         return f.read()
 
 
-TF_VERSION = ">=1.15.0,<2.0"
 TESTS_REQUIRE = [
     # remove pin once https://github.com/nedbat/coveragepy/issues/881 fixed
     "black",
@@ -47,10 +46,12 @@ TESTS_REQUIRE = [
     "pytest-shard",
     "pytest-xdist",
     "pytype",
-    "sphinx",
-    "sphinxcontrib-napoleon",
     "stable-baselines>=2.8.0",
     "tensorflow>=1.8.0,<2.0.0",
+]
+DOCS_REQUIRE = [
+    "sphinx",
+    "sphinxcontrib-napoleon",
 ]
 
 setup(
@@ -64,12 +65,16 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     package_data={"seals": ["py.typed"]},
-    install_requires=["gym[mujoco]"],
+    install_requires=["gym"],
     tests_require=TESTS_REQUIRE,
     extras_require={
         # recommended packages for development
-        "dev": ["ipdb", "jupyter", *TESTS_REQUIRE],
+        "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE],
+        "docs": DOCS_REQUIRE,
         "test": TESTS_REQUIRE,
+        # We'd like to specify `gym[mujoco]`, but this is a no-op when Gym is already
+        # installed. See https://github.com/pypa/pip/issues/4957 for issue.
+        "mujoco": ["mujoco_py>=1.50, <2.0", "imageio"],
     },
     url="https://github.com/HumanCompatibleAI/benchmark-environments",
     license="MIT",
