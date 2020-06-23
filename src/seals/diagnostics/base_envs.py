@@ -16,9 +16,11 @@ class ResettableEnv(gym.Env, abc.ABC):
     Specifically, these environments provide oracle access to sample from
     the initial state distribution and transition dynamics, and compute the
     reward and termination condition. Almost all simulated environments can
-    meet these criteria."""
+    meet these criteria.
+    """
 
     def __init__(self):
+        """Initialize env."""
         self._state_space = None
         self._action_space = None
         self.cur_state = None
@@ -66,6 +68,7 @@ class ResettableEnv(gym.Env, abc.ABC):
         return self._n_actions_taken
 
     def seed(self, seed=None):
+        """Set random seed."""
         if seed is None:
             # Gym API wants list of seeds to be returned for some reason, so
             # generate a seed explicitly in this case
@@ -74,11 +77,13 @@ class ResettableEnv(gym.Env, abc.ABC):
         return [seed]
 
     def reset(self):
+        """Reset episode and return initial observation."""
         self.cur_state = self.initial_state()
         self._n_actions_taken = 0
         return self.obs_from_state(self.cur_state)
 
     def step(self, action):
+        """Transition state using given action."""
         if self.cur_state is None or self._n_actions_taken is None:
             raise ValueError("Need to call reset() before first step()")
 
@@ -107,18 +112,17 @@ class TabularModelEnv(ResettableEnv, abc.ABC):
         """Build tabular environment.
 
         Args:
-                transition_matrix (np.ndarray, shape=(nS, nA, nS)):
-                        Transition probabilities for a given state-action pair.
-                reward_matrix (np.ndarray, len(shape) <= 3):
-                        1-D, 2-D or 3-D array corresponding to rewards to a given `(state,
-                        action, next_state)` triple.    A 2-D array assumes the `next_state`
-                        is not used in the reward, and a 1-D array assumes neither the
-                        `action` nor `next_state` are used.
-                horizon (np.float):
-                        Maximum number of timesteps, default `np.inf`.
-                initial_state_dist (Optional[np.ndarray]):
-                        Distribution from which state is sampled at the start of the episode.
-                        If `None`, it is assumed initial state is always 0.
+            transition_matrix (np.ndarray): 3-D array with transition
+                probabilities for a given state-action pair.
+            reward_matrix (np.ndarray) <= 3): 1-D, 2-D or 3-D array
+                corresponding to rewards to a given `(state, action, next_state)`
+                triple. A 2-D array assumes the `next_state` is not used in the
+                reward, and a 1-D array assumes neither the `action` nor
+                `next_state` are used.
+            horizon (np.float): Maximum number of timesteps, default `np.inf`.
+            initial_state_dist (Optional[np.ndarray]): Distribution from which
+                state is sampled at the start of the episode.  If `None`, it is
+                assumed initial state is always 0.
         """
         super().__init__()
         n_states, n_actions = transition_matrix.shape[:2]
@@ -135,18 +139,22 @@ class TabularModelEnv(ResettableEnv, abc.ABC):
         self._action_space = spaces.Discrete(n_actions)
 
     def initial_state(self) -> int:
+        """Samples from the initial state distribution."""
         return util.sample_distribution(
             self.initial_state_dist, random=self.rand_state,
         )
 
     def transition(self, state: int, action: int) -> int:
+        """Samples from transition distribution."""
         return util.sample_distribution(
             self.transition_matrix[state, action], random=self.rand_state,
         )
 
     def reward(self, state: int, action: int, new_state: int) -> float:
+        """Computes reward for a given transition."""
         inputs = (state, action, new_state)[: len(self.reward_matrix.shape)]
         return self.reward_matrix[inputs]
 
     def terminal(self, state: int, n_actions_taken: int) -> bool:
+        """Checks if state is terminal."""
         return n_actions_taken >= self.horizon

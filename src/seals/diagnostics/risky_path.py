@@ -1,6 +1,5 @@
 """Environment testing for correct behavior under stochasticity."""
 
-import gym
 import numpy as np
 
 from seals.diagnostics import base_envs
