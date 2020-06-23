@@ -1,11 +1,13 @@
 """Finite-horizon discrete environments with known transition dynamics."""
 
 import abc
+from typing import Optional
 
 import gym
 from gym import spaces
 import numpy as np
 
+import seals.util
 
 class ResettableEnv(gym.Env, abc.ABC):
   """ABC for environments that are resettable.
@@ -17,7 +19,6 @@ class ResettableEnv(gym.Env, abc.ABC):
 
   def __init__(self):
     self._state_space = None
-    self._observation_space = None
     self._action_space = None
     self.cur_state = None
     self._n_actions_taken = None
@@ -39,9 +40,9 @@ class ResettableEnv(gym.Env, abc.ABC):
   def terminal(self, state, step: int) -> bool:
     """Is the state terminal?"""
 
-  @abc.abstractmethod
   def obs_from_state(self, state):
     """Returns observation produced by a given state."""
+    return state
 
   @property
   def state_space(self) -> gym.Space:
@@ -51,7 +52,7 @@ class ResettableEnv(gym.Env, abc.ABC):
   @property
   def observation_space(self) -> gym.Space:
     """Observation space. Return type of reset() and component of step()."""
-    return self._observation_space
+    return self.state_space
 
   @property
   def action_space(self) -> gym.Space:
@@ -94,111 +95,60 @@ class ResettableEnv(gym.Env, abc.ABC):
 class TabularModelEnv(ResettableEnv, abc.ABC):
   """ABC for tabular environments with known dynamics."""
 
-  def __init__(self):
-    """Initialise common attributes of all model-based environments,
-    including current state & number of actions taken so far (initial None,
-    so that error can be thrown if reset() is not called), attributes for
-    cached observation/action space, and random seed for rollouts."""
+  def __init__(
+      self,
+      *,
+      transition_matrix : np.ndarray,
+      reward_matrix : np.ndarray,
+      horizon : np.float = np.inf,
+      initial_state_dist : Optional[np.ndarray] = None,
+  ):
+    """Build tabular environment.
+
+    Args:
+        transition_matrix (np.ndarray, shape=(nS, nA, nS)):
+            Transition probabilities for a given state-action pair.
+        reward_matrix (np.ndarray, len(shape) <= 3):
+            1-D, 2-D or 3-D array corresponding to rewards to a given `(state,
+            action, next_state)` triple.  A 2-D array assumes the `next_state`
+            is not used in the reward, and a 1-D array assumes neither the
+            `action` nor `next_state` are used.
+        horizon (np.float):
+            Maximum number of timesteps, default `np.inf`.
+        initial_state_dist (Optional[np.ndarray]):
+            Distribution from which state is sampled at the start of the episode.
+            If `None`, it is assumed initial state is always 0.
+    """
+    n_states, n_actions = transition_matrix.shape[:2]
+    
+    self.transition_matrix = transition_matrix
+    self.reward_matrix = reward_matrix
+    self.horizon = horizon
+
+    if initial_state_dist is None:
+        initial_state_dist = utils.one_hot_encoding(0, n_states)
+    self.initial_state_dist = initial_state_dist
+
+    self._state_space = spaces.Discrete(n_states)
+    self._action_space = spaces.Discrete(n_actions)
+
     super().__init__()
 
-  @property
-  def state_space(self) -> gym.Space:
-    # Construct spaces lazily, so they can depend on properties in subclasses.
-    if self._state_space is None:
-      self._state_space = spaces.Discrete(self.state_dim)
-    return self._state_space
-
-  @property
-  def observation_space(self) -> gym.Space:
-    # Construct spaces lazily, so they can depend on properties in subclasses.
-    if self._observation_space is None:
-      self._observation_space = spaces.Box(low=float('-inf'),
-                                           high=float('inf'),
-                                           shape=(self.obs_dim, ))
-    return self._observation_space
-
-  @property
-  def action_space(self) -> gym.Space:
-    # Construct spaces lazily, so they can depend on properties in subclasses.
-    if self._action_space is None:
-      self._action_space = spaces.Discrete(self.n_actions)
-    return self._action_space
-
   def initial_state(self):
-    return self.rand_state.choice(self.n_states,
-                                  p=self.initial_state_dist)
+    return util.sample_distribution(
+        self.initial_state_dist,
+        random=self.rand_state,
+    )
 
   def transition(self, state, action):
-    out_dist = self.transition_matrix[state, action]
-    choice_states = np.arange(self.n_states)
-    return int(self.rand_state.choice(choice_states, p=out_dist, size=()))
+    return util.sample_distribution(
+        self.transition_matrix[state, action],
+        random=self.rand_state,
+    )
 
   def reward(self, state, action, new_state):
-    reward = self.reward_matrix[state]
-    assert np.isscalar(reward), reward
-    return reward
+    inputs = (state, action, new_state)[:len(self.reward_matrix.shape)]
+    return self.reward_matrix[*inputs]
 
   def terminal(self, state, n_actions_taken):
     return n_actions_taken >= self.horizon
-
-  def obs_from_state(self, state):
-    # Copy so it can't be mutated in-place (updates will be reflected in
-    # self.observation_matrix!)
-    obs = self.observation_matrix[state].copy()
-    assert obs.ndim == 1, obs.shape
-    return obs
-
-  @property
-  def n_states(self):
-    """Number of states in this MDP (int)."""
-    return self.transition_matrix.shape[0]
-
-  @property
-  def n_actions(self):
-    """Number of actions in this MDP (int)."""
-    return self.transition_matrix.shape[1]
-
-  @property
-  def state_dim(self):
-    """Size of state vectors for this MDP."""
-    return self.observation_matrix.shape[0]
-
-  @property
-  def obs_dim(self):
-    """Size of observation vectors for this MDP."""
-    return self.observation_matrix.shape[1]
-
-  # ############################### #
-  # METHODS THAT MUST BE OVERRIDDEN #
-  # ############################### #
-
-  @property
-  @abc.abstractmethod
-  def transition_matrix(self):
-    """3D transition matrix with dimensions corresponding to current state,
-    current action, and next state (in that order). In other words, if `T`
-    is our returned matrix, then `T[s,a,sprime]` is the chance of
-    transitioning into state `sprime` after taking action `a` in state
-    `s`."""
-
-  @property
-  @abc.abstractmethod
-  def observation_matrix(self):
-    """2D observation matrix with dimensions corresponding to current state
-    (first dim) and elements of observation (second dim)."""
-
-  @property
-  @abc.abstractmethod
-  def reward_matrix(self):
-    """1D reward matrix with an element corresponding to each state."""
-
-  @property
-  @abc.abstractmethod
-  def horizon(self):
-    """Number of actions that can be taken in an episode."""
-
-  @property
-  @abc.abstractmethod
-  def initial_state_dist(self):
-    """1D vector representing a distribution over initial states."""
-    return
