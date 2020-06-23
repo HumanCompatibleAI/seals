@@ -7,7 +7,7 @@ import gym
 from gym import spaces
 import numpy as np
 
-import seals.util as util
+from seals import util
 
 class ResettableEnv(gym.Env, abc.ABC):
     """ABC for environments that are resettable.
@@ -100,7 +100,7 @@ class TabularModelEnv(ResettableEnv, abc.ABC):
             *,
             transition_matrix : np.ndarray,
             reward_matrix : np.ndarray,
-            horizon : np.float = np.inf,
+            horizon : float = np.inf,
             initial_state_dist : Optional[np.ndarray] = None,
     ):
         """Build tabular environment.
@@ -133,21 +133,21 @@ class TabularModelEnv(ResettableEnv, abc.ABC):
         self._state_space = spaces.Discrete(n_states)
         self._action_space = spaces.Discrete(n_actions)
 
-    def initial_state(self):
+    def initial_state(self) -> int:
         return util.sample_distribution(
                 self.initial_state_dist,
                 random=self.rand_state,
         )
 
-    def transition(self, state, action):
+    def transition(self, state : int, action : int) -> int:
         return util.sample_distribution(
                 self.transition_matrix[state, action],
                 random=self.rand_state,
         )
 
-    def reward(self, state, action, new_state):
+    def reward(self, state : int, action : int, new_state : int) -> float:
         inputs = (state, action, new_state)[:len(self.reward_matrix.shape)]
         return self.reward_matrix[inputs]
 
-    def terminal(self, state, n_actions_taken):
+    def terminal(self, state: int, n_actions_taken: int) -> bool:
         return n_actions_taken >= self.horizon

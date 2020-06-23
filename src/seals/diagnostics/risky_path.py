@@ -3,7 +3,7 @@
 import gym
 import numpy as np
 
-import seals.diagnostics.base_envs as base_envs
+from seals.diagnostics import base_envs
 
 
 class RiskyPathEnv(base_envs.TabularModelEnv):
