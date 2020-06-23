@@ -7,7 +7,7 @@ import gym
 from gym import spaces
 import numpy as np
 
-import seals.util
+import seals.util as util
 
 class ResettableEnv(gym.Env, abc.ABC):
     """ABC for environments that are resettable.
@@ -119,6 +119,7 @@ class TabularModelEnv(ResettableEnv, abc.ABC):
                         Distribution from which state is sampled at the start of the episode.
                         If `None`, it is assumed initial state is always 0.
         """
+        super().__init__()
         n_states, n_actions = transition_matrix.shape[:2]
         
         self.transition_matrix = transition_matrix
@@ -126,13 +127,11 @@ class TabularModelEnv(ResettableEnv, abc.ABC):
         self.horizon = horizon
 
         if initial_state_dist is None:
-                initial_state_dist = utils.one_hot_encoding(0, n_states)
+                initial_state_dist = util.one_hot_encoding(0, n_states)
         self.initial_state_dist = initial_state_dist
 
         self._state_space = spaces.Discrete(n_states)
         self._action_space = spaces.Discrete(n_actions)
-
-        super().__init__()
 
     def initial_state(self):
         return util.sample_distribution(
@@ -148,7 +147,7 @@ class TabularModelEnv(ResettableEnv, abc.ABC):
 
     def reward(self, state, action, new_state):
         inputs = (state, action, new_state)[:len(self.reward_matrix.shape)]
-        return self.reward_matrix[*inputs]
+        return self.reward_matrix[inputs]
 
     def terminal(self, state, n_actions_taken):
         return n_actions_taken >= self.horizon

@@ -1,7 +1,8 @@
 """Simple diagnostic environments."""
 
-from seals.diagnostics.risky_path import RiskyPathEnv
+import gym
 
-__all__ = [
-    RiskyPathEnv,
-]
+gym.register(
+    id="seals/RiskyPath-v0",
+    entry_point="seals.diagnostics.risky_path:RiskyPathEnv",
+)

@@ -111,3 +111,7 @@ def sample_distribution(p, random=None):
     if random is None:
         random = np.random
     return random.choice(np.arange(len(p)), p=p)
+
+
+def one_hot_encoding(index, size):
+    return np.eye(size)[index]

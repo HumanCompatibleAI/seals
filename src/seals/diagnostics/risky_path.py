@@ -3,10 +3,10 @@
 import gym
 import numpy as np
 
-from seals.diagnostics.base_env import BaseEnv
+import seals.diagnostics.base_envs as base_envs
 
 
-class RiskyPathEnv(BaseEnv):
+class RiskyPathEnv(base_envs.TabularModelEnv):
     """Environment with two paths to a goal: one safe and one risky.
 
     Many LfH algorithms are derived from Maximum Entropy Inverse Reinforcement
@@ -33,26 +33,19 @@ class RiskyPathEnv(BaseEnv):
         nS = 4
         nA = 2
 
-        self.transition_matrix = np.zeros((nS, nA, nS))
-        self.transition_matrix[0, 0, 1] = 1.0
-        self.transition_matrix[0, 1, [2, 3]] = 0.5
+        transition_matrix = np.zeros((nS, nA, nS))
+        transition_matrix[0, 0, 1] = 1.0
+        transition_matrix[0, 1, [2, 3]] = 0.5
 
-        self.transition_matrix[1, 0, 2] = 1.0
-        self.transition_matrix[1, 1, 1] = 1.0
+        transition_matrix[1, 0, 2] = 1.0
+        transition_matrix[1, 1, 1] = 1.0
 
-        self.transition_matrix[[2, 3], :, [2, 3]] = 1.0
+        transition_matrix[[2, 3], :, [2, 3]] = 1.0
 
-        self.reward_matrix = np.zeros((nS, nA, nS))
-        self.reward_matrix[2, :, :] = 1.0
-        self.reward_matrix[3, :, :] = -100.0
+        reward_matrix = np.array([0.0, 0.0, 1.0, -100.0])
 
-        super().__init__(num_states=nS, num_actions=nA)
-
-
-_horizon_v0 = 5
-
-gym.register(
-    id="seals/RiskyPath-v0",
-    entry_point="seals.diagnostics.envs:RiskyPathEnv",
-    max_episode_steps=_horizon_v0,
-)
+        super().__init__(
+            transition_matrix=transition_matrix,
+            reward_matrix=reward_matrix,
+            horizon=5,
+        )
