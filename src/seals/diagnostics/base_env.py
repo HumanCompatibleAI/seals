@@ -1,100 +1,204 @@
-"""Minimal base class for simple environments."""
+"""Finite-horizon discrete environments with known transition dynamics."""
+
+import abc
 
 import gym
-from gym.spaces import Discrete
-from gym.utils import seeding
+from gym import spaces
 import numpy as np
 
-from seals.util import sample_distribution
+
+class ResettableEnv(gym.Env, abc.ABC):
+  """ABC for environments that are resettable.
+
+  Specifically, these environments provide oracle access to sample from
+  the initial state distribution and transition dynamics, and compute the
+  reward and termination condition. Almost all simulated environments can
+  meet these criteria."""
+
+  def __init__(self):
+    self._state_space = None
+    self._observation_space = None
+    self._action_space = None
+    self.cur_state = None
+    self._n_actions_taken = None
+    self.seed()
+
+  @abc.abstractmethod
+  def initial_state(self):
+    """Samples from the initial state distribution."""
+
+  @abc.abstractmethod
+  def transition(self, state, action):
+    """Samples from transition distribution."""
+
+  @abc.abstractmethod
+  def reward(self, state, action, new_state):
+    """Computes reward for a given transition."""
+
+  @abc.abstractmethod
+  def terminal(self, state, step: int) -> bool:
+    """Is the state terminal?"""
+
+  @abc.abstractmethod
+  def obs_from_state(self, state):
+    """Returns observation produced by a given state."""
+
+  @property
+  def state_space(self) -> gym.Space:
+    """State space. Often same as observation_space, but differs in POMDPs."""
+    return self._state_space
+
+  @property
+  def observation_space(self) -> gym.Space:
+    """Observation space. Return type of reset() and component of step()."""
+    return self._observation_space
+
+  @property
+  def action_space(self) -> gym.Space:
+    """Action space. Parameter type of step()."""
+    return self._action_space
+
+  @property
+  def n_actions_taken(self) -> int:
+    """Number of steps taken so far."""
+    return self._n_actions_taken
+
+  def seed(self, seed=None):
+    if seed is None:
+      # Gym API wants list of seeds to be returned for some reason, so
+      # generate a seed explicitly in this case
+      seed = np.random.randint(0, 1 << 31)
+    self.rand_state = np.random.RandomState(seed)
+    return [seed]
+
+  def reset(self):
+    self.cur_state = self.initial_state()
+    self._n_actions_taken = 0
+    return self.obs_from_state(self.cur_state)
+
+  def step(self, action):
+    if self.cur_state is None or self._n_actions_taken is None:
+      raise ValueError("Need to call reset() before first step()")
+
+    old_state = self.cur_state
+    self.cur_state = self.transition(self.cur_state, action)
+    obs = self.obs_from_state(self.cur_state)
+    rew = self.reward(old_state, action, self.cur_state)
+    done = self.terminal(self.cur_state, self._n_actions_taken)
+    self._n_actions_taken += 1
+
+    infos = {"old_state": old_state, "new_state": self.cur_state}
+    return obs, rew, done, infos
 
 
-class BaseEnv(gym.Env):
-    """Minimal environment class, with default tabular method implementations."""
+class TabularModelEnv(ResettableEnv, abc.ABC):
+  """ABC for tabular environments with known dynamics."""
 
-    def __init__(self, num_states=None, num_actions=None):
-        """Initialize spaces (if discrete) and select random seed."""
-        super().__init__()
+  def __init__(self):
+    """Initialise common attributes of all model-based environments,
+    including current state & number of actions taken so far (initial None,
+    so that error can be thrown if reset() is not called), attributes for
+    cached observation/action space, and random seed for rollouts."""
+    super().__init__()
 
-        if num_states is not None:
-            self.observation_space = Discrete(num_states)
-        if num_actions is not None:
-            self.action_space = Discrete(num_actions)
+  @property
+  def state_space(self) -> gym.Space:
+    # Construct spaces lazily, so they can depend on properties in subclasses.
+    if self._state_space is None:
+      self._state_space = spaces.Discrete(self.state_dim)
+    return self._state_space
 
-        self.seed()
+  @property
+  def observation_space(self) -> gym.Space:
+    # Construct spaces lazily, so they can depend on properties in subclasses.
+    if self._observation_space is None:
+      self._observation_space = spaces.Box(low=float('-inf'),
+                                           high=float('inf'),
+                                           shape=(self.obs_dim, ))
+    return self._observation_space
 
-    def seed(self, seed=None):
-        """Set randomness seed."""
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
+  @property
+  def action_space(self) -> gym.Space:
+    # Construct spaces lazily, so they can depend on properties in subclasses.
+    if self._action_space is None:
+      self._action_space = spaces.Discrete(self.n_actions)
+    return self._action_space
 
-    def reset(self):
-        """Start a new episode, returning initial observation."""
-        self.state = self.sample_initial_state()
-        return self.ob_from_state(self.state)
+  def initial_state(self):
+    return self.rand_state.choice(self.n_states,
+                                  p=self.initial_state_dist)
 
-    def step(self, action):
-        """Advance to next timestep using provided action."""
-        assert action in self.action_space, f"{action} not in {self.action_space}"
+  def transition(self, state, action):
+    out_dist = self.transition_matrix[state, action]
+    choice_states = np.arange(self.n_states)
+    return int(self.rand_state.choice(choice_states, p=out_dist, size=()))
 
-        old_state = self.state
-        self.state = self.transition_fn(self.state, action)
-        next_ob = self.ob_from_state(self.state)
+  def reward(self, state, action, new_state):
+    reward = self.reward_matrix[state]
+    assert np.isscalar(reward), reward
+    return reward
 
-        reward = self.reward_fn(old_state, action, self.state)
+  def terminal(self, state, n_actions_taken):
+    return n_actions_taken >= self.horizon
 
-        done = self.termination_fn(self.state)
-        info = {}
+  def obs_from_state(self, state):
+    # Copy so it can't be mutated in-place (updates will be reflected in
+    # self.observation_matrix!)
+    obs = self.observation_matrix[state].copy()
+    assert obs.ndim == 1, obs.shape
+    return obs
 
-        return next_ob, reward, done, info
+  @property
+  def n_states(self):
+    """Number of states in this MDP (int)."""
+    return self.transition_matrix.shape[0]
 
-    def reward_fn(self, state, action, new_state):
-        """Return reward value R(s, a, s')."""
-        return self.reward_matrix[state, action, new_state]
+  @property
+  def n_actions(self):
+    """Number of actions in this MDP (int)."""
+    return self.transition_matrix.shape[1]
 
-    def transition_fn(self, state, action):
-        """Sample next state according to T(s, a)."""
-        return sample_distribution(
-            self.transition_matrix[state, action], random=self.np_random,
-        )
+  @property
+  def state_dim(self):
+    """Size of state vectors for this MDP."""
+    return self.observation_matrix.shape[0]
 
-    def ob_from_state(self, state):
-        """Return observation from current state."""
-        return state
+  @property
+  def obs_dim(self):
+    """Size of observation vectors for this MDP."""
+    return self.observation_matrix.shape[1]
 
-    def state_from_ob(self, ob):
-        """Return state from current observation, when possible."""
-        return ob
+  # ############################### #
+  # METHODS THAT MUST BE OVERRIDDEN #
+  # ############################### #
 
-    def sample_initial_state(self):
-        """Sample initial state.
+  @property
+  @abc.abstractmethod
+  def transition_matrix(self):
+    """3D transition matrix with dimensions corresponding to current state,
+    current action, and next state (in that order). In other words, if `T`
+    is our returned matrix, then `T[s,a,sprime]` is the chance of
+    transitioning into state `sprime` after taking action `a` in state
+    `s`."""
 
-        Default implementation assumes agent starts at
-        state given by zero entries.
-        """
-        return np.zeros(
-            self.observation_space.shape, dtype=self.observation_space.dtype,
-        )
+  @property
+  @abc.abstractmethod
+  def observation_matrix(self):
+    """2D observation matrix with dimensions corresponding to current state
+    (first dim) and elements of observation (second dim)."""
 
-    def initial_state_distribution(self):
-        """Get initial state distribution.
+  @property
+  @abc.abstractmethod
+  def reward_matrix(self):
+    """1D reward matrix with an element corresponding to each state."""
 
-        Default implementation assumes initial state is
-        deterministic, sampling an initial state and returning
-        the deterministic distribution corresponding to the
-        sampled state.
-        """
-        initial_state = self.sample_initial_state()
-        nS = self.observation_space.n
-        one_hot_state = np.eye(nS)[initial_state]
-        return one_hot_state
+  @property
+  @abc.abstractmethod
+  def horizon(self):
+    """Number of actions that can be taken in an episode."""
 
-    def termination_fn(self, state):
-        """Returns whether state is terminal.
-
-        Default implementation assumes state is never terminal.
-        """
-        return False
-
-    def render(self):
-        """Render environment state."""
-        print(self.state)
+  @property
+  @abc.abstractmethod
+  def initial_state_dist(self):
+    """1D vector representing a distribution over initial states."""
+    return
