@@ -107,9 +107,8 @@ def get_gym_max_episode_steps(env_name: str) -> Optional[int]:
 
 
 def sample_distribution(
-        p: np.ndarray,
-        random: Optional[np.random.RandomState] = None,
-    ) -> int:
+    p: np.ndarray, random: Optional[np.random.RandomState] = None,
+) -> int:
     """Samples an integer with probabilities given by p."""
     print(type(random))
     if random is None:

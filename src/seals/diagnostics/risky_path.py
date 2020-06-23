@@ -45,7 +45,5 @@ class RiskyPathEnv(base_envs.TabularModelEnv):
         reward_matrix = np.array([0.0, 0.0, 1.0, -100.0])
 
         super().__init__(
-            transition_matrix=transition_matrix,
-            reward_matrix=reward_matrix,
-            horizon=5,
+            transition_matrix=transition_matrix, reward_matrix=reward_matrix, horizon=5,
         )

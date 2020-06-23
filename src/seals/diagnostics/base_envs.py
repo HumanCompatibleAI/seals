@@ -9,6 +9,7 @@ import numpy as np
 
 from seals import util
 
+
 class ResettableEnv(gym.Env, abc.ABC):
     """ABC for environments that are resettable.
 
@@ -96,12 +97,12 @@ class TabularModelEnv(ResettableEnv, abc.ABC):
     """ABC for tabular environments with known dynamics."""
 
     def __init__(
-            self,
-            *,
-            transition_matrix : np.ndarray,
-            reward_matrix : np.ndarray,
-            horizon : float = np.inf,
-            initial_state_dist : Optional[np.ndarray] = None,
+        self,
+        *,
+        transition_matrix: np.ndarray,
+        reward_matrix: np.ndarray,
+        horizon: float = np.inf,
+        initial_state_dist: Optional[np.ndarray] = None,
     ):
         """Build tabular environment.
 
@@ -121,13 +122,13 @@ class TabularModelEnv(ResettableEnv, abc.ABC):
         """
         super().__init__()
         n_states, n_actions = transition_matrix.shape[:2]
-        
+
         self.transition_matrix = transition_matrix
         self.reward_matrix = reward_matrix
         self.horizon = horizon
 
         if initial_state_dist is None:
-                initial_state_dist = util.one_hot_encoding(0, n_states)
+            initial_state_dist = util.one_hot_encoding(0, n_states)
         self.initial_state_dist = initial_state_dist
 
         self._state_space = spaces.Discrete(n_states)
@@ -135,18 +136,16 @@ class TabularModelEnv(ResettableEnv, abc.ABC):
 
     def initial_state(self) -> int:
         return util.sample_distribution(
-                self.initial_state_dist,
-                random=self.rand_state,
+            self.initial_state_dist, random=self.rand_state,
         )
 
-    def transition(self, state : int, action : int) -> int:
+    def transition(self, state: int, action: int) -> int:
         return util.sample_distribution(
-                self.transition_matrix[state, action],
-                random=self.rand_state,
+            self.transition_matrix[state, action], random=self.rand_state,
         )
 
-    def reward(self, state : int, action : int, new_state : int) -> float:
-        inputs = (state, action, new_state)[:len(self.reward_matrix.shape)]
+    def reward(self, state: int, action: int, new_state: int) -> float:
+        inputs = (state, action, new_state)[: len(self.reward_matrix.shape)]
         return self.reward_matrix[inputs]
 
     def terminal(self, state: int, n_actions_taken: int) -> bool:
