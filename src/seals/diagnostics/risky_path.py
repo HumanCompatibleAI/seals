@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from seals.diagnostics import base_envs
+from seals import base_envs
 
 
 class RiskyPathEnv(base_envs.TabularModelEnv):
