@@ -116,5 +116,6 @@ def sample_distribution(
     return random.choice(np.arange(len(p)), p=p)
 
 
-def one_hot_encoding(index, size):
-    return np.eye(size)[index]
+def one_hot_encoding(pos: int, size: int):
+    """Returns a 1-D hot encoding of a given position and size."""
+    return np.eye(size)[pos]
