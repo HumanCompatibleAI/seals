@@ -3,6 +3,7 @@
 import gym
 
 from seals import util
+import seals.diagnostics # noqa
 from seals.version import VERSION as __version__  # noqa: F401
 
 GYM_ID_PREFIX = "seals"
