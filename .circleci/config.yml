@@ -6,8 +6,8 @@ orbs:
 executors:
   my-executor:
     docker:
-      - image: humancompatibleai/seals:base
-    working_directory: /seals
+      - image: humancompatibleai/benchmark-environments:base
+    working_directory: /benchmark-environments
     environment:
       # If you change these, also change ci/code_checks.sh
       SRC_FILES: src/ tests/ setup.py
@@ -35,7 +35,7 @@ commands:
           command: |
             curl -o /root/.mujoco/mjkey.txt ${MUJOCO_KEY}
             md5sum /root/.mujoco/mjkey.txt
-            [[ -d /venv ]] || /seals/ci/build_venv.sh /venv
+            [[ -d /venv ]] || /benchmark-environments/ci/build_venv.sh /venv
             python -c "import mujoco_py"
 
       - save_cache:
@@ -44,7 +44,7 @@ commands:
           key: v1-dependencies-{{ checksum "setup.py" }}
 
       - run:
-          name: install seals
+          name: install evaluating_rewards
           # Build a wheel then install to avoid copying whole directory (pip issue #2195)
           command: |
             python setup.py sdist bdist_wheel
