@@ -12,6 +12,7 @@ class BaseEnv(gym.Env):
     """Minimal envrironment class, with default tabular method implementations."""
 
     def __init__(self, num_states=None, num_actions=None):
+        """Initialize spaces (if discrete) and select random seed."""
         super().__init__()
 
         if num_states is not None:
@@ -53,7 +54,7 @@ class BaseEnv(gym.Env):
     def transition_fn(self, state, action):
         """Sample next state according to T(s, a)."""
         return sample_distribution(
-            self.transition_matrix[state, action], random=self.np_random
+            self.transition_matrix[state, action], random=self.np_random,
         )
 
     def ob_from_state(self, state):
@@ -71,11 +72,11 @@ class BaseEnv(gym.Env):
         state given by zero entries.
         """
         return np.zeros(
-            self.observation_space.shape, dtype=self.observation_space.dtype
+            self.observation_space.shape, dtype=self.observation_space.dtype,
         )
 
     def initial_state_distribution(self):
-        """Get initial state distribution
+        """Get initial state distribution.
 
         Default implementation assumes initial state is
         deterministic, sampling an initial state and returning

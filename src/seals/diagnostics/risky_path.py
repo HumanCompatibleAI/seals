@@ -29,6 +29,7 @@ class RiskyPathEnv(BaseEnv):
     """
 
     def __init__(self):
+        """Initialize class."""
         nS = 4
         nA = 2
 
@@ -51,7 +52,7 @@ class RiskyPathEnv(BaseEnv):
 _horizon_v0 = 5
 
 gym.register(
-    id=f"seals/RiskyPath-v0",
-    entry_point=f"seals.diagnostics.envs:RiskyPathEnv",
+    id="seals/RiskyPath-v0",
+    entry_point="seals.diagnostics.envs:RiskyPathEnv",
     max_episode_steps=_horizon_v0,
 )

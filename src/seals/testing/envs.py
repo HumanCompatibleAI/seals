@@ -234,7 +234,7 @@ class CountingEnv(gym.Env):
         if np.array(action) not in self.action_space:  # pragma: no cover
             raise ValueError(f"Invalid action {action}")
         if self.timestep > self.episode_length:  # pragma: no cover
-            raise ValueError(f"Should reset env. Episode is over.")
+            raise ValueError("Should reset env. Episode is over.")
 
         t, self.timestep = self.timestep, self.timestep + 1
         done = t == self.episode_length
