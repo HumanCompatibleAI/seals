@@ -5,7 +5,7 @@ from gym.spaces import Discrete
 from gym.utils import seeding
 import numpy as np
 
-from seals.utils import sample_distribution
+from seals.util import sample_distribution
 
 
 class BaseEnv(gym.Env):
