@@ -9,7 +9,7 @@ from seals.util import sample_distribution
 
 
 class BaseEnv(gym.Env):
-    """Minimal envrironment class, with default tabular method implementations."""
+    """Minimal environment class, with default tabular method implementations."""
 
     def __init__(self, num_states=None, num_actions=None):
         """Initialize spaces (if discrete) and select random seed."""
