@@ -104,3 +104,10 @@ def make_env_no_wrappers(env_name: str, **kwargs) -> gym.Env:
 def get_gym_max_episode_steps(env_name: str) -> Optional[int]:
     """Get the `max_episode_steps` attribute associated with a gym Spec."""
     return gym.envs.registry.env_specs[env_name].max_episode_steps
+
+
+def sample_distribution(p, random=None):
+    """Samples an integer with probabilities given by p."""
+    if random is None:
+        random = np.random
+    return random.choice(np.arange(len(p)), p=p)
