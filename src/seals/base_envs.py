@@ -98,8 +98,8 @@ class ResettableEnv(gym.Env, abc.ABC):
         return obs, rew, done, infos
 
 
-class TabularModelEnv(ResettableEnv, abc.ABC):
-    """ABC for tabular environments with known dynamics."""
+class TabularModelEnv(ResettableEnv):
+    """Base class for tabular environments with known dynamics."""
 
     def __init__(
         self,
