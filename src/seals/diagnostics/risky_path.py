@@ -25,7 +25,7 @@ class RiskyPathEnv(BaseEnv):
     the risky action sometimes reaches the goal s_2 in fewer timesteps, leading
     to higher best-case return. Algorithms that fail to correctly handle
     stochastic dynamics may therefore wrongly believe the reward favors taking
-    the risky path. 
+    the risky path.
     """
 
     def __init__(self):

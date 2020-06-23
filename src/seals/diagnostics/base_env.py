@@ -10,6 +10,7 @@ from seals.utils import sample_distribution
 
 class BaseEnv(gym.Env):
     """Minimal envrironment class, with default tabular method implementations."""
+
     def __init__(self, num_states=None, num_actions=None):
         super().__init__()
 
