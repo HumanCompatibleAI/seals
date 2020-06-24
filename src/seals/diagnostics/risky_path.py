@@ -9,13 +9,12 @@ class RiskyPathEnv(base_envs.TabularModelEnv):
     """Environment with two paths to a goal: one safe and one risky.
 
     Many LfH algorithms are derived from Maximum Entropy Inverse Reinforcement
-    Learning (Ziebart et. al, 2008), which models the demonstrator as producing
-    trajectories with probability p(tau) proportional to exp(R(tau)).  This
-    model implies that a demonstrator can ``control'' the environment well
-    enough to follow any high-reward trajectory with high probability (Ziebart,
-    2010). However, in stochastic environments, the agent cannot control the
-    probability of each trajectory independently.  This misspecification may
-    lead to poor behavior.
+    Learning [1], which models the demonstrator as producing trajectories with
+    probability p(tau) proportional to exp(R(tau)).  This model implies that a
+    demonstrator can ``control'' the environment well enough to follow any
+    high-reward trajectory with high probability [2]. However, in stochastic
+    environments, the agent cannot control the probability of each trajectory
+    independently.  This misspecification may lead to poor behavior.
 
     This task tests for this behavior. The agent starts at s_0 and can reach
     the goal s_2 (reward 1.0) by either taking the safe path s_0 to s_1 to s_2,
@@ -25,6 +24,11 @@ class RiskyPathEnv(base_envs.TabularModelEnv):
     to higher best-case return. Algorithms that fail to correctly handle
     stochastic dynamics may therefore wrongly believe the reward favors taking
     the risky path.
+
+    [1] Ziebart, Brian D., et al. "Maximum entropy inverse reinforcement
+        learning." Aaai. Vol. 8. 2008.
+    [2] Ziebart, Brian D. "Modeling purposeful adaptive behavior with the
+        principle of maximum causal entropy." (2010); page 105.
     """
 
     def __init__(self):
