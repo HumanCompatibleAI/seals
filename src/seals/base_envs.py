@@ -126,7 +126,9 @@ class TabularModelEnv(ResettableEnv):
         """
         super().__init__()
         n_states, n_actions, n_next_states = transition_matrix.shape
-        assert n_states == n_next_states, f"malformed transition matrix: {n_states} != {n_next_states}"
+        assert (
+            n_states == n_next_states
+        ), f"malformed transition_matrix: {n_states} != {n_next_states}"
 
         self.transition_matrix = transition_matrix
         self.reward_matrix = reward_matrix
