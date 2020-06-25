@@ -39,6 +39,7 @@ class TestEnvs:
 
 def test_base_envs():
     """Test parts of base_envs not covered elsewhere."""
+
     class NewEnv(base_envs.TabularModelEnv):
         def __init__(self):
             nS = 3
@@ -47,8 +48,7 @@ def test_base_envs():
             transition_matrix /= transition_matrix.sum(axis=2)[:, :, None]
             reward_matrix = np.random.rand(nS)
             super().__init__(
-                transition_matrix=transition_matrix,
-                reward_matrix=reward_matrix,
+                transition_matrix=transition_matrix, reward_matrix=reward_matrix,
             )
 
     env = NewEnv()
