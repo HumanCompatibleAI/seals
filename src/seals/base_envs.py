@@ -21,10 +21,15 @@ class ResettableEnv(gym.Env, abc.ABC):
 
     def __init__(
         self,
-        state_space,
-        action_space,
+        state_space: gym.Space,
+        action_space: gym.Space,
     ):
-        """Initialize env."""
+        """Build tabular environment.
+
+        Args:
+            state_space: gym.Space containing possible states.
+            action_space: gym.Space containing possible actions.
+        """
         self._state_space = state_space
         self._action_space = action_space
         self.cur_state = None
@@ -127,7 +132,6 @@ class TabularModelEnv(ResettableEnv):
                 start of the episode.  If `None`, it is assumed initial state
                 is always 0.
         """
-        super().__init__()
         n_states, n_actions, n_next_states = transition_matrix.shape
         assert (
             n_states == n_next_states
@@ -141,8 +145,10 @@ class TabularModelEnv(ResettableEnv):
             initial_state_dist = util.one_hot_encoding(0, n_states)
         self.initial_state_dist = initial_state_dist
 
-        self._state_space = spaces.Discrete(n_states)
-        self._action_space = spaces.Discrete(n_actions)
+        super().__init__(
+            state_space=spaces.Discrete(n_states),
+            action_space=spaces.Discrete(n_actions),
+        )
 
     def initial_state(self) -> int:
         """Samples from the initial state distribution."""
