@@ -94,6 +94,8 @@ class ResettableEnv(gym.Env, abc.ABC):
         if self.cur_state is None or self._n_actions_taken is None:
             raise ValueError("Need to call reset() before first step()")
 
+        assert action in self.action_space, f"{action} not in {self.action_space}"
+
         old_state = self.cur_state
         self.cur_state = self.transition(self.cur_state, action)
         obs = self.obs_from_state(self.cur_state)
@@ -132,17 +134,17 @@ class TabularModelEnv(ResettableEnv):
         """
         n_states, n_actions, n_next_states = transition_matrix.shape
         assert n_states == n_next_states, (
-            f"malformed transition_matrix:\n"
-            "transition_matrix.shape: {transition_matrix.shape}\n"
-            "{n_states} != {n_next_states}\n"
+            "malformed transition_matrix:\n"
+            f"transition_matrix.shape: {transition_matrix.shape}\n"
+            f"{n_states} != {n_next_states}\n"
         )
 
         assert (
             reward_matrix.shape == transition_matrix.shape[: len(reward_matrix.shape)]
         ), (
-            f"transition_matrix and reward_matrix are not compatible:\n"
-            "transition_matrix.shape: {transition_matrix.shape}\n"
-            "reward_matrix.shape: {reward_matrix.shape}\n"
+            "transition_matrix and reward_matrix are not compatible:\n"
+            f"transition_matrix.shape: {transition_matrix.shape}\n"
+            f"reward_matrix.shape: {reward_matrix.shape}\n"
         )
 
         self.transition_matrix = transition_matrix
