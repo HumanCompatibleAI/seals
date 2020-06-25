@@ -114,7 +114,7 @@ class TabularModelEnv(ResettableEnv):
         Args:
             transition_matrix (np.ndarray): 3-D array with transition
                 probabilities for a given state-action pair.
-            reward_matrix (np.ndarray) <= 3): 1-D, 2-D or 3-D array
+            reward_matrix (np.ndarray): 1-D, 2-D or 3-D array
                 corresponding to rewards to a given `(state, action, next_state)`
                 triple. A 2-D array assumes the `next_state` is not used in the
                 reward, and a 1-D array assumes neither the `action` nor
