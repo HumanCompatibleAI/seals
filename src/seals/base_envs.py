@@ -125,7 +125,8 @@ class TabularModelEnv(ResettableEnv):
                 assumed initial state is always 0.
         """
         super().__init__()
-        n_states, n_actions = transition_matrix.shape[:2]
+        n_states, n_actions, n_next_states = transition_matrix.shape
+        assert n_states == n_next_states, f"malformed transition matrix: {n_states} != {n_next_states}"
 
         self.transition_matrix = transition_matrix
         self.reward_matrix = reward_matrix

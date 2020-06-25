@@ -26,9 +26,9 @@ class RiskyPathEnv(base_envs.TabularModelEnv):
     the risky path.
 
     [1] Ziebart, Brian D., et al. "Maximum entropy inverse reinforcement
-        learning." Aaai. Vol. 8. 2008.
+        learning." AAAI. Vol. 8. 2008.
     [2] Ziebart, Brian D. "Modeling purposeful adaptive behavior with the
-        principle of maximum causal entropy." (2010); page 105.
+        principle of maximum causal entropy." (2010); PhD thesis, CMU-ML-10-110; page 105.
     """
 
     def __init__(self):
