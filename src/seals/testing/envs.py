@@ -121,16 +121,19 @@ def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) ->
 
     assert_equal_rollout(rollout_a, rollout_b)
 
-    # For non-deterministic environments, if we try enough seeds we should
+    # For most non-deterministic environments, if we try enough seeds we should
     # eventually get a different result. For deterministic environments, all
     # seeds should produce the same starting state.
-    def new_seed_equals_orig_rollout(seed):
-        env.seed(seed)
-        new_rollout = get_rollout(env, actions)
-        return has_same_observations(new_rollout, rollout_a)
+    def different_seeds_same_rollout(seed1, seed2):
+        new_actions = [env.action_space.sample() for _ in range(10)]
+        env.seed(seed1)
+        new_rollout_1 = get_rollout(env, new_actions)
+        env.seed(seed2)
+        new_rollout_2 = get_rollout(env, new_actions)
+        return has_same_observations(new_rollout_1, new_rollout_2)
 
     is_deterministic = matches_list(env_name, deterministic_envs)
-    same_obs = all(new_seed_equals_orig_rollout(seed) for seed in range(20))
+    same_obs = all(different_seeds_same_rollout(seed, seed + 1) for seed in range(100))
     assert same_obs == is_deterministic
 
 
@@ -234,7 +237,7 @@ class CountingEnv(gym.Env):
         if np.array(action) not in self.action_space:  # pragma: no cover
             raise ValueError(f"Invalid action {action}")
         if self.timestep > self.episode_length:  # pragma: no cover
-            raise ValueError(f"Should reset env. Episode is over.")
+            raise ValueError("Should reset env. Episode is over.")
 
         t, self.timestep = self.timestep, self.timestep + 1
         done = t == self.episode_length
