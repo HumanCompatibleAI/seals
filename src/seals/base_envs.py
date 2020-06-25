@@ -116,17 +116,16 @@ class TabularModelEnv(ResettableEnv):
         """Build tabular environment.
 
         Args:
-            transition_matrix (np.ndarray): 3-D array with transition
-                probabilities for a given state-action pair.
-            reward_matrix (np.ndarray): 1-D, 2-D or 3-D array
-                corresponding to rewards to a given `(state, action, next_state)`
-                triple. A 2-D array assumes the `next_state` is not used in the
-                reward, and a 1-D array assumes neither the `action` nor
-                `next_state` are used.
-            horizon (np.float): Maximum number of timesteps, default `np.inf`.
-            initial_state_dist (Optional[np.ndarray]): Distribution from which
-                state is sampled at the start of the episode.  If `None`, it is
-                assumed initial state is always 0.
+            transition_matrix: 3-D array with transition probabilities for a
+                given state-action pair.
+            reward_matrix: 1-D, 2-D or 3-D array corresponding to rewards to a
+                given `(state, action, next_state)` triple. A 2-D array assumes
+                the `next_state` is not used in the reward, and a 1-D array
+                assumes neither the `action` nor `next_state` are used.
+            horizon: Maximum number of timesteps, default `np.inf`.
+            initial_state_dist: Distribution from which state is sampled at the
+                start of the episode.  If `None`, it is assumed initial state
+                is always 0.
         """
         super().__init__()
         n_states, n_actions, n_next_states = transition_matrix.shape
