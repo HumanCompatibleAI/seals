@@ -63,3 +63,34 @@ def test_base_envs():
     assert env.n_actions_taken == 1
     env.step(env.action_space.sample())
     assert env.n_actions_taken == 2
+
+
+def test_tabular_env_validation():
+    """Test input validation for base_envs.TabularModelEnv."""
+    with pytest.raises(ValueError, match=r"Malformed transition_matrix.*"):
+        base_envs.TabularModelEnv(
+            transition_matrix=np.zeros((3, 1, 4)), reward_matrix=np.zeros((3,)),
+        )
+    with pytest.raises(ValueError, match=r"initial_state_dist has multiple.*"):
+        base_envs.TabularModelEnv(
+            transition_matrix=np.zeros((3, 1, 3)),
+            reward_matrix=np.zeros((3,)),
+            initial_state_dist=np.zeros((3, 4)),
+        )
+    with pytest.raises(ValueError, match=r"transition_matrix and initial_state_dist.*"):
+        base_envs.TabularModelEnv(
+            transition_matrix=np.zeros((3, 1, 3)),
+            reward_matrix=np.zeros((3,)),
+            initial_state_dist=np.zeros((2)),
+        )
+    with pytest.raises(ValueError, match=r"transition_matrix and reward_matrix.*"):
+        base_envs.TabularModelEnv(
+            transition_matrix=np.zeros((4, 1, 4)), reward_matrix=np.zeros((3,)),
+        )
+
+    env = base_envs.TabularModelEnv(
+        transition_matrix=np.zeros((3, 1, 3)), reward_matrix=np.zeros((3,)),
+    )
+    env.reset()
+    with pytest.raises(ValueError, match=r".*not in.*"):
+        env.step(4)

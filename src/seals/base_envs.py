@@ -150,23 +150,34 @@ class TabularModelEnv(ResettableEnv):
             raise ValueError(
                 "Malformed transition_matrix:\n"
                 f"transition_matrix.shape: {transition_matrix.shape}\n"
-                f"{n_states} != {n_next_states}\n",
+                f"{n_states} != {n_next_states}",
+            )
+
+        if initial_state_dist is None:
+            initial_state_dist = util.one_hot_encoding(0, n_states)
+        if initial_state_dist.ndim != 1:
+            raise ValueError(
+                "initial_state_dist has multiple dimensions:\n"
+                f"{initial_state_dist.ndim} != 1",
+            )
+        if initial_state_dist.shape[0] != n_states:
+            raise ValueError(
+                "transition_matrix and initial_state_dist are not compatible:\n"
+                f"n_states = {n_states}\n"
+                f"len(initial_state_dist) = {len(initial_state_dist)}",
             )
 
         if reward_matrix.shape != transition_matrix.shape[: len(reward_matrix.shape)]:
             raise ValueError(
                 "transition_matrix and reward_matrix are not compatible:\n"
                 f"transition_matrix.shape: {transition_matrix.shape}\n"
-                f"reward_matrix.shape: {reward_matrix.shape}\n",
+                f"reward_matrix.shape: {reward_matrix.shape}",
             )
 
         self.transition_matrix = transition_matrix
         self.reward_matrix = reward_matrix
         self._feature_matrix = None
         self.horizon = horizon
-
-        if initial_state_dist is None:
-            initial_state_dist = util.one_hot_encoding(0, n_states)
         self.initial_state_dist = initial_state_dist
 
         super().__init__(
