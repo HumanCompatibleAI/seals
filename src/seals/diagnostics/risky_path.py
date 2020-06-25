@@ -33,7 +33,7 @@ class RiskyPathEnv(base_envs.TabularModelEnv):
     """
 
     def __init__(self):
-        """Initialize class."""
+        """Initialize environment."""
         nS = 4
         nA = 2
 

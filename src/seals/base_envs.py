@@ -1,7 +1,7 @@
 """Base environment classes."""
 
 import abc
-from typing import Optional
+from typing import Optional, Sequence
 
 import gym
 from gym import spaces
@@ -20,16 +20,26 @@ class ResettableEnv(gym.Env, abc.ABC):
     """
 
     def __init__(
-        self, state_space: gym.Space, action_space: gym.Space,
+        self,
+        *,
+        state_space: gym.Space,
+        observation_space: Optional[gym.Space] = None,
+        action_space: gym.Space,
     ):
-        """Build tabular environment.
+        """Build resettable (PO)MDP.
 
         Args:
             state_space: gym.Space containing possible states.
+            observation_space: gym.Space containing possible observations.
+                If None, defaults to `state_space`.
             action_space: gym.Space containing possible actions.
         """
         self._state_space = state_space
+        if observation_space is None:
+            observation_space = state_space
+        self._observation_space = observation_space
         self._action_space = action_space
+
         self.cur_state = None
         self._n_actions_taken = None
         self.seed()
@@ -43,7 +53,7 @@ class ResettableEnv(gym.Env, abc.ABC):
         """Samples from transition distribution."""
 
     @abc.abstractmethod
-    def reward(self, state, action, new_state):
+    def reward(self, state, action, new_state) -> float:
         """Computes reward for a given transition."""
 
     @abc.abstractmethod
@@ -74,7 +84,7 @@ class ResettableEnv(gym.Env, abc.ABC):
         """Number of steps taken so far."""
         return self._n_actions_taken
 
-    def seed(self, seed=None):
+    def seed(self, seed=None) -> Sequence[int]:
         """Set random seed."""
         if seed is None:
             # Gym API wants list of seeds to be returned for some reason, so
@@ -86,6 +96,7 @@ class ResettableEnv(gym.Env, abc.ABC):
     def reset(self):
         """Reset episode and return initial observation."""
         self.cur_state = self.initial_state()
+        assert self.cur_state in self.state_space, f"unexpected state {self.cur_state}"
         self._n_actions_taken = 0
         return self.obs_from_state(self.cur_state)
 
@@ -93,12 +104,14 @@ class ResettableEnv(gym.Env, abc.ABC):
         """Transition state using given action."""
         if self.cur_state is None or self._n_actions_taken is None:
             raise ValueError("Need to call reset() before first step()")
-
-        assert action in self.action_space, f"{action} not in {self.action_space}"
+        if action not in self.action_space:
+            raise ValueError(f"{action} not in {self.action_space}")
 
         old_state = self.cur_state
         self.cur_state = self.transition(self.cur_state, action)
+        assert self.cur_state in self.state_space, f"unexpected state {self.cur_state}"
         obs = self.obs_from_state(self.cur_state)
+        assert obs in self.observation_space, f"{obs} not in {self.observation_space}"
         rew = self.reward(old_state, action, self.cur_state)
         done = self.terminal(self.cur_state, self._n_actions_taken)
         self._n_actions_taken += 1
@@ -133,19 +146,19 @@ class TabularModelEnv(ResettableEnv):
                 is always 0.
         """
         n_states, n_actions, n_next_states = transition_matrix.shape
-        assert n_states == n_next_states, (
-            "malformed transition_matrix:\n"
-            f"transition_matrix.shape: {transition_matrix.shape}\n"
-            f"{n_states} != {n_next_states}\n"
-        )
+        if n_states != n_next_states:
+            raise ValueError(
+                "Malformed transition_matrix:\n"
+                f"transition_matrix.shape: {transition_matrix.shape}\n"
+                f"{n_states} != {n_next_states}\n",
+            )
 
-        assert (
-            reward_matrix.shape == transition_matrix.shape[: len(reward_matrix.shape)]
-        ), (
-            "transition_matrix and reward_matrix are not compatible:\n"
-            f"transition_matrix.shape: {transition_matrix.shape}\n"
-            f"reward_matrix.shape: {reward_matrix.shape}\n"
-        )
+        if reward_matrix.shape != transition_matrix.shape[: len(reward_matrix.shape)]:
+            raise ValueError(
+                "transition_matrix and reward_matrix are not compatible:\n"
+                f"transition_matrix.shape: {transition_matrix.shape}\n"
+                f"reward_matrix.shape: {reward_matrix.shape}\n",
+            )
 
         self.transition_matrix = transition_matrix
         self.reward_matrix = reward_matrix
@@ -185,6 +198,7 @@ class TabularModelEnv(ResettableEnv):
     @property
     def feature_matrix(self):
         """Matrix mapping states to feature vectors."""
+        # Construct lazily to save memory in algorithms that don't need features.
         if self._feature_matrix is None:
             n_states = self.state_space.n
             self._feature_matrix = np.eye(n_states)
