@@ -1,9 +1,8 @@
 """Smoke tests for all environments."""
 
 import gym
-import pytest
-
 import numpy as np
+import pytest
 
 import seals  # noqa: F401 required for env registration
 from seals import base_envs
@@ -39,6 +38,7 @@ class TestEnvs:
 
 
 def test_base_envs():
+    """Test parts of base_envs not covered elsewhere."""
     class NewEnv(base_envs.TabularModelEnv):
         def __init__(self):
             nS = 3
