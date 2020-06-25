@@ -149,6 +149,7 @@ class TabularModelEnv(ResettableEnv):
 
         self.transition_matrix = transition_matrix
         self.reward_matrix = reward_matrix
+        self._feature_matrix = None
         self.horizon = horizon
 
         if initial_state_dist is None:

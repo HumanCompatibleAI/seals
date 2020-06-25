@@ -3,7 +3,10 @@
 import gym
 import pytest
 
+import numpy as np
+
 import seals  # noqa: F401 required for env registration
+from seals import base_envs
 from seals.testing import envs
 
 ENV_NAMES = [
@@ -33,3 +36,30 @@ class TestEnvs:
     def test_rollout_schema(self, env: gym.Env):
         """Tests if environments have correct types on `step()` and `reset()`."""
         envs.test_rollout_schema(env)
+
+
+def test_base_envs():
+    class NewEnv(base_envs.TabularModelEnv):
+        def __init__(self):
+            nS = 3
+            nA = 2
+            transition_matrix = np.random.rand(nS, nA, nS)
+            transition_matrix /= transition_matrix.sum(axis=2)[:, :, None]
+            reward_matrix = np.random.rand(nS)
+            super().__init__(
+                transition_matrix=transition_matrix,
+                reward_matrix=reward_matrix,
+            )
+
+    env = NewEnv()
+
+    assert np.all(np.eye(3) == env.feature_matrix)
+
+    envs.test_premature_step(env, skip_fn=pytest.skip, raises_fn=pytest.raises)
+
+    env.reset()
+    assert env.n_actions_taken == 0
+    env.step(env.action_space.sample())
+    assert env.n_actions_taken == 1
+    env.step(env.action_space.sample())
+    assert env.n_actions_taken == 2
