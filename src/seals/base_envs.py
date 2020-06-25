@@ -1,4 +1,4 @@
-"""Finite-horizon discrete environments with known transition dynamics."""
+"""Base environment classes."""
 
 import abc
 from typing import Optional
@@ -19,10 +19,14 @@ class ResettableEnv(gym.Env, abc.ABC):
     meet these criteria.
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        state_space,
+        action_space,
+    ):
         """Initialize env."""
-        self._state_space = None
-        self._action_space = None
+        self._state_space = state_space
+        self._action_space = action_space
         self.cur_state = None
         self._n_actions_taken = None
         self.seed()
