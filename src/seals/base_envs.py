@@ -20,9 +20,7 @@ class ResettableEnv(gym.Env, abc.ABC):
     """
 
     def __init__(
-        self,
-        state_space: gym.Space,
-        action_space: gym.Space,
+        self, state_space: gym.Space, action_space: gym.Space,
     ):
         """Build tabular environment.
 
@@ -133,9 +131,19 @@ class TabularModelEnv(ResettableEnv):
                 is always 0.
         """
         n_states, n_actions, n_next_states = transition_matrix.shape
+        assert n_states == n_next_states, (
+            f"malformed transition_matrix:\n"
+            "transition_matrix.shape: {transition_matrix.shape}\n"
+            "{n_states} != {n_next_states}\n"
+        )
+
         assert (
-            n_states == n_next_states
-        ), f"malformed transition_matrix: {n_states} != {n_next_states}"
+            reward_matrix.shape == transition_matrix.shape[: len(reward_matrix.shape)]
+        ), (
+            f"transition_matrix and reward_matrix are not compatible:\n"
+            "transition_matrix.shape: {transition_matrix.shape}\n"
+            "reward_matrix.shape: {reward_matrix.shape}\n"
+        )
 
         self.transition_matrix = transition_matrix
         self.reward_matrix = reward_matrix
