@@ -3,10 +3,12 @@
 import collections
 
 import numpy as np
+
 from seals import util
 
 
 def test_sample_distribution():
+    "Test util.test_sample_distribution."
     distr_size = 5
     distr = np.random.rand(distr_size)
     distr /= distr.sum()
@@ -31,6 +33,7 @@ def test_sample_distribution():
 
 
 def test_one_hot_encoding():
+    "Test util.test_one_hot_encoding."
     Case = collections.namedtuple("Case", ["pos", "size", "encoding"])
 
     cases = [
