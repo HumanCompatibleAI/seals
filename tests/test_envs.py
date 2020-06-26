@@ -1,5 +1,7 @@
 """Smoke tests for all environments."""
 
+from typing import List
+
 import gym
 import numpy as np
 import pytest
@@ -8,13 +10,13 @@ import seals  # noqa: F401 required for env registration
 from seals import base_envs
 from seals.testing import envs
 
-ENV_NAMES = [
+ENV_NAMES: List[str] = [
     env_spec.id
     for env_spec in gym.envs.registration.registry.all()
     if env_spec.id.startswith(f"{seals.GYM_ID_PREFIX}/")
 ]
 
-DETERMINISTIC_ENVS = []
+DETERMINISTIC_ENVS: List[str] = []
 
 
 env = pytest.fixture(envs.make_env_fixture(skip_fn=pytest.skip))

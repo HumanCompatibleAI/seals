@@ -76,6 +76,10 @@ jobs:
           name: pytype
           command: pytype ${TYPECHECK_FILES}
 
+      - run:
+          name: mypy
+          command: mypy ${TYPECHECK_FILES}
+
   unit-test:
     executor: my-executor
     parallelism: 3

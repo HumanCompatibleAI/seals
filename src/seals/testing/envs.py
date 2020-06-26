@@ -5,12 +5,23 @@ projects such as `imitation`, and may be useful in other codebases.
 """
 
 import re
-from typing import Any, Callable, Iterable, Iterator, Mapping, Optional, Sequence, Tuple
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+)
 
 import gym
 import numpy as np
 
-Rollout = Sequence[Tuple[Any, Optional[float], bool, Mapping[str, Any]]]
+Step = Tuple[Any, Optional[float], bool, Mapping[str, Any]]
+Rollout = Sequence[Step]
 """A sequence of 4-tuples (obs, rew, done, info) as returned by `get_rollout`."""
 
 
@@ -70,7 +81,7 @@ def get_rollout(env: gym.Env, actions: Iterable[Any]) -> Rollout:
     Returns:
       A sequence of 4-tuples (obs, rew, done, info).
     """
-    ret = [(env.reset(), None, False, {})]
+    ret: List[Step] = [(env.reset(), None, False, {})]
     for act in actions:
         ret.append(env.step(act))
     return ret
