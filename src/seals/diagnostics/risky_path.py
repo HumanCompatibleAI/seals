@@ -5,7 +5,7 @@ import numpy as np
 from seals import base_envs
 
 
-class RiskyPathEnv(base_envs.TabularModelPOMDP):
+class RiskyPathEnv(base_envs.TabularModelMDP):
     """Environment with two paths to a goal: one safe and one risky.
 
     Many LfH algorithms are derived from Maximum Entropy Inverse Reinforcement
