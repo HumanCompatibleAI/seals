@@ -63,7 +63,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         """Is the state terminal?"""
 
     def obs_from_state(self, state: State) -> Observation:
-        """Returns observation produced by a given state."""
+        """Sample observation for given state."""
 
     @property
     def state_space(self) -> gym.Space:
