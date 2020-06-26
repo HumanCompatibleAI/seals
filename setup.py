@@ -3,7 +3,7 @@
 import os
 import sys
 
-from setuptools import find_packages, setup
+from setuptools import find_packages, setup  # type:ignore
 
 
 def get_version() -> str:
@@ -14,7 +14,7 @@ def get_version() -> str:
     sys.path.insert(
         0, os.path.join(os.path.dirname(__file__), "src", "seals"),
     )
-    from version import VERSION  # pytype:disable=import-error
+    from version import VERSION  # type:ignore
 
     del sys.path[0]
     return VERSION
@@ -40,6 +40,7 @@ TESTS_REQUIRE = [
     "flake8-debugger",
     "flake8-docstrings",
     "flake8-isort",
+    "mypy",
     "pydocstyle",
     "pytest",
     "pytest-cov",

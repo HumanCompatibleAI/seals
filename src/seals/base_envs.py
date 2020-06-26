@@ -1,7 +1,7 @@
 """Base environment classes."""
 
 import abc
-from typing import Optional, Sequence
+from typing import Generic, Optional, Sequence, Tuple, TypeVar
 
 import gym
 from gym import spaces
@@ -9,9 +9,13 @@ import numpy as np
 
 from seals import util
 
+State = TypeVar("State")
+Observation = TypeVar("Observation")
+Action = TypeVar("Action")
 
-class ResettableEnv(gym.Env, abc.ABC):
-    """ABC for environments that are resettable.
+
+class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
+    """ABC for POMDPs that are resettable.
 
     Specifically, these environments provide oracle access to sample from
     the initial state distribution and transition dynamics, and compute the
@@ -23,7 +27,7 @@ class ResettableEnv(gym.Env, abc.ABC):
         self,
         *,
         state_space: gym.Space,
-        observation_space: Optional[gym.Space] = None,
+        observation_space: gym.Space = None,
         action_space: gym.Space,
     ):
         """Build resettable (PO)MDP.
@@ -35,34 +39,31 @@ class ResettableEnv(gym.Env, abc.ABC):
             action_space: gym.Space containing possible actions.
         """
         self._state_space = state_space
-        if observation_space is None:
-            observation_space = state_space
         self._observation_space = observation_space
         self._action_space = action_space
 
-        self.cur_state = None
-        self._n_actions_taken = None
+        self.cur_state: Optional[State] = None
+        self._n_actions_taken: Optional[int] = None
         self.seed()
 
     @abc.abstractmethod
-    def initial_state(self):
+    def initial_state(self) -> State:
         """Samples from the initial state distribution."""
 
     @abc.abstractmethod
-    def transition(self, state, action):
+    def transition(self, state: State, action: Action) -> State:
         """Samples from transition distribution."""
 
     @abc.abstractmethod
-    def reward(self, state, action, new_state) -> float:
+    def reward(self, state: State, action: Action, new_state: State) -> float:
         """Computes reward for a given transition."""
 
     @abc.abstractmethod
-    def terminal(self, state, step: int) -> bool:
+    def terminal(self, state: State, step: int) -> bool:
         """Is the state terminal?"""
 
-    def obs_from_state(self, state):
-        """Returns observation produced by a given state."""
-        return state
+    def obs_from_state(self, state: State) -> Observation:
+        """Sample observation for given state."""
 
     @property
     def state_space(self) -> gym.Space:
@@ -72,7 +73,7 @@ class ResettableEnv(gym.Env, abc.ABC):
     @property
     def observation_space(self) -> gym.Space:
         """Observation space. Return type of reset() and component of step()."""
-        return self.state_space
+        return self._observation_space
 
     @property
     def action_space(self) -> gym.Space:
@@ -82,6 +83,7 @@ class ResettableEnv(gym.Env, abc.ABC):
     @property
     def n_actions_taken(self) -> int:
         """Number of steps taken so far."""
+        assert self._n_actions_taken is not None
         return self._n_actions_taken
 
     def seed(self, seed=None) -> Sequence[int]:
@@ -93,14 +95,14 @@ class ResettableEnv(gym.Env, abc.ABC):
         self.rand_state = np.random.RandomState(seed)
         return [seed]
 
-    def reset(self):
+    def reset(self) -> Observation:
         """Reset episode and return initial observation."""
         self.cur_state = self.initial_state()
         assert self.cur_state in self.state_space, f"unexpected state {self.cur_state}"
         self._n_actions_taken = 0
         return self.obs_from_state(self.cur_state)
 
-    def step(self, action):
+    def step(self, action: Action) -> Tuple[Observation, float, bool, dict]:
         """Transition state using given action."""
         if self.cur_state is None or self._n_actions_taken is None:
             raise ValueError("Need to call reset() before first step()")
@@ -120,7 +122,32 @@ class ResettableEnv(gym.Env, abc.ABC):
         return obs, rew, done, infos
 
 
-class TabularModelEnv(ResettableEnv):
+class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action]):
+    """ABC for MDPs that are resettable."""
+
+    def __init__(
+        self, *, state_space: gym.Space, action_space: gym.Space,
+    ):
+        """Build resettable MDP.
+
+        Args:
+            state_space: gym.Space containing possible states.
+            observation_space: gym.Space containing possible observations.
+                If None, defaults to `state_space`.
+            action_space: gym.Space containing possible actions.
+        """
+        super().__init__(
+            state_space=state_space,
+            observation_space=state_space,
+            action_space=action_space,
+        )
+
+    def obs_from_state(self, state: State) -> State:
+        """Identity since observation == state in an MDP."""
+        return state
+
+
+class TabularModelPOMDP(ResettableMDP[int, int]):
     """Base class for tabular environments with known dynamics."""
 
     def __init__(
