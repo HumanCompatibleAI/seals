@@ -73,7 +73,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
     @property
     def observation_space(self) -> gym.Space:
         """Observation space. Return type of reset() and component of step()."""
-        return self.state_space
+        return self._observation_space
 
     @property
     def action_space(self) -> gym.Space:
