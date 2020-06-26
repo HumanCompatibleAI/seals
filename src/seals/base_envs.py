@@ -27,7 +27,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         self,
         *,
         state_space: gym.Space,
-        observation_space: Optional[gym.Space] = None,
+        observation_space: gym.Space = None,
         action_space: gym.Space,
     ):
         """Build resettable (PO)MDP.
@@ -39,8 +39,6 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
             action_space: gym.Space containing possible actions.
         """
         self._state_space = state_space
-        if observation_space is None:
-            observation_space = state_space
         self._observation_space = observation_space
         self._action_space = action_space
 
