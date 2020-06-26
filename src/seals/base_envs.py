@@ -1,7 +1,7 @@
 """Base environment classes."""
 
 import abc
-from typing import Generic, Optional, Sequence, Tuple, TypeVar, cast
+from typing import Generic, Optional, Sequence, Tuple, TypeVar
 
 import gym
 from gym import spaces
@@ -14,8 +14,8 @@ Observation = TypeVar("Observation")
 Action = TypeVar("Action")
 
 
-class ResettableEnv(gym.Env, abc.ABC, Generic[State, Observation, Action]):
-    """ABC for environments that are resettable.
+class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
+    """ABC for POMDPs that are resettable.
 
     Specifically, these environments provide oracle access to sample from
     the initial state distribution and transition dynamics, and compute the
@@ -65,13 +65,7 @@ class ResettableEnv(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         """Is the state terminal?"""
 
     def obs_from_state(self, state: State) -> Observation:
-        """Returns observation produced by a given state.
-
-        Default implementation is identity, suitable for MDPs;
-        must be overridden for POMDP subclasses.
-        """
-        assert self.state_space == self.observation_space
-        return cast(state, Observation)
+        """Returns observation produced by a given state."""
 
     @property
     def state_space(self) -> gym.Space:
@@ -130,7 +124,32 @@ class ResettableEnv(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         return obs, rew, done, infos
 
 
-class TabularModelEnv(ResettableEnv[int, int, int]):
+class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action]):
+    """ABC for MDPs that are resettable."""
+
+    def __init__(
+        self, *, state_space: gym.Space, action_space: gym.Space,
+    ):
+        """Build resettable MDP.
+
+        Args:
+            state_space: gym.Space containing possible states.
+            observation_space: gym.Space containing possible observations.
+                If None, defaults to `state_space`.
+            action_space: gym.Space containing possible actions.
+        """
+        super().__init__(
+            state_space=state_space,
+            observation_space=state_space,
+            action_space=action_space,
+        )
+
+    def obs_from_state(self, state: State) -> State:
+        """Identity since observation == state in an MDP."""
+        return state
+
+
+class TabularModelPOMDP(ResettableMDP[int, int]):
     """Base class for tabular environments with known dynamics."""
 
     def __init__(

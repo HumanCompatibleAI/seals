@@ -40,7 +40,7 @@ class TestEnvs:
 def test_base_envs():
     """Test parts of base_envs not covered elsewhere."""
 
-    class NewEnv(base_envs.TabularModelEnv):
+    class NewEnv(base_envs.TabularModelPOMDP):
         def __init__(self):
             nS = 3
             nA = 2
@@ -68,27 +68,27 @@ def test_base_envs():
 def test_tabular_env_validation():
     """Test input validation for base_envs.TabularModelEnv."""
     with pytest.raises(ValueError, match=r"Malformed transition_matrix.*"):
-        base_envs.TabularModelEnv(
+        base_envs.TabularModelPOMDP(
             transition_matrix=np.zeros((3, 1, 4)), reward_matrix=np.zeros((3,)),
         )
     with pytest.raises(ValueError, match=r"initial_state_dist has multiple.*"):
-        base_envs.TabularModelEnv(
+        base_envs.TabularModelPOMDP(
             transition_matrix=np.zeros((3, 1, 3)),
             reward_matrix=np.zeros((3,)),
             initial_state_dist=np.zeros((3, 4)),
         )
     with pytest.raises(ValueError, match=r"transition_matrix and initial_state_dist.*"):
-        base_envs.TabularModelEnv(
+        base_envs.TabularModelPOMDP(
             transition_matrix=np.zeros((3, 1, 3)),
             reward_matrix=np.zeros((3,)),
             initial_state_dist=np.zeros((2)),
         )
     with pytest.raises(ValueError, match=r"transition_matrix and reward_matrix.*"):
-        base_envs.TabularModelEnv(
+        base_envs.TabularModelPOMDP(
             transition_matrix=np.zeros((4, 1, 4)), reward_matrix=np.zeros((3,)),
         )
 
-    env = base_envs.TabularModelEnv(
+    env = base_envs.TabularModelPOMDP(
         transition_matrix=np.zeros((3, 1, 3)), reward_matrix=np.zeros((3,)),
     )
     env.reset()
