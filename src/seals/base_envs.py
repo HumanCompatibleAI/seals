@@ -51,9 +51,9 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
     def reward(self, state: State, action: Action, new_state: State) -> float:
         """Computes reward for a given transition."""
 
+    @abc.abstractmethod
     def terminal(self, state: State, step: int) -> bool:
         """Is the state terminal?"""
-        return False
 
     @abc.abstractmethod
     def obs_from_state(self, state: State) -> Observation:
