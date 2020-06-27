@@ -7,3 +7,9 @@ gym.register(
     entry_point="seals.diagnostics.risky_path:RiskyPathEnv",
     max_episode_steps=5,
 )
+
+gym.register(
+    id=f"seals/Parabola-v0",
+    entry_point="seals.diagnostics.parabola:ParabolaEnv",
+    max_episode_steps=20,
+)
