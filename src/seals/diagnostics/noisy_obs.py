@@ -51,7 +51,7 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
 
     def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
         """Returns positive reward if state is the goal."""
-        return np.allclose(state, self._goal)
+        return float(np.allclose(state, self._goal))
 
     def transition(self, state: np.ndarray, action: int) -> np.ndarray:
         """Returns next state according to grid."""
