@@ -43,7 +43,7 @@ class EarlyTerminationEnv(base_envs.TabularModelPOMDP):
         transition_matrix[2, :, 2] = 1.0
 
         reward_sign = 2 * is_reward_positive - 1
-        reward_matrix = reward_sign * np.ones((nS,))
+        reward_matrix = reward_sign * np.ones((nS,), dtype=float)
 
         super().__init__(
             transition_matrix=transition_matrix, reward_matrix=reward_matrix,
@@ -51,7 +51,7 @@ class EarlyTerminationEnv(base_envs.TabularModelPOMDP):
 
     def terminal(self, state: int, n_actions_taken: int) -> bool:
         """Returns True if (and only if) in state 2."""
-        return state == 2
+        return bool(state == 2)
 
 
 EarlyTermPosEnv = partial(EarlyTerminationEnv, is_reward_positive=True)
