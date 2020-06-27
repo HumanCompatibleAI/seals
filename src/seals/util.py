@@ -121,7 +121,10 @@ def one_hot_encoding(pos: int, size: int) -> np.ndarray:
 
 
 def grid_transition_fn(
-        state: int, action: int, x_bounds: Tuple[float, float] =(-np.inf, np.inf), y_bounds: Tuple[float, float] = (-np.inf, np.inf),
+    state: np.ndarray,
+    action: int,
+    x_bounds: Tuple[float, float] = (-np.inf, np.inf),
+    y_bounds: Tuple[float, float] = (-np.inf, np.inf),
 ):
     """Returns transition of a deterministic gridworld.
 

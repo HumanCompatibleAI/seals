@@ -15,7 +15,8 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
     The challenge is to select the relevant features in the observations, and
     not overfit to noise.
     """
-    def __init__(self, *, size:int = 5, noise_length:int = 20):
+
+    def __init__(self, *, size: int = 5, noise_length: int = 20):
         """Build environment.
 
         Args:
@@ -26,39 +27,39 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
         self._noise_length = noise_length
         self._goal = np.array([self._size // 2, self._size // 2])
 
-        self._observation_space = spaces.Box(
-            low=np.concatenate(([0, 0], np.full(self._noise_length, -np.inf),)),
-            high=np.concatenate(
-                ([size - 1, size - 1], np.full(self._noise_length, np.inf),)
-            ),
-            dtype=float,
-        )
-
         super().__init__(
             state_space=spaces.MultiDiscrete([size, size]),
             action_space=spaces.Discrete(5),
+            observation_space=spaces.Box(
+                low=np.concatenate(([0, 0], np.full(self._noise_length, -np.inf),)),
+                high=np.concatenate(
+                    ([size - 1, size - 1], np.full(self._noise_length, np.inf),)
+                ),
+                dtype=float,
+            ),
         )
 
-    def terminal(self, state: int) -> bool:
+    def terminal(self, state: np.ndarray, n_actions_taken: int) -> bool:
+        """Always returns False."""
         return False
 
-    def initial_state(self) -> int:
+    def initial_state(self) -> np.ndarray:
+        """Returns one of the grid's corners."""
         n = self._size
         corners = np.array([[0, 0], [n - 1, 0], [0, n - 1], [n - 1, n - 1]])
         return corners[np.random.randint(4)]
 
-    def reward(self, state: int, action: int, new_state: int) -> float:
-        return np.allclose(state, self.goal)
+    def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
+        """Returns positive reward if state is the goal."""
+        return np.allclose(state, self._goal)
 
-    def transition(self, state: int, action: int) -> int:
+    def transition(self, state: np.ndarray, action: int) -> np.ndarray:
+        """Returns next state according to grid."""
         return util.grid_transition_fn(
             state, action, x_bounds=(0, self._size - 1), y_bounds=(0, self._size - 1)
         )
 
-    @property
-    def observation_space(self):
-        return self._observation_space
-
-    def ob_from_state(self, state):
-        noise_vector = self.np_random.randn(self._noise_length)
+    def obs_from_state(self, state: np.ndarray) -> np.ndarray:
+        """Returns (x, y) concatenated with Gaussian noise."""
+        noise_vector = self.rand_state.randn(self._noise_length)
         return np.concatenate([state, noise_vector])
