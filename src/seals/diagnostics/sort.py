@@ -35,7 +35,7 @@ class SortEnv(base_envs.ResettableMDP):
         return self.rand_state.random(size=self._length)
 
     def reward(
-        self, state: np.ndarray, action: np.ndarray, new_state: np.ndarray
+        self, state: np.ndarray, action: np.ndarray, new_state: np.ndarray,
     ) -> float:
         """Rewards fully sorted lists, and new correct positions."""
         num_correct = self._num_correct_positions(state)
