@@ -47,7 +47,7 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
         """Returns one of the grid's corners."""
         n = self._size
         corners = np.array([[0, 0], [n - 1, 0], [0, n - 1], [n - 1, n - 1]])
-        return corners[np.random.randint(4)]
+        return corners[np.rand_state.randint(4)]
 
     def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
         """Returns positive reward if state is the goal."""
