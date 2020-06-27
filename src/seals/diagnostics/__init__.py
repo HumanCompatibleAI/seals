@@ -9,7 +9,7 @@ gym.register(
 )
 
 gym.register(
-    id=f"seals/Branching-v0",
+    id="seals/Branching-v0",
     entry_point="seals.diagnostics.branching:BranchingEnv",
     max_episode_steps=11,
 )
