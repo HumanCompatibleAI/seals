@@ -42,7 +42,7 @@ class SortEnv(base_envs.ResettableMDP):
         new_num_correct = self._num_correct_positions(new_state)
         potential_diff = new_num_correct - num_correct
 
-        return int(self._is_sorted(new_state)) + potential_diff
+        return float(self._is_sorted(new_state)) + potential_diff
 
     def transition(self, state: np.ndarray, action: np.ndarray) -> float:
         """Action a = (i, j) swaps elements in positions i and j."""
