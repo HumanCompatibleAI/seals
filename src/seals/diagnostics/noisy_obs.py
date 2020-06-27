@@ -31,9 +31,9 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
             state_space=spaces.MultiDiscrete([size, size]),
             action_space=spaces.Discrete(5),
             observation_space=spaces.Box(
-                low=np.concatenate(([0, 0], np.full(self._noise_length, -np.inf),)),
+                low=np.concatenate(([0, 0], np.full(self._noise_length, -np.inf))),
                 high=np.concatenate(
-                    ([size - 1, size - 1], np.full(self._noise_length, np.inf),)
+                    ([size - 1, size - 1], np.full(self._noise_length, np.inf)),
                 ),
                 dtype=float,
             ),
@@ -56,7 +56,7 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
     def transition(self, state: np.ndarray, action: int) -> np.ndarray:
         """Returns next state according to grid."""
         return util.grid_transition_fn(
-            state, action, x_bounds=(0, self._size - 1), y_bounds=(0, self._size - 1)
+            state, action, x_bounds=(0, self._size - 1), y_bounds=(0, self._size - 1),
         )
 
     def obs_from_state(self, state: np.ndarray) -> np.ndarray:
