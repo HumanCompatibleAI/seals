@@ -41,7 +41,7 @@ class LargestSumEnv(base_envs.ResettableMDP):
         """Returns positive reward for action being the right label."""
         n = self._length
         label = np.sum(state[: n // 2]) > np.sum(state[n // 2 :])
-        return int(act == label)
+        return float(act == label)
 
     def transition(self, state: np.ndarray, action: int) -> np.ndarray:
         """Returns same state."""
