@@ -16,7 +16,7 @@ class ParabolaEnv(base_envs.ResettableMDP):
     at the start of the episode.
     """
 
-    def __init__(self, x_step=0.05, bounds=5):
+    def __init__(self, x_step: float = 0.05, bounds: float = 5):
         """Construct environment.
 
         Args:
@@ -36,19 +36,19 @@ class ParabolaEnv(base_envs.ResettableMDP):
         """Always returns False."""
         return False
 
-    def initial_state(self):
+    def initial_state(self) -> np.ndarray:
         """Get state by sampling a random parabola."""
         a, b, c = -1 + 2 * self.rand_state.rand(3)
         x, y = 0, c
         return np.array([x, y, a, b, c])
 
-    def reward(self, state, act, next_state):
+    def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
         """Negative squared vertical distance from parabola."""
         x, y, a, b, c = state
         target_y = a * x ** 2 + b * x + c
         return (-1) * (y - target_y) ** 2
 
-    def transition(self, state, action):
+    def transition(self, state: np.ndarray, action: int) -> np.ndarray:
         """Update x according to x_step and y according to action."""
         x, y, a, b, c = state
         next_x = x + self._x_step

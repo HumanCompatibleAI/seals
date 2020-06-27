@@ -9,7 +9,7 @@ gym.register(
 )
 
 gym.register(
-    id=f"seals/Parabola-v0",
+    id="seals/Parabola-v0",
     entry_point="seals.diagnostics.parabola:ParabolaEnv",
     max_episode_steps=20,
 )
