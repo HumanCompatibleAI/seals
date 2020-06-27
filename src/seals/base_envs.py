@@ -126,8 +126,9 @@ class FullyObservableMixin(Generic[State]):
 
     def obs_from_state(self, state: State) -> State:
         """Returns the state as observation.
-        
-        In a fully observable MDP, the observations are the state."""
+
+        In a fully observable MDP, the observations are the state.
+        """
         return state
 
 
