@@ -16,7 +16,9 @@ ENV_NAMES: List[str] = [
     if env_spec.id.startswith(f"{seals.GYM_ID_PREFIX}/")
 ]
 
-DETERMINISTIC_ENVS: List[str] = []
+DETERMINISTIC_ENVS: List[str] = [
+    "seals/Branching-v0",
+]
 
 
 env = pytest.fixture(envs.make_env_fixture(skip_fn=pytest.skip))
