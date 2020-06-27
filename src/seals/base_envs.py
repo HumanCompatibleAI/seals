@@ -24,15 +24,21 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
     """
 
     def __init__(
-        self, *, state_space: gym.Space, action_space: gym.Space,
+        self,
+        *,
+        state_space: gym.Space,
+        observation_space: gym.Space,
+        action_space: gym.Space,
     ):
         """Build resettable (PO)MDP.
 
         Args:
             state_space: gym.Space containing possible states.
+            observation_space: gym.Space containing possible observations.
             action_space: gym.Space containing possible actions.
         """
         self._state_space = state_space
+        self._observation_space = observation_space
         self._action_space = action_space
 
         self.cur_state: Optional[State] = None
@@ -60,14 +66,14 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         """Sample observation for given state."""
 
     @property
-    @abc.abstractmethod
-    def observation_space(self) -> gym.Space:
-        """Observation space. Return type of reset() and component of step()."""
-
-    @property
     def state_space(self) -> gym.Space:
         """State space. Often same as observation_space, but differs in POMDPs."""
         return self._state_space
+
+    @property
+    def observation_space(self) -> gym.Space:
+        """Observation space. Return type of reset() and component of step()."""
+        return self._observation_space
 
     @property
     def action_space(self) -> gym.Space:
@@ -116,28 +122,33 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         return obs, rew, done, infos
 
 
-class FullyObservableMixin(Generic[State]):
-    """Mixin for setting a POMDP as an MDP."""
+class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action]):
+    """ABC for MDPs that are resettable."""
 
-    @property
-    def observation_space(self):
-        """Returns observation/state space."""
-        return self.state_space
+    def __init__(
+        self, *, state_space: gym.Space, action_space: gym.Space,
+    ):
+        """Build resettable MDP.
+
+        Args:
+            state_space: gym.Space containing possible states.
+            observation_space: gym.Space containing possible observations.
+                If None, defaults to `state_space`.
+            action_space: gym.Space containing possible actions.
+        """
+        super().__init__(
+            state_space=state_space,
+            observation_space=state_space,
+            action_space=action_space,
+        )
 
     def obs_from_state(self, state: State) -> State:
-        """Returns the state as observation.
-
-        In a fully observable MDP, the observations are the state.
-        """
+        """Identity since observation == state in an MDP."""
         return state
 
 
-class TabularModelPOMDP(ResettablePOMDP[int, Observation, int], Generic[Observation]):
-    """Abstract class for tabular environments with known dynamics.
-
-    To make it concrete, you need to override at least observation_space and
-    obs_from_state.
-    """
+class TabularModelMDP(ResettableMDP[int, int]):
+    """Base class for tabular environments with known dynamics."""
 
     def __init__(
         self,
@@ -230,9 +241,3 @@ class TabularModelPOMDP(ResettablePOMDP[int, Observation, int], Generic[Observat
             n_states = self.state_space.n
             self._feature_matrix = np.eye(n_states)
         return self._feature_matrix
-
-
-class TabularModelMDP(FullyObservableMixin[int], TabularModelPOMDP[int]):
-    """Concrete class for tabular MDPs with known dynamics."""
-
-    pass
