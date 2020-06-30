@@ -39,7 +39,7 @@ class SortEnv(base_envs.ResettableMDP):
     ) -> float:
         """Rewards fully sorted lists, and new correct positions."""
         # This is not meant to be a potential shaping in the formal sense,
-        # as it changes the trajectory returns (since the we do not return
+        # as it changes the trajectory returns (since we do not return
         # a fixed-potential state at termination).
         num_correct = self._num_correct_positions(state)
         new_num_correct = self._num_correct_positions(new_state)
