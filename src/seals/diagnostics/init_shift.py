@@ -8,7 +8,7 @@ import numpy as np
 from seals import base_envs
 
 
-class InitShiftEnv(base_envs.TabularModelPOMDP):
+class InitShiftEnv(base_envs.TabularModelMDP):
     """Tests for robustness to initial state shift.
 
     Many LfH algorithms learn from expert demonstrations. This can be
