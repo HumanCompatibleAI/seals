@@ -35,7 +35,7 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
                 high=np.concatenate(
                     ([size - 1, size - 1], np.full(self._noise_length, np.inf)),
                 ),
-                dtype=float,
+                dtype=np.float32,
             ),
         )
 
@@ -50,7 +50,7 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
         return corners[self.rand_state.randint(4)]
 
     def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
-        """Returns positive reward if state is the goal."""
+        """Returns  +1.0 reward if state is the goal and 0.0 otherwise."""
         return float(np.allclose(state, self._goal))
 
     def transition(self, state: np.ndarray, action: int) -> np.ndarray:
