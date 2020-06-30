@@ -38,6 +38,9 @@ class SortEnv(base_envs.ResettableMDP):
         self, state: np.ndarray, action: np.ndarray, new_state: np.ndarray,
     ) -> float:
         """Rewards fully sorted lists, and new correct positions."""
+        # This is not meant to be a potential shaping in the formal sense,
+        # as it changes the trajectory returns (since the we do not return
+        # a fixed-potential state at termination).
         num_correct = self._num_correct_positions(state)
         new_num_correct = self._num_correct_positions(new_state)
         potential_diff = new_num_correct - num_correct
