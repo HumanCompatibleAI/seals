@@ -1,4 +1,4 @@
-"""Environment testing scalability to high-dimensionality."""
+"""Environment testing scalability to high-dimensional tasks."""
 
 from gym import spaces
 import numpy as np
@@ -38,7 +38,7 @@ class LargestSumEnv(base_envs.ResettableMDP):
         return self.rand_state.rand(self._length)
 
     def reward(self, state: np.ndarray, act: int, next_state: np.ndarray) -> float:
-        """Returns positive reward for action being the right label."""
+        """Returns +1.0 reward when action is the right label and 0.0 otherwise."""
         n = self._length
         label = np.sum(state[: n // 2]) > np.sum(state[n // 2 :])
         return float(act == label)
