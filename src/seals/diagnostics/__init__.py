@@ -49,3 +49,9 @@ gym.register(
     entry_point="seals.diagnostics.early_term:EarlyTermNegEnv",
     max_episode_steps=10,
 )
+
+gym.register(
+    id="seals/LargestSum-v0",
+    entry_point="seals.diagnostics.largest_sum:LargestSumEnv",
+    max_episode_steps=1,
+)
