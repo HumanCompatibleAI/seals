@@ -30,8 +30,8 @@ class LargestSumEnv(base_envs.ResettableMDP):
         )
 
     def terminal(self, state: np.ndarray, n_actions_taken: int) -> bool:
-        """Always returns False."""
-        return False
+        """Always returns True, since this task should have a 1-timestep horizon."""
+        return True
 
     def initial_state(self) -> np.ndarray:
         """Returns vector sampled uniformly in [0, 1]**L."""
