@@ -55,3 +55,9 @@ gym.register(
     entry_point="seals.diagnostics.largest_sum:LargestSumEnv",
     max_episode_steps=1,
 )
+
+gym.register(
+    id="seals/Parabola-v0",
+    entry_point="seals.diagnostics.parabola:ParabolaEnv",
+    max_episode_steps=20,
+)
