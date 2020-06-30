@@ -1,4 +1,4 @@
-"""Gridworld with large random initial state."""
+"""Large gridworld with random agent and goal position."""
 
 from gym import spaces
 import numpy as np
@@ -7,7 +7,7 @@ from seals import base_envs, util
 
 
 class ProcGoalEnv(base_envs.ResettableMDP):
-    """Gridworld with large random initial state.
+"""Large gridworld with random agent and goal position.
 
     In this task, the agent starts at a random position in a large
     grid, and must navigate to a goal randomly placed in a
