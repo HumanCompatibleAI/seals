@@ -1,6 +1,6 @@
 """Environment checking for correctness under early termination."""
 
-from functools import partial
+import functools
 
 import numpy as np
 
@@ -54,5 +54,5 @@ class EarlyTerminationEnv(base_envs.TabularModelPOMDP):
         return bool(state == 2)
 
 
-EarlyTermPosEnv = partial(EarlyTerminationEnv, is_reward_positive=True)
-EarlyTermNegEnv = partial(EarlyTerminationEnv, is_reward_positive=False)
+EarlyTermPosEnv = functools.partial(EarlyTerminationEnv, is_reward_positive=True)
+EarlyTermNegEnv = functools.partial(EarlyTerminationEnv, is_reward_positive=False)
