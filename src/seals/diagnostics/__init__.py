@@ -61,3 +61,9 @@ gym.register(
     entry_point="seals.diagnostics.parabola:ParabolaEnv",
     max_episode_steps=20,
 )
+
+gym.register(
+    id="seals/ProcGoal-v0",
+    entry_point="seals.diagnostics.proc_goal:ProcGoalEnv",
+    max_episode_steps=20,
+)
