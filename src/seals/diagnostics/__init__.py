@@ -25,3 +25,9 @@ gym.register(
     entry_point="seals.diagnostics.noisy_obs:NoisyObsEnv",
     max_episode_steps=15,
 )
+
+gym.register(
+    id="seals/Sort-v0",
+    entry_point="seals.diagnostics.sort:SortEnv",
+    max_episode_steps=6,
+)
