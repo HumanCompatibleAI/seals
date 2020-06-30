@@ -1,6 +1,6 @@
 """Miscellaneous utilities."""
 
-from typing import Optional
+from typing import Optional, Tuple
 
 import gym
 import numpy as np
@@ -118,3 +118,41 @@ def sample_distribution(
 def one_hot_encoding(pos: int, size: int) -> np.ndarray:
     """Returns a 1-D hot encoding of a given position and size."""
     return np.eye(size)[pos]
+
+
+def grid_transition_fn(
+    state: np.ndarray,
+    action: int,
+    x_bounds: Tuple[float, float] = (-np.inf, np.inf),
+    y_bounds: Tuple[float, float] = (-np.inf, np.inf),
+):
+    """Returns transition of a deterministic gridworld.
+
+    Agent is bounded in the region limited by x_bounds and y_bounds,
+    ends inclusive.
+
+    (0, 0) is interpreted to be top-left corner.
+
+    Actions:
+    0: Right
+    1: Down
+    2: Left
+    3: Up
+    4: Stay put
+    """
+    dirs = [
+        (1, 0),
+        (0, 1),
+        (-1, 0),
+        (0, -1),
+        (0, 0),
+    ]
+
+    x, y = state
+    dx, dy = dirs[action]
+
+    next_x = np.clip(x + dx, *x_bounds)
+    next_y = np.clip(y + dy, *y_bounds)
+    next_state = np.array([next_x, next_y], dtype=state.dtype)
+
+    return next_state

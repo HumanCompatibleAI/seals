@@ -8,6 +8,7 @@ import pytest
 
 import seals  # noqa: F401 required for env registration
 from seals import base_envs
+from seals.diagnostics import init_shift
 from seals.testing import envs
 
 ENV_NAMES: List[str] = [
@@ -19,6 +20,9 @@ ENV_NAMES: List[str] = [
 DETERMINISTIC_ENVS: List[str] = [
     "seals/EarlyTermPos-v0",
     "seals/EarlyTermNeg-v0",
+    "seals/Branching-v0",
+    "seals/InitShiftTrain-v0",
+    "seals/InitShiftTest-v0",
 ]
 
 
@@ -99,3 +103,10 @@ def test_tabular_env_validation():
     env.reset()
     with pytest.raises(ValueError, match=r".*not in.*"):
         env.step(4)
+
+
+def test_init_shift_validation():
+    """Test input validation for init_shift.InitShiftEnv."""
+    for invalid_state in [-1, 7, 8, 100]:
+        with pytest.raises(ValueError, match=r"Initial state.*"):
+            init_shift.InitShiftEnv(initial_state=invalid_state)
