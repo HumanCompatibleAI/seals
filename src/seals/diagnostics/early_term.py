@@ -11,17 +11,20 @@ class EarlyTerminationEnv(base_envs.TabularModelPOMDP):
     """Three-state MDP with early termination state.
 
     Many implementations of imitation learning algorithms incorrectly assign a
-    value of zero to terminal states (Kostrikov et. al (2018)).  Depending on
-    the sign of the learned reward function in non-terminal states, this can
-    either bias the agent to end episodes early or prolong them as long as
-    possible.  This confounds evaluation as performance is spuriously high in
-    tasks where the termination bias aligns with the task objective.  These
-    tasks attempt to detect this type of bias, and they are adapted from
-    Kostrikov et. al (2018).
+    value of zero to terminal states [1]. Depending on the sign of the learned
+    reward function in non-terminal states, this can either bias the agent to
+    end episodes early or prolong them as long as possible. This confounds
+    evaluation as performance is spuriously high in tasks where the termination
+    bias aligns with the task objective. These tasks attempt to detect this
+    type of bias, and they are adapted from [1].
 
     The environment is a 3-state MDP, in which the agent can either alternate
     between two initial states until reaching the time horizon, or they can
     move to a terminal state causing the episode to terminate early.
+
+    [1] Kostrikov, Ilya, et al. "Discriminator-actor-critic: Addressing sample
+    inefficiency and reward bias in adversarial imitation learning." arXiv
+    preprint arXiv:1809.02925 (2018).
     """
 
     def __init__(self, is_reward_positive: bool = True):
