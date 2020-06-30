@@ -7,7 +7,7 @@ from seals import base_envs, util
 
 
 class ProcGoalEnv(base_envs.ResettableMDP):
-"""Large gridworld with random agent and goal position.
+    """Large gridworld with random agent and goal position.
 
     In this task, the agent starts at a random position in a large
     grid, and must navigate to a goal randomly placed in a
