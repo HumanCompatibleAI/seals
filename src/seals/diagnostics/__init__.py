@@ -18,6 +18,7 @@ gym.register(
     id="seals/InitShiftTest-v0",
     entry_point="seals.diagnostics.init_shift:InitShiftTestEnv",
     max_episode_steps=3,
+)
 
 gym.register(
     id="seals/NoisyObs-v0",
