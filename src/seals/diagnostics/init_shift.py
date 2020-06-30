@@ -1,4 +1,4 @@
-"""Environment with initial state distribution shift."""
+"""Environment with shift in initial state distribution."""
 
 import functools
 import itertools
@@ -27,7 +27,7 @@ class InitShiftEnv(base_envs.TabularModelPOMDP):
     disambiguate this case.
     """
 
-    def __init__(self, initial_state: int = 0):
+    def __init__(self, initial_state: int):
         """Constructs environment.
 
         Args:
