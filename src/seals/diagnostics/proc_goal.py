@@ -23,9 +23,9 @@ class ProcGoalEnv(base_envs.ResettableMDP):
         """Constructs environment.
 
         Args:
-            bounds: the absolute values of the agent's coordinates are
-                bounded by `bounds`. Increasing the value might make
-                generalization harder.
+            bounds: the absolute values of the coordinates of the initial agent
+            position are bounded by `bounds`. Increasing the value might make
+            generalization harder.
             distance: initial distance between agent and goal.
         """
         self._bounds = bounds
