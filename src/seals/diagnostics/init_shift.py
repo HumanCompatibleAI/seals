@@ -33,9 +33,13 @@ class InitShiftEnv(base_envs.TabularModelPOMDP):
         Args:
             initial_state: fixed initial state.
         """
-        self._initial_state = initial_state
         nS = 7
         nA = 2
+
+        if not 0 <= initial_state < nS:
+            raise ValueError(f"Initial state {initial_state} must lie in [0,{nS})")
+
+        self._initial_state = initial_state
 
         non_leaves = np.arange(3)
         leaves = np.arange(3, 7)
@@ -60,5 +64,5 @@ class InitShiftEnv(base_envs.TabularModelPOMDP):
         return self._initial_state
 
 
-InitShiftExpertEnv = functools.partial(InitShiftEnv, initial_state=0)
-InitShiftLearnerEnv = functools.partial(InitShiftEnv, initial_state=1)
+InitShiftTrainEnv = functools.partial(InitShiftEnv, initial_state=0)
+InitShiftTestEnv = functools.partial(InitShiftEnv, initial_state=1)
