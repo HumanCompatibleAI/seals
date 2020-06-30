@@ -131,6 +131,8 @@ def grid_transition_fn(
     Agent is bounded in the region limited by x_bounds and y_bounds,
     ends inclusive.
 
+    (0, 0) is interpreted to be top-left corner.
+
     Actions:
     0: Right
     1: Down
