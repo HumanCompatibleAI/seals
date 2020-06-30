@@ -31,3 +31,9 @@ gym.register(
     entry_point="seals.diagnostics.sort:SortEnv",
     max_episode_steps=6,
 )
+
+gym.register(
+    id="seals/Branching-v0",
+    entry_point="seals.diagnostics.branching:BranchingEnv",
+    max_episode_steps=11,
+)

@@ -18,6 +18,7 @@ ENV_NAMES: List[str] = [
 ]
 
 DETERMINISTIC_ENVS: List[str] = [
+    "seals/Branching-v0",
     "seals/InitShiftTrain-v0",
     "seals/InitShiftTest-v0",
 ]
