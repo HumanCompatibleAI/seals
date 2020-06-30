@@ -27,8 +27,11 @@ class ParabolaEnv(base_envs.ResettableMDP):
         self._x_step = x_step
         self._bounds = bounds
 
+        state_high = np.array([bounds, bounds, 1.0, 1.0, 1.0])
+        state_low = (-1) * state_high
+
         super().__init__(
-            state_space=spaces.Box(low=-bounds, high=bounds, shape=(5,)),
+            state_space=spaces.Box(low=state_low, high=state_high),
             action_space=spaces.Box(low=-np.inf, high=np.inf, shape=()),
         )
 
