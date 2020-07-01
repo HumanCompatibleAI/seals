@@ -1,12 +1,12 @@
-SEALS User Guide
+seals User Guide
 ================
 
-The Suite of Environments for Algorithms that Learn Specifications (SEALS) is a toolkit for
+The Suite of Environments for Algorithms that Learn Specifications, or *seals*, is a toolkit for
 evaluating specification learning algorithms, such as reward or imitation learning. The environments
 are compatible with `Gym <https://github.com/openai/gym/>`_, but are designed to test algorithms
 that learn from user data, without requiring a procedurally specified reward function.
 
-SEALS currently contains two types of environments:
+There are two types of environments in *seals*:
 
     * **Diagnostic Tasks** which test individual facets of algorithm performance in isolation.
       The `DERAIL <https://arxiv.org/abs/2006.XXXXX>`_ paper describes these tasks in detail
@@ -17,24 +17,31 @@ SEALS currently contains two types of environments:
       the score appearing in the observation, etc) and including all the information needed to
       compute the reward in the observation space.
 
-SEALS is under active development and we intend to add more categories of tasks soon.
+*seals* is under active development and we intend to add more categories of tasks soon.
 
 .. toctree::
    :maxdepth: 1
+   :caption: User Guide
+
+   guide/install
+
+
+.. toctree::
+   :maxdepth: 3
    :caption: Environments
 
    environments/diagnostic
    environments/renovated
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Common
 
    common/base_envs
    common/util
    common/testing
 
-Citing SEALS
+Citing seals
 ------------
 To cite this project in publications:
 
@@ -42,7 +49,7 @@ To cite this project in publications:
 
     @misc{seals,
       author = {Adam Gleave and Pedro Freire and Steven Wang and Sam Toyer},
-      title = {SEALS: Suite of Environments for Algorithms that Learn Specifications},
+      title = {{seals}: Suite of Environments for Algorithms that Learn Specifications},
       year = {2020},
       publisher = {GitHub},
       journal = {GitHub repository},
@@ -55,7 +62,7 @@ Additionally, if you use the diagnostic tasks, you may wish to cite:
 
     @inproceedings{freire:2020,
       author = {Pedro Freire and Adam Gleave and Sam Toyer and Stuart Russell},
-      title = {DERAIL: Diagnostic Environments for Reward and Imitation Learning},
+      title = {{DERAIL}: Diagnostic Environments for Reward and Imitation Learning},
       year = {2020},
       booktitle = {Participatory ML Workshop at ICML},
       url = {https://arxiv.org/abs/2006.XXXX},

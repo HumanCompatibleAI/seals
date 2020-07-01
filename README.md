@@ -5,11 +5,11 @@
 
 **Status**: alpha, pre-release.
 
-The [CHAI](https://humancompatible.ai/) Suite of Environments for Algorithms that Learn 
-Specifications (SEALS) is a toolkit for evaluating specification learning algorithms, such as
-reward or imitation learning. The environments are compatible with [Gym](https://github.com/openai/gym),
-but are designed to test algorithms that learn from user data, without requiring a procedurally
-specified reward function.
+*seals*, the Suite of Environments for Algorithms that Learn Specifications, is a toolkit for
+evaluating specification learning algorithms, such as reward or imitation learning. The
+environments are compatible with [Gym](https://github.com/openai/gym), but are designed
+to test algorithms that learn from user data, without requiring a procedurally specified
+reward function.
 
 This is currently a work-in progress. While you are welcome to use the repository, we may make
 breaking changes at any time without prior notice. We intend for it to eventually contain:
@@ -22,6 +22,8 @@ breaking changes at any time without prior notice. We intend for it to eventuall
 You may also be interested in our sister project [imitation](https://github.com/humancompatibleai/imitation/),
 providing implementations of a variety of imitation and reward learning algorithms.
 
+Check out our [documentation](https://seals.readthedocs.io/en/latest/) for more information about *seals*.
+
 # Quickstart
 
 To install the latest release from PyPI, run:
@@ -30,7 +32,7 @@ To install the latest release from PyPI, run:
 pip install seals
 ```
 
-All SEALS environments are available in the Gym registry. Simply import it and then use as you
+All *seals* environments are available in the Gym registry. Simply import it and then use as you
 would with your usual RL or specification learning algroithm:
 
 ```python
