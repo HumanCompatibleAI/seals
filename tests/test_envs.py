@@ -11,7 +11,7 @@ from seals.testing import envs
 ENV_NAMES: List[str] = [
     env_spec.id
     for env_spec in gym.envs.registration.registry.all()
-    if env_spec.id.startswith(f"{seals.GYM_ID_PREFIX}/")
+    if env_spec.id.startswith("seals/")
 ]
 
 DETERMINISTIC_ENVS: List[str] = [
