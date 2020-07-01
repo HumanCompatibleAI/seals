@@ -11,7 +11,7 @@ class RiskyPathEnv(base_envs.TabularModelMDP):
     Many LfH algorithms are derived from Maximum Entropy Inverse Reinforcement
     Learning [1], which models the demonstrator as producing trajectories with
     probability p(tau) proportional to exp(R(tau)).  This model implies that a
-    demonstrator can ``control'' the environment well enough to follow any
+    demonstrator can "control" the environment well enough to follow any
     high-reward trajectory with high probability [2]. However, in stochastic
     environments, the agent cannot control the probability of each trajectory
     independently.  This misspecification may lead to poor behavior.

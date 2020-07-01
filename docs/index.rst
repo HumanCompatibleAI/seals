@@ -1,16 +1,65 @@
-.. seals documentation master file, created by
-   sphinx-quickstart on Mon Jan 13 20:48:50 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+SEALS User Guide
+================
 
-Welcome to seals's documentation!
-==================================================
+The Suite of Environments for Algorithms that Learn Specifications (SEALS) is a toolkit for
+evaluating specification learning algorithms, such as reward or imitation learning. The environments
+are compatible with `Gym <https://github.com/openai/gym/>`_, but are designed to test algorithms
+that learn from user data, without requiring a procedurally specified reward function.
+
+SEALS currently contains two types of environments:
+
+    * **Diagnostic Tasks** which test individual facets of algorithm performance in isolation.
+      The `DERAIL <https://arxiv.org/abs/2006.XXXXX>`_ paper describes these tasks in detail
+      including benchmark results.
+    * **Renovated Environments**, adaptations of widely-used benchmarks such as MuJoCo continuous
+      control tasks to be suitable for specification learning benchmarks. In particular, this
+      involves removing any side-channel sources of reward information (such as episode boundaries,
+      the score appearing in the observation, etc) and including all the information needed to
+      compute the reward in the observation space.
+
+SEALS is under active development and we intend to add more categories of tasks soon.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Environments
 
+   environments/diagnostic
+   environments/renovated
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Common
+
+   common/base_envs
+   common/util
+   common/testing
+
+Citing SEALS
+------------
+To cite this project in publications:
+
+.. code-block:: bibtex
+
+    @misc{seals,
+      author = {Adam Gleave and Pedro Freire and Steven Wang and Sam Toyer},
+      title = {SEALS: Suite of Environments for Algorithms that Learn Specifications},
+      year = {2020},
+      publisher = {GitHub},
+      journal = {GitHub repository},
+      howpublished = {\url{https://github.com/HumanCompatibleAI/seals}},
+   }
+
+Additionally, if you use the diagnostic tasks, you may wish to cite:
+
+.. code-block:: bibtex
+
+    @inproceedings{freire:2020,
+      author = {Pedro Freire and Adam Gleave and Sam Toyer and Stuart Russell},
+      title = {DERAIL: Diagnostic Environments for Reward and Imitation Learning},
+      year = {2020},
+      booktitle = {Participatory ML Workshop at ICML},
+      url = {https://arxiv.org/abs/2006.XXXX},
+   }
 
 Indices and tables
 ==================

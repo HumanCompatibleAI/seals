@@ -1,4 +1,4 @@
-"""Adaptation of MuJoCo environments for IRL."""
+"""Adaptation of MuJoCo environments for specification learning algorithms."""
 
 import functools
 
