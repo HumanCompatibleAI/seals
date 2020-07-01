@@ -52,6 +52,7 @@ TESTS_REQUIRE = [
 ]
 DOCS_REQUIRE = [
     "sphinx",
+    "sphinx-rtd-theme",
     "sphinxcontrib-napoleon",
 ]
 
