@@ -7,7 +7,7 @@ import numpy as np
 from seals import base_envs
 
 
-class BranchingEnv(base_envs.TabularModelPOMDP):
+class BranchingEnv(base_envs.TabularModelMDP):
     """Long branching environment requiring exploration.
 
     The agent must traverse a specific path of length L to reach a

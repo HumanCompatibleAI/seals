@@ -7,7 +7,7 @@ import numpy as np
 from seals import base_envs
 
 
-class EarlyTerminationEnv(base_envs.TabularModelPOMDP):
+class EarlyTerminationEnv(base_envs.TabularModelMDP):
     """Three-state MDP with early termination state.
 
     Many implementations of imitation learning algorithms incorrectly assign a

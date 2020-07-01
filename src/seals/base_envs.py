@@ -27,7 +27,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         self,
         *,
         state_space: gym.Space,
-        observation_space: gym.Space = None,
+        observation_space: gym.Space,
         action_space: gym.Space,
     ):
         """Build resettable (PO)MDP.
@@ -35,7 +35,6 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         Args:
             state_space: gym.Space containing possible states.
             observation_space: gym.Space containing possible observations.
-                If None, defaults to `state_space`.
             action_space: gym.Space containing possible actions.
         """
         self._state_space = state_space
@@ -62,6 +61,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
     def terminal(self, state: State, step: int) -> bool:
         """Is the state terminal?"""
 
+    @abc.abstractmethod
     def obs_from_state(self, state: State) -> Observation:
         """Sample observation for given state."""
 
@@ -147,7 +147,7 @@ class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action
         return state
 
 
-class TabularModelPOMDP(ResettableMDP[int, int]):
+class TabularModelMDP(ResettableMDP[int, int]):
     """Base class for tabular environments with known dynamics."""
 
     def __init__(
