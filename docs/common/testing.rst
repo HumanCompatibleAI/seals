@@ -1,7 +1,7 @@
 .. _testing:
 
-Testing Helpers
-===============
+Helpers for unit-testing environments
+=====================================
 
 .. automodule:: seals.testing.envs
    :members:
