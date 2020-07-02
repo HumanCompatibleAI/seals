@@ -30,16 +30,20 @@ def make_env_fixture(
 ) -> Callable[[str], Iterator[gym.Env]]:
     """Creates a fixture function, calling `skip_fn` when dependencies are missing.
 
-    For example, in `pytest`, one would use:
+    For example, in `pytest`, one would use::
+
         env = pytest.fixture(make_env_fixture(skip_fn=pytest.skip))
+
     Then any method with an `env` parameter will receive the created environment, with
     the `env_name` parameter automatically passed to the fixture.
 
-    In `unittest`, one would use:
+    In `unittest`, one would use::
+
         def skip_fn(msg):
             raise unittest.SkipTest(msg)
 
         make_env = contextlib.contextmanager(make_env_fixture(skip_fn=skip_fn))
+
     And then call `with make_env(env_name) as env:` to create environments.
 
     Args:

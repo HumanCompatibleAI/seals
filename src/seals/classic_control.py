@@ -1,4 +1,4 @@
-"""Adaptation of classic Gym environments for IRL."""
+"""Adaptation of classic Gym environments for specification learning algorithms."""
 
 import warnings
 

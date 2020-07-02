@@ -6,7 +6,7 @@ orbs:
 executors:
   my-executor:
     docker:
-      - image: humancompatibleai/benchmark-environments:base
+      - image: humancompatibleai/seals:base
     working_directory: /benchmark-environments
     environment:
       # If you change these, also change ci/code_checks.sh
