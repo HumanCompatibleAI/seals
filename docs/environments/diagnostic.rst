@@ -4,8 +4,6 @@ Diagnostic Tasks
 ================
 
 Diagnostic tasks test individual facets of algorithm performance in isolation.
-See the `DERAIL <https://arxiv.org/abs/2006.XXXXX>`_ paper for background information
-and benchmark results.
 
 Branching
 ---------

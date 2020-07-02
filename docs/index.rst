@@ -9,8 +9,6 @@ that learn from user data, without requiring a procedurally specified reward fun
 There are two types of environments in *seals*:
 
     * **Diagnostic Tasks** which test individual facets of algorithm performance in isolation.
-      The `DERAIL <https://arxiv.org/abs/2006.XXXXX>`_ paper describes these tasks in detail
-      including benchmark results.
     * **Renovated Environments**, adaptations of widely-used benchmarks such as MuJoCo continuous
       control tasks to be suitable for specification learning benchmarks. In particular, this
       involves removing any side-channel sources of reward information (such as episode boundaries,
@@ -54,18 +52,6 @@ To cite this project in publications:
       publisher = {GitHub},
       journal = {GitHub repository},
       howpublished = {\url{https://github.com/HumanCompatibleAI/seals}},
-   }
-
-Additionally, if you use the diagnostic tasks, you may wish to cite:
-
-.. code-block:: bibtex
-
-    @inproceedings{freire:2020,
-      author = {Pedro Freire and Adam Gleave and Sam Toyer and Stuart Russell},
-      title = {{DERAIL}: Diagnostic Environments for Reward and Imitation Learning},
-      year = {2020},
-      booktitle = {Participatory ML Workshop at ICML},
-      url = {https://arxiv.org/abs/2006.XXXX},
    }
 
 Indices and tables
