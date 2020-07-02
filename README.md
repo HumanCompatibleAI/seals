@@ -77,7 +77,8 @@ ln -s ../../ci/code_checks.sh .git/hooks/pre-commit
 
 We use [pytest](https://docs.pytest.org/en/latest/) for unit tests
 and [codecov](http://codecov.io/) for code coverage.
-We also use [pytype](https://github.com/google/pytype) for type checking.
+We also use [pytype](https://github.com/google/pytype) and [mypy](http://mypy-lang.org/)
+for type checking.
 
 ## Workflow
 
