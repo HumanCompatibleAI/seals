@@ -3,6 +3,8 @@
 [![codecov](https://codecov.io/gh/HumanCompatibleAI/seals/branch/master/graph/badge.svg)](https://codecov.io/gh/HumanCompatibleAI/seals)
 [![PyPI version](https://badge.fury.io/py/seals.svg)](https://badge.fury.io/py/seals)
 
+<img src="docs/\_static/img/logo.png" align="center" width="50%"/>
+
 **Status**: alpha, pre-release.
 
 *seals*, the Suite of Environments for Algorithms that Learn Specifications, is a toolkit for
