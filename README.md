@@ -5,7 +5,7 @@
 
 <img src="docs/_static/img/logo.svg" width="50%"/>
 
-**Status**: alpha, pre-release.
+**Status**: early beta.
 
 *seals*, the Suite of Environments for Algorithms that Learn Specifications, is a toolkit for
 evaluating specification learning algorithms, such as reward or imitation learning. The
