@@ -13,13 +13,14 @@ environments are compatible with [Gym](https://github.com/openai/gym), but are d
 to test algorithms that learn from user data, without requiring a procedurally specified
 reward function.
 
-This is currently a work-in progress. While you are welcome to use the repository, we may make
-breaking changes at any time without prior notice. We intend for it to eventually contain:
+There are two types of environments in *seals*:
 
-  - A suite of diagnostic tasks for reward learning.
-  - Wrappers around common RL benchmark environments that help to avoid common pitfalls in
-    benchmarking (e.g. by masking visible score counters in Gym Atari tasks).
-  - New challenge tasks for specification learning algorithms.
+  - **Diagnostic Tasks** which test individual facets of algorithm performance in isolation.
+  - **Renovated Environments**, adaptations of widely-used benchmarks such as MuJoCo continuous
+      control tasks to be suitable for specification learning benchmarks. In particular, we remove
+      any side-channel sources of reward information.
+
+*seals* is under active development and we intend to add more categories of tasks soon.
  
 You may also be interested in our sister project [imitation](https://github.com/humancompatibleai/imitation/),
 providing implementations of a variety of imitation and reward learning algorithms.
