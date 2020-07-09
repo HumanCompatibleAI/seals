@@ -3,7 +3,7 @@
 [![codecov](https://codecov.io/gh/HumanCompatibleAI/seals/branch/master/graph/badge.svg)](https://codecov.io/gh/HumanCompatibleAI/seals)
 [![PyPI version](https://badge.fury.io/py/seals.svg)](https://badge.fury.io/py/seals)
 
-<img src="docs/_static/img/logo.svg" width="50%"/>
+<p align="center"><img src="docs/_static/img/logo.svg" width="50%"/></p>
 
 **Status**: early beta.
 
