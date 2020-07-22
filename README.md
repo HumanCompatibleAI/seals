@@ -91,3 +91,18 @@ integration tests (CircleCI linting, type checking, unit tests and CodeCov) to b
 
 It is often helpful to open an issue before proposing a PR, to allow for discussion of the design
 before coding commences.
+
+# Citing seals
+
+To cite this project in publications:
+
+```bibtex
+ @misc{seals,
+   author = {Adam Gleave and Pedro Freire and Steven Wang and Sam Toyer},
+   title = {{seals}: Suite of Environments for Algorithms that Learn Specifications},
+   year = {2020},
+   publisher = {GitHub},
+   journal = {GitHub repository},
+   howpublished = {\url{https://github.com/HumanCompatibleAI/seals}},
+}
+```
