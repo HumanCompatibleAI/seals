@@ -32,7 +32,8 @@ TESTS_REQUIRE = [
     "coverage==4.5.4",
     "codecov",
     "codespell",
-    "isort",
+    # TODO(adam): isort 4.X required for flake8-isort (2020-07-21)
+    "isort<5.0",
     "flake8",
     "flake8-blind-except",
     "flake8-builtins",
