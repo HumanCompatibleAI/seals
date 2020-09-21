@@ -172,7 +172,9 @@ def _sample_and_check(env: gym.Env, obs_space: gym.Space) -> bool:
 
 
 def test_rollout_schema(
-    env: gym.Env, steps_after_done: int = 10, max_steps: int = 10000,
+    env: gym.Env,
+    steps_after_done: int = 10,
+    max_steps: int = 10000,
 ) -> None:
     """Check custom environments have correct types on `step` and `reset`.
 

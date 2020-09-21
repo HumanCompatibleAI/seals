@@ -56,7 +56,10 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
     def transition(self, state: np.ndarray, action: int) -> np.ndarray:
         """Returns next state according to grid."""
         return util.grid_transition_fn(
-            state, action, x_bounds=(0, self._size - 1), y_bounds=(0, self._size - 1),
+            state,
+            action,
+            x_bounds=(0, self._size - 1),
+            y_bounds=(0, self._size - 1),
         )
 
     def obs_from_state(self, state: np.ndarray) -> np.ndarray:

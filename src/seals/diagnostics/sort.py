@@ -36,7 +36,10 @@ class SortEnv(base_envs.ResettableMDP):
         return sample.astype(self.state_space.dtype)
 
     def reward(
-        self, state: np.ndarray, action: np.ndarray, new_state: np.ndarray,
+        self,
+        state: np.ndarray,
+        action: np.ndarray,
+        new_state: np.ndarray,
     ) -> float:
         """Rewards fully sorted lists, and new correct positions."""
         # This is not meant to be a potential shaping in the formal sense,

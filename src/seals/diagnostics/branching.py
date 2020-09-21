@@ -37,5 +37,6 @@ class BranchingEnv(base_envs.TabularModelMDP):
         reward_matrix[-1] = 1.0
 
         super().__init__(
-            transition_matrix=transition_matrix, reward_matrix=reward_matrix,
+            transition_matrix=transition_matrix,
+            reward_matrix=reward_matrix,
         )
