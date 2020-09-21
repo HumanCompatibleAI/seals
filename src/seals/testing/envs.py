@@ -174,6 +174,8 @@ def test_rollout_schema(
     def _sample_and_check():
         act = env.action_space.sample()
         obs, rew, done, info = env.step(act)
+        assert obs.shape == obs_space.shape
+        assert obs.dtype == obs_space.dtype
         assert obs in obs_space
         assert isinstance(rew, float)
         assert isinstance(done, bool)
