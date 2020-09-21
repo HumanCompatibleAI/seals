@@ -12,7 +12,8 @@ def get_version() -> str:
     Changes system path internally to avoid missing dependencies breaking imports.
     """
     sys.path.insert(
-        0, os.path.join(os.path.dirname(__file__), "src", "seals"),
+        0,
+        os.path.join(os.path.dirname(__file__), "src", "seals"),
     )
     from version import VERSION  # type:ignore
 

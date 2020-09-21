@@ -49,7 +49,8 @@ class EarlyTerminationEnv(base_envs.TabularModelMDP):
         reward_matrix = reward_sign * np.ones((nS,), dtype=float)
 
         super().__init__(
-            transition_matrix=transition_matrix, reward_matrix=reward_matrix,
+            transition_matrix=transition_matrix,
+            reward_matrix=reward_matrix,
         )
 
     def terminal(self, state: int, n_actions_taken: int) -> bool:

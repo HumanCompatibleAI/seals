@@ -14,7 +14,8 @@ from gym.envs.mujoco import (
 
 def _include_position_in_observation(cls):
     cls.__init__ = functools.partialmethod(
-        cls.__init__, exclude_current_positions_from_observation=False,
+        cls.__init__,
+        exclude_current_positions_from_observation=False,
     )
     return cls
 

@@ -153,7 +153,9 @@ def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) ->
 
 
 def test_rollout_schema(
-    env: gym.Env, steps_after_done: int = 10, max_steps: int = 10000,
+    env: gym.Env,
+    steps_after_done: int = 10,
+    max_steps: int = 10000,
 ) -> None:
     """Check custom environments have correct types on `step` and `reset`.
 
