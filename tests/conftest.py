@@ -4,6 +4,7 @@ import pytest
 
 pytest.register_assert_rewrite("seals.testing")
 
+
 def pytest_addoption(parser):
     """Add --expensive option."""
     parser.addoption(

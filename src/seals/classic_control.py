@@ -33,6 +33,7 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
         self.observation_space = spaces.Box(-high, high, dtype=np.float32)
 
     def reset(self):
+        """Reset for FixedHorizonCartPole."""
         return super().reset().astype(np.float32)
 
     def step(self, action):

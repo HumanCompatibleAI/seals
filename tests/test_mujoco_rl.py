@@ -13,12 +13,14 @@ import seals  # noqa: F401 Import required for env registration
 
 def _eval_env(
     env_name: str, total_timesteps: int,
-) -> Tuple[float, int]:  # pragma: no cover
+) -> Tuple[float, float]:  # pragma: no cover
     """Train PPO2 for `total_timesteps` on `env_name` and evaluate returns."""
     env = gym.make(env_name)
     model = PPO2(MlpPolicy, env)
     model.learn(total_timesteps=total_timesteps)
-    return evaluate_policy(model, env)
+    res = evaluate_policy(model, env)
+    assert isinstance(res[0], float)
+    return res
 
 
 @pytest.mark.expensive

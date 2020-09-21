@@ -153,12 +153,15 @@ def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) ->
 
 
 def _check_obs(obs: np.ndarray, obs_space: gym.Space) -> None:
+    """Check obs is consistent with obs_space."""
     if obs_space.shape:
         assert obs.shape == obs_space.shape
         assert obs.dtype == obs_space.dtype
     assert obs in obs_space
 
-def _sample_and_check(env: gym.Env, obs_space: gym.Space) -> None:
+
+def _sample_and_check(env: gym.Env, obs_space: gym.Space) -> bool:
+    """Sample from env and check return value is of valid type."""
     act = env.action_space.sample()
     obs, rew, done, info = env.step(act)
     _check_obs(obs, obs_space)
