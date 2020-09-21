@@ -23,6 +23,27 @@ class AutoResetWrapper(gym.Wrapper):
         return obs, rew, False, info
 
 
+class ObsCastWrapper(gym.Wrapper):
+    """Cast observations to specified dtype.
+
+    Some external environments return observations of a different type than the
+    declared observation space. Where possible, this should be fixed upstream,
+    but casting can be a viable workaround -- especially when the returned
+    observations are higher resolution than the observation space.
+    """
+
+    def __init__(self, env: gym.Env, dtype: np.dtype):
+        super().__init__(env)
+        self.dtype = dtype
+
+    def reset(self):
+        return super().reset().astype(self.dtype)
+
+    def step(self, action):
+        obs, rew, done, info = super().step(action)
+        return obs.astype(self.dtype), rew, done, info
+
+
 class AbsorbAfterDoneWrapper(gym.Wrapper):
     """Transition into absorbing state instead of episode termination.
 

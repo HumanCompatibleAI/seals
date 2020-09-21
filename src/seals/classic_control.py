@@ -32,6 +32,9 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
         high = np.array(high)
         self.observation_space = spaces.Box(-high, high, dtype=np.float32)
 
+    def reset(self):
+        return super().reset().astype(np.float32)
+
     def step(self, action):
         """Step function for FixedHorizonCartPole."""
         with warnings.catch_warnings():
@@ -51,7 +54,7 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
         )
 
         rew = 1.0 if state_ok else 0.0
-        return np.array(self.state), rew, False, {}
+        return np.array(self.state, dtype=np.float32), rew, False, {}
 
 
 def mountain_car():
@@ -64,5 +67,6 @@ def mountain_car():
     Done is always returned on timestep 200 only.
     """
     env = util.make_env_no_wrappers("MountainCar-v0")
+    env = util.ObsCastWrapper(env, dtype=np.float32)
     env = util.AbsorbAfterDoneWrapper(env)
     return env

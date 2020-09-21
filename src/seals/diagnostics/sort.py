@@ -32,7 +32,8 @@ class SortEnv(base_envs.ResettableMDP):
 
     def initial_state(self):
         """Sample random vector uniformly in [0, 1]**L."""
-        return self.rand_state.random(size=self._length)
+        sample = self.rand_state.random(size=self._length)
+        return sample.astype(self.state_space.dtype)
 
     def reward(
         self, state: np.ndarray, action: np.ndarray, new_state: np.ndarray,
