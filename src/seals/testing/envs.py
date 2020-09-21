@@ -152,6 +152,22 @@ def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) ->
     assert same_obs == is_deterministic
 
 
+def _check_obs(obs: np.ndarray, obs_space: gym.Space) -> None:
+    if obs_space.shape:
+        assert obs.shape == obs_space.shape
+        assert obs.dtype == obs_space.dtype
+    assert obs in obs_space
+
+def _sample_and_check(env: gym.Env, obs_space: gym.Space) -> None:
+    act = env.action_space.sample()
+    obs, rew, done, info = env.step(act)
+    _check_obs(obs, obs_space)
+    assert isinstance(rew, float)
+    assert isinstance(done, bool)
+    assert isinstance(info, dict)
+    return done
+
+
 def test_rollout_schema(
     env: gym.Env, steps_after_done: int = 10, max_steps: int = 10000,
 ) -> None:
@@ -169,28 +185,17 @@ def test_rollout_schema(
     """
     obs_space = env.observation_space
     obs = env.reset()
-    assert obs in obs_space
-
-    def _sample_and_check():
-        act = env.action_space.sample()
-        obs, rew, done, info = env.step(act)
-        assert obs.shape == obs_space.shape
-        assert obs.dtype == obs_space.dtype
-        assert obs in obs_space
-        assert isinstance(rew, float)
-        assert isinstance(done, bool)
-        assert isinstance(info, dict)
-        return done
+    _check_obs(obs, obs_space)
 
     for _ in range(max_steps):
-        done = _sample_and_check()
+        done = _sample_and_check(env, obs_space)
         if done:
             break
 
     assert done is True, "did not get to end of episode"
 
     for _ in range(steps_after_done):
-        _sample_and_check()
+        _sample_and_check(env, obs_space)
 
 
 def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
@@ -245,7 +250,7 @@ class CountingEnv(gym.Env):
     def reset(self):
         """Reset method for CountingEnv."""
         t, self.timestep = 0, 1
-        return t
+        return np.array(t, dtype=self.observation_space.dtype)
 
     def step(self, action):
         """Step method for CountingEnv."""
@@ -257,5 +262,7 @@ class CountingEnv(gym.Env):
             raise ValueError("Should reset env. Episode is over.")
 
         t, self.timestep = self.timestep, self.timestep + 1
+        obs = np.array(t, dtype=self.observation_space.dtype)
+        rew = t * 10.0
         done = t == self.episode_length
-        return t, t * 10, done, {}
+        return obs, rew, done, {}
