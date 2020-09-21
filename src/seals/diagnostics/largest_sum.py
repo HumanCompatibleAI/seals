@@ -36,7 +36,8 @@ class LargestSumEnv(base_envs.ResettableMDP):
 
     def initial_state(self) -> np.ndarray:
         """Returns vector sampled uniformly in [0, 1]**L."""
-        return self.rand_state.rand(self._length)
+        init_state = self.rand_state.rand(self._length)
+        return init_state.astype(self.observation_space.dtype)
 
     def reward(self, state: np.ndarray, act: int, next_state: np.ndarray) -> float:
         """Returns +1.0 reward when action is the right label and 0.0 otherwise."""

@@ -1,5 +1,8 @@
 """Tests for wrapper classes."""
 
+import numpy as np
+import pytest
+
 from seals import util
 from seals.testing import envs
 
@@ -81,3 +84,25 @@ def test_absorb_repeat_final_state(episode_length=6, n_steps=100, n_manual_reset
                 expected_rew = t * 10.0
             assert obs == expected_obs
             assert rew == expected_rew
+
+
+@pytest.mark.parametrize("dtype", [np.int, np.float32, np.float64])
+def test_obs_cast(dtype: np.dtype, episode_length: int = 5):
+    """Check obs_cast observations are of specified dtype and not mangled.
+
+    Test uses CountingEnv with small integers, which can be represented in
+    all the specified dtypes without any loss of precision.
+    """
+    env = envs.CountingEnv(episode_length=episode_length)
+    env = util.ObsCastWrapper(env, dtype)
+
+    obs = env.reset()
+    assert obs.dtype == dtype
+    assert obs == 0
+    for t in range(1, episode_length + 1):
+        act = env.action_space.sample()
+        obs, rew, done, _ = env.step(act)
+        assert done == (t == episode_length)
+        assert obs.dtype == dtype
+        assert obs == t
+        assert rew == t * 10.0

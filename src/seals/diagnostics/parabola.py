@@ -43,7 +43,7 @@ class ParabolaEnv(base_envs.ResettableMDP):
         """Get state by sampling a random parabola."""
         a, b, c = -1 + 2 * self.rand_state.rand(3)
         x, y = 0, c
-        return np.array([x, y, a, b, c])
+        return np.array([x, y, a, b, c], dtype=self.state_space.dtype)
 
     def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
         """Negative squared vertical distance from parabola."""
@@ -56,4 +56,4 @@ class ParabolaEnv(base_envs.ResettableMDP):
         x, y, a, b, c = state
         next_x = np.clip(x + self._x_step, -self._bounds, self._bounds)
         next_y = np.clip(y + action, -self._bounds, self._bounds)
-        return np.array([next_x, next_y, a, b, c])
+        return np.array([next_x, next_y, a, b, c], dtype=self.state_space.dtype)
