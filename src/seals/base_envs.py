@@ -126,7 +126,10 @@ class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action
     """ABC for MDPs that are resettable."""
 
     def __init__(
-        self, *, state_space: gym.Space, action_space: gym.Space,
+        self,
+        *,
+        state_space: gym.Space,
+        action_space: gym.Space,
     ):
         """Build resettable MDP.
 
@@ -215,13 +218,15 @@ class TabularModelMDP(ResettableMDP[int, int]):
     def initial_state(self) -> int:
         """Samples from the initial state distribution."""
         return util.sample_distribution(
-            self.initial_state_dist, random=self.rand_state,
+            self.initial_state_dist,
+            random=self.rand_state,
         )
 
     def transition(self, state: int, action: int) -> int:
         """Samples from transition distribution."""
         return util.sample_distribution(
-            self.transition_matrix[state, action], random=self.rand_state,
+            self.transition_matrix[state, action],
+            random=self.rand_state,
         )
 
     def reward(self, state: int, action: int, new_state: int) -> float:

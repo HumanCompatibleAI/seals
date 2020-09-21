@@ -56,7 +56,8 @@ class InitShiftEnv(base_envs.TabularModelMDP):
         reward_matrix[leaves] = [1, -1, -1, 2]
 
         super().__init__(
-            transition_matrix=transition_matrix, reward_matrix=reward_matrix,
+            transition_matrix=transition_matrix,
+            reward_matrix=reward_matrix,
         )
 
     def initial_state(self) -> int:

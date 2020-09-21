@@ -26,7 +26,8 @@ class LargestSumEnv(base_envs.ResettableMDP):
         self._length = length
         state_space = spaces.Box(low=0.0, high=1.0, shape=(length,))
         super().__init__(
-            state_space=state_space, action_space=spaces.Discrete(2),
+            state_space=state_space,
+            action_space=spaces.Discrete(2),
         )
 
     def terminal(self, state: np.ndarray, n_actions_taken: int) -> bool:

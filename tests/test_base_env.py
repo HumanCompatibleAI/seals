@@ -22,7 +22,8 @@ def test_base_envs():
             transition_matrix /= transition_matrix.sum(axis=2)[:, :, None]
             reward_matrix = np.random.rand(nS)
             super().__init__(
-                transition_matrix=transition_matrix, reward_matrix=reward_matrix,
+                transition_matrix=transition_matrix,
+                reward_matrix=reward_matrix,
             )
 
     env = NewEnv()
@@ -43,7 +44,8 @@ def test_tabular_env_validation():
     """Test input validation for base_envs.TabularModelEnv."""
     with pytest.raises(ValueError, match=r"Malformed transition_matrix.*"):
         base_envs.TabularModelMDP(
-            transition_matrix=np.zeros((3, 1, 4)), reward_matrix=np.zeros((3,)),
+            transition_matrix=np.zeros((3, 1, 4)),
+            reward_matrix=np.zeros((3,)),
         )
     with pytest.raises(ValueError, match=r"initial_state_dist has multiple.*"):
         base_envs.TabularModelMDP(
@@ -59,11 +61,13 @@ def test_tabular_env_validation():
         )
     with pytest.raises(ValueError, match=r"transition_matrix and reward_matrix.*"):
         base_envs.TabularModelMDP(
-            transition_matrix=np.zeros((4, 1, 4)), reward_matrix=np.zeros((3,)),
+            transition_matrix=np.zeros((4, 1, 4)),
+            reward_matrix=np.zeros((3,)),
         )
 
     env = base_envs.TabularModelMDP(
-        transition_matrix=np.zeros((3, 1, 3)), reward_matrix=np.zeros((3,)),
+        transition_matrix=np.zeros((3, 1, 3)),
+        reward_matrix=np.zeros((3,)),
     )
     env.reset()
     with pytest.raises(ValueError, match=r".*not in.*"):
