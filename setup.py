@@ -49,8 +49,7 @@ TESTS_REQUIRE = [
     "pytest-shard",
     "pytest-xdist",
     "pytype",
-    "stable-baselines>=2.8.0",
-    "tensorflow>=1.8.0,<2.0.0",
+    "stable-baselines3>=0.9.0",
 ]
 DOCS_REQUIRE = [
     "sphinx",

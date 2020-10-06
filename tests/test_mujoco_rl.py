@@ -4,9 +4,8 @@ from typing import Tuple
 
 import gym
 import pytest
-from stable_baselines import PPO2
-from stable_baselines.common.evaluation import evaluate_policy
-from stable_baselines.common.policies import MlpPolicy
+import stable_baselines3
+from stable_baselines3.common import evaluation
 
 import seals  # noqa: F401 Import required for env registration
 
@@ -17,9 +16,9 @@ def _eval_env(
 ) -> Tuple[float, float]:  # pragma: no cover
     """Train PPO2 for `total_timesteps` on `env_name` and evaluate returns."""
     env = gym.make(env_name)
-    model = PPO2(MlpPolicy, env)
+    model = stable_baselines3.PPO("MlpPolicy", env)
     model.learn(total_timesteps=total_timesteps)
-    res = evaluate_policy(model, env)
+    res = evaluation.evaluate_policy(model, env)
     assert isinstance(res[0], float)
     return res
 
