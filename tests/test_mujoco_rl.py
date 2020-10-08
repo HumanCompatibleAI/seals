@@ -23,6 +23,9 @@ def _eval_env(
     return res
 
 
+# SOMEDAY(adam): tests are flaky and consistently fail in some environments
+# Unclear if they even should pass in some cases.
+# See discussion in GH#6 and GH#40.
 @pytest.mark.expensive
 @pytest.mark.parametrize(
     "env_base",
