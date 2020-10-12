@@ -32,6 +32,9 @@ class InitShiftEnv(base_envs.TabularModelMDP):
 
         Args:
             initial_state: fixed initial state.
+
+        Raises:
+            ValueError: `initial_state` not in [0,6].
         """
         nS = 7
         nA = 2

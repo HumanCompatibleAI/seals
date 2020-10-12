@@ -54,6 +54,18 @@ def make_env_fixture(
     """
 
     def f(env_name: str) -> Iterator[gym.Env]:
+        """Create environment `env_name`.
+
+        Args:
+            env_name: The name of the environment in the Gym registry.
+
+        Yields:
+            The created environment.
+
+        Raises:
+            gym.error.DependencyNotInstalled: if a dependency is missing
+                other than MuJoCo (for MuJoCo, the test is instead skipped).
+        """
         env = None
         try:
             env = gym.make(env_name)
