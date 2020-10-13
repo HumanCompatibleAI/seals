@@ -135,8 +135,6 @@ class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action
 
         Args:
             state_space: gym.Space containing possible states.
-            observation_space: gym.Space containing possible observations.
-                If None, defaults to `state_space`.
             action_space: gym.Space containing possible actions.
         """
         super().__init__(
@@ -165,15 +163,21 @@ class TabularModelMDP(ResettableMDP[int, int]):
 
         Args:
             transition_matrix: 3-D array with transition probabilities for a
-                given state-action pair.
+                given state-action pair, of shape `(n_states,n_actions,n_states)`.
             reward_matrix: 1-D, 2-D or 3-D array corresponding to rewards to a
                 given `(state, action, next_state)` triple. A 2-D array assumes
                 the `next_state` is not used in the reward, and a 1-D array
                 assumes neither the `action` nor `next_state` are used.
+                Of shape `(n_states,n_actions,n_states)[:n]` where `n`
+                is the dimensionality of the array.
             horizon: Maximum number of timesteps, default `np.inf`.
             initial_state_dist: Distribution from which state is sampled at the
                 start of the episode.  If `None`, it is assumed initial state
-                is always 0.
+                is always 0. Shape `(n_states,)`.
+
+        Raises:
+            ValueError: `transition_matrix`, `reward_matrix` or
+                `initial_state_dist` have shapes different to specified above.
         """
         n_states, n_actions, n_next_states = transition_matrix.shape
         if n_states != n_next_states:

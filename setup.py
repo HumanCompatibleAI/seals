@@ -33,8 +33,7 @@ TESTS_REQUIRE = [
     "coverage==4.5.4",
     "codecov",
     "codespell",
-    # TODO(adam): isort 4.X required for flake8-isort (2020-07-21)
-    "isort<5.0",
+    "darglint",
     "flake8",
     "flake8-blind-except",
     "flake8-builtins",
@@ -42,6 +41,7 @@ TESTS_REQUIRE = [
     "flake8-debugger",
     "flake8-docstrings",
     "flake8-isort",
+    "isort",
     "mypy",
     "pydocstyle",
     "pytest",
