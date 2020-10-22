@@ -1,6 +1,7 @@
 version: 2.1  # Version of CircleCI config format
 
-# "Orbs" are CircleCI's package management system.
+# "Orbs" are reusable packages of CircleCI config.
+# They can simplify common tasks, such as interacting with external services.
 # This section lists orbs this config uses.
 orbs:
   codecov: codecov/codecov@1.1.0  # support for uploading code coverage to codecov
