@@ -1,13 +1,15 @@
 version: 2.1  # Version of CircleCI config format
 
-orbs:  # CircleCI packages ("orbs") we depend on
+# "Orbs" are CircleCI's package management system.
+# This section lists orbs this config uses.
+orbs:
   codecov: codecov/codecov@1.1.0  # support for uploading code coverage to codecov
 
 executors:
   my-executor:
     docker:
       - image: humancompatibleai/seals:base
-        # Credentials defined in `docker-hub-creds` context.
+        # Credentials defined in `docker-hub-creds` context (database of environment variables).
         # We authenticate to avoid Dockerhub per-IP rate limiting of anonymous users.
         auth:
           username: $DOCKERHUB_USERNAME
@@ -15,15 +17,16 @@ executors:
     working_directory: /seals
     environment:
       # If you change these, also change ci/code_checks.sh
-      SRC_FILES: src/ tests/ setup.py
-      TYPECHECK_FILES: src/  # tests often do weird things with types, exclude
+      LINT_FILES: src/ tests/ setup.py  # files we lint
+      # Files we statically type check. Source files like src/ should almost always be present.
+      # In this repo we also typecheck tests/ -- but sometimes you may want to exclude these
+      # if they do strange things with types (e.g. mocking).
+      TYPECHECK_FILES: src/ tests/ setup.py
       NUM_CPUS: 2  # more CPUs visible but we're throttled to 2, which breaks auto-detect
 
 commands:
   # Define common function to install dependencies and seals, used in the jobs defined in the next section
   dependencies:
-    # You must still manually update the Docker image if any
-    # binary (non-Python) dependencies change.
     description: "Check out and update Python dependencies."
     steps:
       - checkout  # Check out the code from Git
@@ -32,17 +35,19 @@ commands:
       # Note the Docker image must still be manually updated if any binary (non-Python) dependencies change.
 
       # Restore cache if it exists. setup.py defines all the requirements, so we checksum that.
-      # If you need to force an update, then increase the version number `vn-dependencies`.
+      # If you want to force an update despite setup.py not changing, you can bump the version
+      # number `vn-dependencies`. This can be useful if newer versions of a package have been
+      # released that you want to upgrade to, without mandating the newer version in setup.py.
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "setup.py" }}
 
-      # Create virtual environment and nistall dependencies using `ci/build_venv.sh`.
+      # Create virtual environment and install dependencies using `ci/build_venv.sh`.
       # `mujoco_py` needs a MuJoCo key, so download that first.
       # We do some sanity checks to ensure the key works.
       - run:
           name: install dependencies
-          # MUJOCO_KEY is defined in the context `MuJoCo`.
+          # MUJOCO_KEY is defined in the CircleCI `MuJoCo` context (database of environment variables).
           command: |
             curl -o /root/.mujoco/mjkey.txt ${MUJOCO_KEY}
             md5sum /root/.mujoco/mjkey.txt
@@ -76,15 +81,15 @@ jobs:
       - dependencies
       - run:
           name: flake8
-          command: flake8 ${SRC_FILES}
+          command: flake8 ${LINT_FILES}
 
       - run:
           name: black
-          command: black --check ${SRC_FILES}
+          command: black --check ${LINT_FILES}
 
       - run:
           name: codespell
-          command: codespell -I .codespell.skip --skip='*.pyc' ${SRC_FILES}
+          command: codespell -I .codespell.skip --skip='*.pyc' ${LINT_FILES}
 
       - run:
           name: sphinx
@@ -111,6 +116,7 @@ jobs:
       # usage over time to aid with diagnosing these failures.
       - run:
           name: Memory Monitor
+          # | is needed for multi-line values in YAML
           command: |
             mkdir /tmp/resource-usage
             export FILE=/tmp/resource-usage/memory.txt
@@ -128,7 +134,8 @@ jobs:
             export DISPLAY=:0  # we need an X11 display for tests of environment rendering
             # --cov specifies which directories to report code coverage for
             # Since we test the installed `seals`, our source files live in `venv`, not in `src/seals`.
-            # --junitxml records test results in JUnit format. CircleCI can parse this to pretty-print results.
+            # --junitxml records test results in JUnit format. We upload this file using `store_test_results`
+            # later, and CircleCI then parses this to pretty-print results.
             # --shard-id and --num-shards are used to split tests across parallel executors using `pytest-shard`.
             # -n uses `pytest-xdist` to parallelize tests within a single instance.
             pytest --cov=/venv/lib/python3.7/site-packages/seals --cov=tests \
@@ -151,15 +158,18 @@ jobs:
       # store_test_results uploads the files and tells CircleCI that it should parse them as test results
       - store_test_results:
           path: /tmp/test-reports
-          unit-test:
 
-# Workflows define the jobs to actually run on CircleCI.
-# Here we have just a single workflow, `test`.
-# We attach two contexts to both jobs:
+# Workflows specify what jobs to actually run on CircleCI. If we didn't specify this,
+# nothing would run! Here we have just a single workflow, `test`, containing both the
+# jobs defined above. By default, the jobs all run in parallel. We can make them run
+# sequentially, or have more complex dependency structures, using the `require` command;
+# see https://circleci.com/docs/2.0/workflows/
+#
+# We attach two contexts to both jobs, which define a set of environment variable:
 # - `MuJoCo` which contains the URL for our MuJoCo license key.
 # - `docker-hub-creds` which contain the credentials for our Dockerhub machine user.
-# The environment variables these define MUST be kept secret.
-# So don't echo the environment variables anywhere in the config!
+# It's important these are kept confidential -- so don't echo the environment variables
+# anywhere in the config!
 workflows:
   version: 2
   test:
