@@ -24,6 +24,7 @@ release = seals.__version__
 extensions = [
     "sphinxcontrib.napoleon",
     "sphinx.ext.autodoc",
+    "sphinx_autodoc_typehints",
     "sphinx.ext.autosummary",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
