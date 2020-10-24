@@ -4,4 +4,3 @@ Base Environments
 =================
 
 .. automodule:: seals.base_envs
-   :members:

@@ -18,7 +18,7 @@ executors:
     working_directory: /seals
     environment:
       # If you change these, also change ci/code_checks.sh
-      LINT_FILES: src/ tests/ setup.py  # files we lint
+      LINT_FILES: src/ tests/ docs/conf.py setup.py  # files we lint
       # Files we statically type check. Source files like src/ should almost always be present.
       # In this repo we also typecheck tests/ -- but sometimes you may want to exclude these
       # if they do strange things with types (e.g. mocking).

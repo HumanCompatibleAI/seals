@@ -41,7 +41,6 @@ CartPole
 **Gym ID**: ``seals/CartPole-v0``
 
 .. autoclass:: seals.classic_control.FixedHorizonCartPole
-   :members:
 
 MountainCar
 ***********
@@ -59,7 +58,6 @@ Ant
 **Gym ID**: ``seals/Ant-v0``
 
 .. autoclass:: seals.mujoco.AntEnv
-   :members:
 
 HalfCheetah
 ***********
@@ -67,7 +65,6 @@ HalfCheetah
 **Gym ID**: ``seals/HalfCheetah-v0``
 
 .. autoclass:: seals.mujoco.HalfCheetahEnv
-   :members:
 
 Hopper
 ******
@@ -75,7 +72,6 @@ Hopper
 **Gym ID**: ``seals/Hopper-v0``
 
 .. autoclass:: seals.mujoco.HopperEnv
-   :members:
 
 Humanoid
 ********
@@ -83,7 +79,6 @@ Humanoid
 **Gym ID**: ``seals/Humanoid-v0``
 
 .. autoclass:: seals.mujoco.HumanoidEnv
-   :members:
 
 Swimmer
 *******
@@ -91,7 +86,6 @@ Swimmer
 **Gym ID**: ``seals/Swimmer-v0``
 
 .. autoclass:: seals.mujoco.SwimmerEnv
-   :members:
 
 Walker2d
 ********
@@ -99,4 +93,3 @@ Walker2d
 **Gym ID**: ``seals/Walker2d-v0``
 
 .. autoclass:: seals.mujoco.Walker2dEnv
-   :members:

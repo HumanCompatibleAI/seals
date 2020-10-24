@@ -4,4 +4,3 @@ Utilities
 =========
 
 .. automodule:: seals.util
-   :members:
