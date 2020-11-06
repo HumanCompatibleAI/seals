@@ -46,7 +46,6 @@ TESTS_REQUIRE = [
     "pydocstyle",
     "pytest",
     "pytest-cov",
-    "pytest-shard",
     "pytest-xdist",
     "pytype",
     "stable-baselines3>=0.9.0",
