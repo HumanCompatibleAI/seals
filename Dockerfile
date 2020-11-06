@@ -58,11 +58,12 @@ WORKDIR /seals
 # Copy only necessary dependencies to build virtual environment.
 # This minimizes how often this layer needs to be rebuilt.
 COPY ./setup.py ./setup.py
-COPY ./src/seals/__init__.py ./src/seals/__init__.py
+COPY ./README.md ./README.md
+COPY ./src/seals/version.py ./src/seals/version.py
 COPY ./ci/build_venv.sh ./ci/build_venv.sh
 
 # mjkey.txt needs to exist for build, but doesn't need to be a real key
-RUN touch /root/.mujoco/mjkey.txt && /seals/scripts/build_venv.sh /venv
+RUN touch /root/.mujoco/mjkey.txt && /seals/ci/build_venv.sh /venv
 
 # full stage contains everything.
 # Can be used for deployment and local testing.
@@ -72,7 +73,7 @@ FROM python-req as full
 COPY . /seals
 # Build a wheel then install to avoid copying whole directory (pip issue #2195)
 RUN python setup.py sdist bdist_wheel
-RUN pip install dist/evaluating_rewards-*.whl
+RUN pip install dist/seals-*.whl
 
 # Default entrypoints
 CMD ["pytest", "-n", "auto", "-vv", "tests/"]
