@@ -3,6 +3,7 @@
 from typing import List
 
 import gym
+from gym.envs import registration
 import pytest
 
 import seals  # noqa: F401 required for env registration
@@ -10,7 +11,7 @@ from seals.testing import envs
 
 ENV_NAMES: List[str] = [
     env_spec.id
-    for env_spec in gym.envs.registration.registry.all()
+    for env_spec in registration.registry.all()
     if env_spec.id.startswith("seals/")
 ]
 
