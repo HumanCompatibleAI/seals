@@ -32,7 +32,7 @@ class ParabolaEnv(base_envs.ResettableMDP):
 
         super().__init__(
             state_space=spaces.Box(low=state_low, high=state_high),
-            action_space=spaces.Box(low=-np.inf, high=np.inf, shape=()),
+            action_space=spaces.Box(low=-np.inf, high=np.inf, shape=(1,)),
         )
 
     def terminal(self, state: int, n_actions_taken: int) -> bool:
@@ -45,15 +45,15 @@ class ParabolaEnv(base_envs.ResettableMDP):
         x, y = 0, c
         return np.array([x, y, a, b, c], dtype=self.state_space.dtype)
 
-    def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
+    def reward(self, state: np.ndarray, action: np.ndarray, new_state: np.ndarray) -> float:
         """Negative squared vertical distance from parabola."""
         x, y, a, b, c = state
         target_y = a * x ** 2 + b * x + c
         return (-1) * (y - target_y) ** 2
 
-    def transition(self, state: np.ndarray, action: int) -> np.ndarray:
+    def transition(self, state: np.ndarray, action: np.ndarray) -> np.ndarray:
         """Update x according to x_step and y according to action."""
         x, y, a, b, c = state
         next_x = np.clip(x + self._x_step, -self._bounds, self._bounds)
-        next_y = np.clip(y + action, -self._bounds, self._bounds)
+        next_y = np.clip(y + action[0], -self._bounds, self._bounds)
         return np.array([next_x, next_y, a, b, c], dtype=self.state_space.dtype)
