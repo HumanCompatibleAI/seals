@@ -58,7 +58,7 @@ WORKDIR /seals
 # Copy only necessary dependencies to build virtual environment.
 # This minimizes how often this layer needs to be rebuilt.
 COPY ./setup.py ./setup.py
-COPY ./src/imitation/__init__.py ./src/imitation/__init__.py
+COPY ./src/seals/__init__.py ./src/seals/__init__.py
 COPY ./ci/build_venv.sh ./ci/build_venv.sh
 
 # mjkey.txt needs to exist for build, but doesn't need to be a real key
