@@ -272,7 +272,7 @@ def test_render(env: gym.Env, raises_fn) -> None:
         for mode in render_modes:
             env.render(mode=mode)
 
-        is_mujoco = not isinstance(env.unwrapped, mujoco_env.MujocoEnv)
+        is_mujoco = isinstance(env.unwrapped, mujoco_env.MujocoEnv)
         if "rgb_array" in render_modes and not is_mujoco:
             # Render should not change without calling `step()`.
             # MuJoCo rendering fails this check, ignore -- not much we can do.
