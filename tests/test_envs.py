@@ -41,3 +41,7 @@ class TestEnvs:
     def test_rollout_schema(self, env: gym.Env):
         """Tests if environments have correct types on `step()` and `reset()`."""
         envs.test_rollout_schema(env)
+
+    def test_render(self, env: gym.Env):
+        """Tests `render()` supports modes specified in environment metadata."""
+        envs.test_render(env, raises_fn=pytest.raises)

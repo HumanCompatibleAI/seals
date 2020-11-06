@@ -223,7 +223,7 @@ def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
     """Test that you must call reset() before calling step().
 
     Example usage in pytest:
-        test_premature_step(env, skip_fn=pytest.skip, exception_fn=pytest.raises)
+        test_premature_step(env, skip_fn=pytest.skip, raises_fn=pytest.raises)
 
     Args:
         env: The environment to test.
@@ -241,6 +241,40 @@ def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
     act = env.action_space.sample()
     with raises_fn(Exception):  # need to call env.reset() first
         env.step(act)
+
+
+def test_render(env: gym.Env, raises_fn) -> None:
+    """Test that render() supports the modes declared.
+
+    Example usage in pytest:
+        test_render(env, raises_fn=pytest.raises)
+
+    Args:
+        env: The environment to test.
+        raises_fn: Context manager to check exception is thrown.
+
+    Raises:
+        AssertionError: if test fails. This occurs if:
+            (a) `env.render(mode=mode)` fails for any mode declared supported
+            in `env.metadata["render.modes"]`; (b) env.render() *succeeds* when
+            `env.metadata["render.modes"]` is empty; (c) `env.render(mode="rgb_array")`
+            returns different values at the same time step.
+    """
+    env.reset()  # make sure environment is in consistent state
+
+    render_modes = env.metadata["render.modes"]
+    if not render_modes:
+        # No modes supported -- render() should fail.
+        with raises_fn(NotImplementedError):
+            env.render()
+    else:
+        for mode in render_modes:
+            env.render(mode=mode)
+        if "rgb_array" in render_modes:
+            # Render should not change without calling `step()`.
+            resa = env.render(mode="rgb_array")
+            resb = env.render(mode="rgb_array")
+            assert np.all(resa == resb)
 
 
 class CountingEnv(gym.Env):
