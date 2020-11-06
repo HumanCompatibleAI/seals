@@ -272,6 +272,11 @@ def test_render(env: gym.Env, raises_fn) -> None:
         for mode in render_modes:
             env.render(mode=mode)
 
+        # WARNING(adam): there seems to be a memory leak with Gym 0.17.3
+        # & MuJoCoPy 1.50.1.68. `MujocoEnv.close()` does not call `finish()`
+        # on the viewer (commented out) so the resources are not released.
+        # For now this is OK, but may bite if we end up testing a lot of
+        # MuJoCo environments.
         is_mujoco = isinstance(env.unwrapped, mujoco_env.MujocoEnv)
         if "rgb_array" in render_modes and not is_mujoco:
             # Render should not change without calling `step()`.

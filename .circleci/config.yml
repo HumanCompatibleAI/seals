@@ -20,8 +20,7 @@ executors:
     resource_class: large
     environment:
       # Don't use auto-detect since it sees all CPUs available, but container is throttled.
-      # Use 3, less than the 4 available, CPUs to make sure plenty of memory headroom
-      NUM_CPUS: 3
+      NUM_CPUS: 4
   lintandtype:
     <<: *defaults
     resource_class: medium
