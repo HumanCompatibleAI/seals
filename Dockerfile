@@ -44,30 +44,36 @@ RUN    mkdir -p /root/.mujoco \
 ENV PATH="/venv/bin:$PATH"
 ENV LD_LIBRARY_PATH /root/.mujoco/mjpro150/bin:${LD_LIBRARY_PATH}
 
+# Run Xdummy mock X server by default so that rendering will work.
+COPY ci/xorg.conf /etc/dummy_xorg.conf
+COPY ci/Xdummy-entrypoint.py /usr/bin/Xdummy-entrypoint.py
+ENTRYPOINT ["/usr/bin/Xdummy-entrypoint.py"]
+
 # python-req stage contains Python venv, but not code.
 # It is useful for development purposes: you can mount
 # code from outside the Docker container.
 FROM base as python-req
 
-WORKDIR /benchmark-environments
+WORKDIR /seals
 # Copy only necessary dependencies to build virtual environment.
 # This minimizes how often this layer needs to be rebuilt.
 COPY ./setup.py ./setup.py
-COPY ./src/imitation/__init__.py ./src/imitation/__init__.py
+COPY ./README.md ./README.md
+COPY ./src/seals/version.py ./src/seals/version.py
 COPY ./ci/build_venv.sh ./ci/build_venv.sh
 
 # mjkey.txt needs to exist for build, but doesn't need to be a real key
-RUN touch /root/.mujoco/mjkey.txt && /benchmark-environments/scripts/build_venv.sh /venv
+RUN touch /root/.mujoco/mjkey.txt && /seals/ci/build_venv.sh /venv
 
 # full stage contains everything.
 # Can be used for deployment and local testing.
 FROM python-req as full
 
 # Delay copying (and installing) the code until the very end
-COPY . /benchmark-environments
+COPY . /seals
 # Build a wheel then install to avoid copying whole directory (pip issue #2195)
 RUN python setup.py sdist bdist_wheel
-RUN pip install dist/evaluating_rewards-*.whl
+RUN pip install dist/seals-*.whl
 
 # Default entrypoints
 CMD ["pytest", "-n", "auto", "-vv", "tests/"]

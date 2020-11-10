@@ -18,6 +18,7 @@ from typing import (
 )
 
 import gym
+from gym.envs.mujoco import mujoco_env
 import numpy as np
 
 Step = Tuple[Any, Optional[float], bool, Mapping[str, Any]]
@@ -223,7 +224,7 @@ def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
     """Test that you must call reset() before calling step().
 
     Example usage in pytest:
-        test_premature_step(env, skip_fn=pytest.skip, exception_fn=pytest.raises)
+        test_premature_step(env, skip_fn=pytest.skip, raises_fn=pytest.raises)
 
     Args:
         env: The environment to test.
@@ -241,6 +242,49 @@ def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
     act = env.action_space.sample()
     with raises_fn(Exception):  # need to call env.reset() first
         env.step(act)
+
+
+def test_render(env: gym.Env, raises_fn) -> None:
+    """Test that render() supports the modes declared.
+
+    Example usage in pytest:
+        test_render(env, raises_fn=pytest.raises)
+
+    Args:
+        env: The environment to test.
+        raises_fn: Context manager to check NotImplementedError is thrown when
+            environment metadata indicates modes are supported.
+
+    Raises:
+        AssertionError: if test fails. This occurs if:
+            (a) `env.render(mode=mode)` fails for any mode declared supported
+            in `env.metadata["render.modes"]`; (b) env.render() *succeeds* when
+            `env.metadata["render.modes"]` is empty; (c) `env.render(mode="rgb_array")`
+            returns different values at the same time step.
+    """
+    env.reset()  # make sure environment is in consistent state
+
+    render_modes = env.metadata["render.modes"]
+    if not render_modes:
+        # No modes supported -- render() should fail.
+        with raises_fn(NotImplementedError):
+            env.render()
+    else:
+        for mode in render_modes:
+            env.render(mode=mode)
+
+        # WARNING(adam): there seems to be a memory leak with Gym 0.17.3
+        # & MuJoCoPy 1.50.1.68. `MujocoEnv.close()` does not call `finish()`
+        # on the viewer (commented out) so the resources are not released.
+        # For now this is OK, but may bite if we end up testing a lot of
+        # MuJoCo environments.
+        is_mujoco = isinstance(env.unwrapped, mujoco_env.MujocoEnv)
+        if "rgb_array" in render_modes and not is_mujoco:
+            # Render should not change without calling `step()`.
+            # MuJoCo rendering fails this check, ignore -- not much we can do.
+            resa = env.render(mode="rgb_array")
+            resb = env.render(mode="rgb_array")
+            assert np.allclose(resa, resb)
 
 
 class CountingEnv(gym.Env):
