@@ -252,7 +252,8 @@ def test_render(env: gym.Env, raises_fn) -> None:
 
     Args:
         env: The environment to test.
-        raises_fn: Context manager to check exception is thrown.
+        raises_fn: Context manager to check NotImplementedError is thrown when
+            environment metadata indicates modes are supported.
 
     Raises:
         AssertionError: if test fails. This occurs if:
