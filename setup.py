@@ -33,7 +33,7 @@ TESTS_REQUIRE = [
     "coverage==4.5.4",
     "codecov",
     "codespell",
-    "darglint",
+    "darglint>=1.5.6",
     "flake8",
     "flake8-blind-except",
     "flake8-builtins",

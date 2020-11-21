@@ -52,11 +52,7 @@ def make_env_fixture(
 
     Returns:
         A method to create Gym environments given their name.
-
-    # noqa: DAR301
-    # noqa: DAR401 gym.error.DependencyNotInstalled
     """
-    # TODO(adam): remove Darglint noqa once GH#132 closed
 
     def f(env_name: str) -> Iterator[gym.Env]:
         """Create environment `env_name`.
