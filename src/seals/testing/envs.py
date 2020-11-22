@@ -18,7 +18,12 @@ from typing import (
 )
 
 import gym
-from gym.envs.mujoco import mujoco_env
+try:  # noqa: I003
+    from gym.envs.mujoco import mujoco_env
+    MUJOCO_AVAILABLE = True
+except gym.error.DependencyNotInstalled:
+    mujoco_env = None
+    MUJOCO_AVAILABLE = False
 import numpy as np
 
 Step = Tuple[Any, Optional[float], bool, Mapping[str, Any]]
@@ -274,7 +279,7 @@ def test_render(env: gym.Env, raises_fn) -> None:
         # on the viewer (commented out) so the resources are not released.
         # For now this is OK, but may bite if we end up testing a lot of
         # MuJoCo environments.
-        is_mujoco = isinstance(env.unwrapped, mujoco_env.MujocoEnv)
+        is_mujoco = MUJOCO_AVAILABLE and isinstance(env.unwrapped, mujoco_env.MujocoEnv)
         if "rgb_array" in render_modes and not is_mujoco:
             # Render should not change without calling `step()`.
             # MuJoCo rendering fails this check, ignore -- not much we can do.
