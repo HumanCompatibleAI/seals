@@ -15,8 +15,8 @@ RUN    apt-get update -q \
     libosmesa6-dev \
     net-tools \
     parallel \
-    python3.7 \
-    python3.7-dev \
+    python3.6 \
+    python3.6-dev \
     python3-pip \
     rsync \
     software-properties-common \

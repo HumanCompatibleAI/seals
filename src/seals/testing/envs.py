@@ -18,8 +18,10 @@ from typing import (
 )
 
 import gym
-try:  # noqa: I003
+
+try:
     from gym.envs.mujoco import mujoco_env
+
     MUJOCO_AVAILABLE = True
 except gym.error.DependencyNotInstalled:
     mujoco_env = None
