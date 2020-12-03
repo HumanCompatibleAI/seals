@@ -38,6 +38,6 @@ def test_experts(env_name):
     expert = ExpertModel()
 
     def get_return(m):
-        evaluation.evaluate_policy(m, env)[0]
+        return evaluation.evaluate_policy(m, env)[0]
 
     assert get_return(ppo_model) <= get_return(expert)
