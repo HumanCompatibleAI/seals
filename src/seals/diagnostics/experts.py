@@ -1,7 +1,7 @@
 """Expert policies for diagnostic environments."""
 
 import numpy as np
-from scipy.special import logsumexp
+from scipy.special import logsumexp  # type: ignore
 
 from seals.util import sample_distribution
 
