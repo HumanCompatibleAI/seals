@@ -2,68 +2,23 @@
 
 import gym
 
-gym.register(
-    id="seals/Branching-v0",
-    entry_point="seals.diagnostics.branching:BranchingEnv",
-    max_episode_steps=11,
-)
+envs_info = [
+    ("Branching-v0", "branching:BranchingEnv", 11),
+    ("EarlyTermNeg-v0", "early_term:EarlyTermNegEnv", 10),
+    ("EarlyTermPos-v0", "early_term:EarlyTermPosEnv", 10),
+    ("InitShiftTrain-v0", "init_shift:InitShiftTrainEnv", 3),
+    ("InitShiftTest-v0", "init_shift:InitShiftTestEnv", 3),
+    ("LargestSum-v0", "largest_sum:LargestSumEnv", 1),
+    ("NoisyObs-v0", "noisy_obs:NoisyObsEnv", 15),
+    ("Parabola-v0", "parabola:ParabolaEnv", 20),
+    ("ProcGoal-v0", "proc_goal:ProcGoalEnv", 20),
+    ("RiskyPath-v0", "risky_path:RiskyPathEnv", 5),
+    ("Sort-v0", "sort:SortEnv", 6),
+]
 
-gym.register(
-    id="seals/EarlyTermNeg-v0",
-    entry_point="seals.diagnostics.early_term:EarlyTermNegEnv",
-    max_episode_steps=10,
-)
-
-gym.register(
-    id="seals/EarlyTermPos-v0",
-    entry_point="seals.diagnostics.early_term:EarlyTermPosEnv",
-    max_episode_steps=10,
-)
-
-gym.register(
-    id="seals/InitShiftTrain-v0",
-    entry_point="seals.diagnostics.init_shift:InitShiftTrainEnv",
-    max_episode_steps=3,
-)
-
-gym.register(
-    id="seals/InitShiftTest-v0",
-    entry_point="seals.diagnostics.init_shift:InitShiftTestEnv",
-    max_episode_steps=3,
-)
-
-gym.register(
-    id="seals/LargestSum-v0",
-    entry_point="seals.diagnostics.largest_sum:LargestSumEnv",
-    max_episode_steps=1,
-)
-
-gym.register(
-    id="seals/NoisyObs-v0",
-    entry_point="seals.diagnostics.noisy_obs:NoisyObsEnv",
-    max_episode_steps=15,
-)
-
-gym.register(
-    id="seals/Parabola-v0",
-    entry_point="seals.diagnostics.parabola:ParabolaEnv",
-    max_episode_steps=20,
-)
-
-gym.register(
-    id="seals/ProcGoal-v0",
-    entry_point="seals.diagnostics.proc_goal:ProcGoalEnv",
-    max_episode_steps=20,
-)
-
-gym.register(
-    id="seals/RiskyPath-v0",
-    entry_point="seals.diagnostics.risky_path:RiskyPathEnv",
-    max_episode_steps=5,
-)
-
-gym.register(
-    id="seals/Sort-v0",
-    entry_point="seals.diagnostics.sort:SortEnv",
-    max_episode_steps=6,
-)
+for name, source, horizon in envs_info:
+    gym.register(
+        id=f"seals/{name}",
+        entry_point=f"seals.diagnostics.{source}",
+        max_episode_steps=horizon,
+    )

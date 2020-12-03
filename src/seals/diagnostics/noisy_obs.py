@@ -25,7 +25,7 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
         """
         self._size = size
         self._noise_length = noise_length
-        self._goal = np.array([self._size // 2, self._size // 2])
+        self.goal = np.array([self._size // 2, self._size // 2])
 
         super().__init__(
             state_space=spaces.MultiDiscrete([size, size]),
@@ -51,7 +51,7 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
 
     def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
         """Returns  +1.0 reward if state is the goal and 0.0 otherwise."""
-        return float(np.all(state == self._goal))
+        return float(np.all(state == self.goal))
 
     def transition(self, state: np.ndarray, action: int) -> np.ndarray:
         """Returns next state according to grid."""

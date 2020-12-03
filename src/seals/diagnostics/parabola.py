@@ -24,7 +24,7 @@ class ParabolaEnv(base_envs.ResettableMDP):
             bounds: limits coordinates, useful for keeping rewards in
                 a small bounded range.
         """
-        self._x_step = x_step
+        self.x_step = x_step
         self._bounds = bounds
 
         state_high = np.array([bounds, bounds, 1.0, 1.0, 1.0])
@@ -54,6 +54,6 @@ class ParabolaEnv(base_envs.ResettableMDP):
     def transition(self, state: np.ndarray, action: np.ndarray) -> np.ndarray:
         """Update x according to x_step and y according to action."""
         x, y, a, b, c = state
-        next_x = np.clip(x + self._x_step, -self._bounds, self._bounds)
+        next_x = np.clip(x + self.x_step, -self._bounds, self._bounds)
         next_y = np.clip(y + action[0], -self._bounds, self._bounds)
         return np.array([next_x, next_y, a, b, c], dtype=self.state_space.dtype)
