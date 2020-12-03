@@ -142,16 +142,12 @@ def get_parabola_expert_fn(env=None, x_step=None):
 
 def _policy_matrix_to_predict_fn(policy_matrix):
     def predict_fn(ob, state=None, deterministic=False):
-        if len(policy_matrix.shape) == 3:
-            t = state if state is not None else 0
-            action_distribution = policy_matrix[t, ob]
-            new_state = t + 1
-        else:
-            action_distribution = policy_matrix[ob]
-            new_state = state
-
+        t = state if state is not None else 0
+        action_distribution = policy_matrix[t, ob]
         strategy = np.argmax if deterministic else sample_distribution
+
         act = strategy(action_distribution)
+        new_state = t + 1
 
         return act, new_state
 
