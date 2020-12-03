@@ -3,6 +3,7 @@
 from typing import List
 
 import gym
+from gym.envs import registration
 import pytest
 
 import seals  # noqa: F401 required for env registration
@@ -10,7 +11,7 @@ from seals.testing import envs
 
 ENV_NAMES: List[str] = [
     env_spec.id
-    for env_spec in gym.envs.registration.registry.all()
+    for env_spec in registration.registry.all()
     if env_spec.id.startswith("seals/")
 ]
 
@@ -41,3 +42,7 @@ class TestEnvs:
     def test_rollout_schema(self, env: gym.Env):
         """Tests if environments have correct types on `step()` and `reset()`."""
         envs.test_rollout_schema(env)
+
+    def test_render(self, env: gym.Env):
+        """Tests `render()` supports modes specified in environment metadata."""
+        envs.test_render(env, raises_fn=pytest.raises)
