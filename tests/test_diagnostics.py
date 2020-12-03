@@ -19,20 +19,24 @@ def test_init_shift_validation():
 
 
 _env_names = [info[0] for info in seals.diagnostics.envs_info]
+
+
 @pytest.mark.parametrize("env_name", _env_names)
 def test_experts(env_name):
     """Test whether specified expert has non-trivial performance."""
     env = gym.make(f"seals/{env_name}")
-    get_return = lambda m : evaluation.evaluate_policy(m, env)[0]
+    get_return = lambda m: evaluation.evaluate_policy(m, env)[0]
     total_timesteps = 1000
 
     ppo_model = stable_baselines3.PPO("MlpPolicy", env)
     ppo_model.learn(total_timesteps=total_timesteps)
 
     expert_fn = seals.diagnostics.experts.env_name_to_expert_fn[env_name](env)
+
     class ExpertModel:
         def predict(self, *args, **kwargs):
             return expert_fn(*args, **kwargs)
+
     expert = ExpertModel()
 
     assert get_return(ppo_model) <= get_return(expert)

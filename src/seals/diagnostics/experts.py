@@ -1,8 +1,10 @@
 import numpy as np
 from scipy.special import logsumexp
 
+
 def get_horizon(env):
     return env._max_episode_steps
+
 
 def get_noisy_obs_expert_fn(env=None, goal=None):
     if goal is None:
@@ -134,6 +136,7 @@ def policy_matrix_to_predict_fn(policy_matrix):
 
     return predict_fn
 
+
 def force_dim(a, new_dim):
     dim = len(a.shape)
     index = (slice(None),) * dim + (None,) * (new_dim - dim)
@@ -153,13 +156,13 @@ def get_value_iteration_expert_fn(env, discount=1.0, beta=np.inf):
     V[-1] = np.zeros(nS)
     if np.isinf(beta):
         for t in reversed(range(h)):
-            Q[t] = np.einsum('san,san->sa', T, R + discount * V[t+1][None, None])
+            Q[t] = np.einsum("san,san->sa", T, R + discount * V[t + 1][None, None])
             V[t] = np.max(Q[t], axis=1)
 
         policy = np.eye(nA)[Q.argmax(axis=2)]
     else:
         for t in reversed(range(h)):
-            Q[t] = np.einsum('san,san->sa', T, R + discount * V[t+1][None, None])
+            Q[t] = np.einsum("san,san->sa", T, R + discount * V[t + 1][None, None])
             V[t] = logsumexp(beta * Q[t], axis=1) / beta
 
         policy = np.exp(beta * (Q - V[:-1, :, None]))
@@ -169,15 +172,15 @@ def get_value_iteration_expert_fn(env, discount=1.0, beta=np.inf):
 
 
 env_name_to_expert_fn = {
-    "Branching-v0" : get_value_iteration_expert_fn,
-    "EarlyTermNeg-v0" : get_early_term_neg_expert_fn,
-    "EarlyTermPos-v0" : get_early_term_pos_expert_fn,
-    "InitShiftTrain-v0" : get_value_iteration_expert_fn,
-    "InitShiftTest-v0" : get_value_iteration_expert_fn,
-    "LargestSum-v0" : get_largest_sum_expert_fn,
-    "NoisyObs-v0" : get_noisy_obs_expert_fn,
-    "Parabola-v0" : get_parabola_expert_fn,
-    "ProcGoal-v0" : get_proc_goal_expert_fn,
-    "RiskyPath-v0" : get_value_iteration_expert_fn,
-    "Sort-v0" : get_sort_expert_fn,
+    "Branching-v0": get_value_iteration_expert_fn,
+    "EarlyTermNeg-v0": get_early_term_neg_expert_fn,
+    "EarlyTermPos-v0": get_early_term_pos_expert_fn,
+    "InitShiftTrain-v0": get_value_iteration_expert_fn,
+    "InitShiftTest-v0": get_value_iteration_expert_fn,
+    "LargestSum-v0": get_largest_sum_expert_fn,
+    "NoisyObs-v0": get_noisy_obs_expert_fn,
+    "Parabola-v0": get_parabola_expert_fn,
+    "ProcGoal-v0": get_proc_goal_expert_fn,
+    "RiskyPath-v0": get_value_iteration_expert_fn,
+    "Sort-v0": get_sort_expert_fn,
 }
