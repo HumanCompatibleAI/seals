@@ -24,8 +24,8 @@ _env_names = [info[0] for info in seals.diagnostics.envs_info]
 def test_experts(env_name):
     """Test whether specified expert has non-trivial performance."""
     env = gym.make(f"seals/{env_name}")
-    total_timesteps = 1000
 
+    total_timesteps = 1000
     ppo_model = stable_baselines3.PPO("MlpPolicy", env)
     ppo_model.learn(total_timesteps=total_timesteps)
 
