@@ -1,13 +1,12 @@
 """Test the `diagnostics.*` environments."""
 
-import pytest
-
 import gym
+import pytest
 import stable_baselines3
 from stable_baselines3.common import evaluation
 
-from seals.diagnostics import init_shift
 import seals.diagnostics
+from seals.diagnostics import init_shift
 import seals.diagnostics.experts
 
 
@@ -25,7 +24,6 @@ _env_names = [info[0] for info in seals.diagnostics.envs_info]
 def test_experts(env_name):
     """Test whether specified expert has non-trivial performance."""
     env = gym.make(f"seals/{env_name}")
-    get_return = lambda m: evaluation.evaluate_policy(m, env)[0]
     total_timesteps = 1000
 
     ppo_model = stable_baselines3.PPO("MlpPolicy", env)
@@ -38,5 +36,8 @@ def test_experts(env_name):
             return expert_fn(*args, **kwargs)
 
     expert = ExpertModel()
+
+    def get_return(m):
+        evaluation.evaluate_policy(m, env)[0]
 
     assert get_return(ppo_model) <= get_return(expert)

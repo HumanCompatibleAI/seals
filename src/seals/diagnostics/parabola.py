@@ -46,7 +46,10 @@ class ParabolaEnv(base_envs.ResettableMDP):
         return np.array([x, y, a, b, c], dtype=self.state_space.dtype)
 
     def reward(
-        self, state: np.ndarray, action: np.ndarray, new_state: np.ndarray
+        self,
+        state: np.ndarray,
+        action: np.ndarray,
+        new_state: np.ndarray,
     ) -> float:
         """Negative squared vertical distance from parabola."""
         x, y, a, b, c = state
