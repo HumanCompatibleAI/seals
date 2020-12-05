@@ -80,7 +80,7 @@ commands:
           # Build a wheel then install to avoid copying whole directory (pip issue #2195)
           command: |
             python setup.py sdist bdist_wheel
-            pip install --upgrade dist/seals-*.whl
+            pip install --force-reinstall --upgrade --no-deps dist/seals-*.whl
 
 # The `jobs` section defines jobs that can be executed on CircleCI as part of workflows.
 jobs:
