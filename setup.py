@@ -49,6 +49,7 @@ TESTS_REQUIRE = [
     "pytest-xdist",
     "pytype",
     "stable-baselines3>=0.9.0",
+    "pyglet>=1.4.0",
 ]
 DOCS_REQUIRE = [
     "sphinx",
@@ -68,7 +69,7 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     package_data={"seals": ["py.typed"]},
-    install_requires=["gym", "pyglet"],
+    install_requires=["gym"],
     tests_require=TESTS_REQUIRE,
     extras_require={
         # recommended packages for development
