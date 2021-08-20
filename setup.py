@@ -49,6 +49,7 @@ TESTS_REQUIRE = [
     "pytest-xdist",
     "pytype",
     "stable-baselines3>=0.9.0",
+    "pyglet>=1.4.0",
 ]
 DOCS_REQUIRE = [
     "sphinx",

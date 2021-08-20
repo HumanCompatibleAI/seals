@@ -1,2 +1,8 @@
 [tool.black]
 target-version = ["py37"]
+
+[[tool.mypy.overrides]]
+module = [
+    "gym.*"
+]
+ignore_missing_imports = true

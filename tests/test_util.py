@@ -14,8 +14,9 @@ def test_sample_distribution():
     distr /= distr.sum()
 
     n_samples = 1000
+    rng = np.random.RandomState()
     sample_count = collections.Counter(
-        util.sample_distribution(distr) for _ in range(n_samples)
+        util.sample_distribution(distr, rng) for _ in range(n_samples)
     )
 
     empirical_distr = np.array([sample_count[i] for i in range(distr_size)]) / n_samples
