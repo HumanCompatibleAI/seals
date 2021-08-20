@@ -86,7 +86,7 @@ def test_absorb_repeat_final_state(episode_length=6, n_steps=100, n_manual_reset
             assert rew == expected_rew
 
 
-@pytest.mark.parametrize("dtype", [np.int, np.float32, np.float64])
+@pytest.mark.parametrize("dtype", [np.int64, np.float32, np.float64])
 def test_obs_cast(dtype: np.dtype, episode_length: int = 5):
     """Check obs_cast observations are of specified dtype and not mangled.
 
