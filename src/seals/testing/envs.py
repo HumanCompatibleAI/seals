@@ -235,8 +235,7 @@ def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
     Raises:
         AssertionError if test fails.
     """
-    if MUJOCO_AVAILABLE and isinstance(env.unwrapped, mujoco_env.MujocoEnv): # pragma: no cover
-        # if hasattr(env, "sim") and hasattr(env, "model"):  
+    if MUJOCO_AVAILABLE and isinstance(env.unwrapped, mujoco_env.MujocoEnv):
         # We can't use isinstance since importing mujoco_py will fail on
         # machines without MuJoCo installed
         skip_fn("MuJoCo environments cannot perform this check.")
