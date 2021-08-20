@@ -18,12 +18,6 @@ from typing import (
 )
 
 import gym
-try:  # noqa: I003
-    from gym.envs.mujoco import mujoco_env
-    MUJOCO_AVAILABLE = True
-except gym.error.DependencyNotInstalled:
-    mujoco_env = None
-    MUJOCO_AVAILABLE = False
 import numpy as np
 
 Step = Tuple[Any, Optional[float], bool, Mapping[str, Any]]
@@ -235,7 +229,7 @@ def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:
     Raises:
         AssertionError if test fails.
     """
-    if MUJOCO_AVAILABLE and isinstance(env.unwrapped, mujoco_env.MujocoEnv):
+    if _check_is_mujoco_env(env): # pragma: no cover
         # We can't use isinstance since importing mujoco_py will fail on
         # machines without MuJoCo installed
         skip_fn("MuJoCo environments cannot perform this check.")
@@ -279,13 +273,17 @@ def test_render(env: gym.Env, raises_fn) -> None:
         # on the viewer (commented out) so the resources are not released.
         # For now this is OK, but may bite if we end up testing a lot of
         # MuJoCo environments.
-        is_mujoco = MUJOCO_AVAILABLE and isinstance(env.unwrapped, mujoco_env.MujocoEnv)
+        is_mujoco = _check_is_mujoco_env(env) # pragma: no cover
         if "rgb_array" in render_modes and not is_mujoco:
             # Render should not change without calling `step()`.
             # MuJoCo rendering fails this check, ignore -- not much we can do.
             resa = env.render(mode="rgb_array")
             resb = env.render(mode="rgb_array")
             assert np.allclose(resa, resb)
+
+
+def _check_is_mujoco_env(env: gym.Env) -> bool:
+    return hasattr(env, "sim") and hasattr(env, "model")
 
 
 class CountingEnv(gym.Env):
