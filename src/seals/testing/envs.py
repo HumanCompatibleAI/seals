@@ -18,7 +18,6 @@ from typing import (
 )
 
 import gym
-from gym.envs.mujoco import mujoco_env
 import numpy as np
 
 Step = Tuple[Any, Optional[float], bool, Mapping[str, Any]]
@@ -274,7 +273,7 @@ def test_render(env: gym.Env, raises_fn) -> None:
         # on the viewer (commented out) so the resources are not released.
         # For now this is OK, but may bite if we end up testing a lot of
         # MuJoCo environments.
-        is_mujoco = isinstance(env.unwrapped, mujoco_env.MujocoEnv)
+        is_mujoco = if hasattr(env, "sim") and hasattr(env, "model")
         if "rgb_array" in render_modes and not is_mujoco:
             # Render should not change without calling `step()`.
             # MuJoCo rendering fails this check, ignore -- not much we can do.
