@@ -122,7 +122,17 @@ def has_same_observations(rollout_a: Rollout, rollout_b: Rollout) -> bool:
     """True if `rollout_a` and `rollout_b` have the same observations."""
     obs_list_a = [step[0] for step in rollout_a]
     obs_list_b = [step[0] for step in rollout_b]
-    return all(np.all(obs_a == obs_b) for obs_a, obs_b in zip(obs_list_a, obs_list_b))
+    for obs_a, obs_b in zip(obs_list_a, obs_list_b):
+        if isinstance(obs_a, Mapping):
+            if obs_a.keys() != obs_b.keys():
+                return False
+            obs_a = list(obs_a.values())
+            obs_b = list(obs_b.values())
+        else:
+            obs_a, obs_b = [obs_a], [obs_b]
+        if any([np.any(x != y) for x, y in zip(obs_a, obs_b)]):
+            return False
+    return True
 
 
 def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) -> None:
