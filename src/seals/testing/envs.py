@@ -122,10 +122,10 @@ def has_same_observations(rollout_a: Rollout, rollout_b: Rollout) -> bool:
     """True if `rollout_a` and `rollout_b` have the same observations."""
     obs_list_a = [step[0] for step in rollout_a]
     obs_list_b = [step[0] for step in rollout_b]
-    if len(obs_list_a) != len(obs_list_b):
+    if len(obs_list_a) != len(obs_list_b):  # pragma: no cover
         return False
     for obs_a, obs_b in zip(obs_list_a, obs_list_b):
-        if isinstance(obs_a, Mapping):
+        if isinstance(obs_a, Mapping):  # pragma: no cover
             if obs_a.keys() != obs_b.keys():
                 return False
             obs_a = list(obs_a.values())
