@@ -186,9 +186,9 @@ workflows:
     jobs:
       - lintandtype:
           context:
-          - MuJoCo
+          - MuJoCo-free
           - docker-hub-creds
       - unit-test:
           context:
-          - MuJoCo
+          - MuJoCo-free
           - docker-hub-creds
