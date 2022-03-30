@@ -33,7 +33,7 @@ class AntEnv(ant_v3.AntEnv):
 
 @_include_position_in_observation
 class HalfCheetahEnv(half_cheetah_v3.HalfCheetahEnv):
-    """HalfCheetah with position observation and no early termination."""
+    """HalfCheetah with position observation. Naturally does not terminate early."""
 
 
 @_include_position_in_observation
