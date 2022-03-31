@@ -48,7 +48,7 @@ class ParabolaEnv(base_envs.ResettableMDP):
     def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
         """Negative squared vertical distance from parabola."""
         x, y, a, b, c = state
-        target_y = a * x ** 2 + b * x + c
+        target_y = a * x**2 + b * x + c
         return (-1) * (y - target_y) ** 2
 
     def transition(self, state: np.ndarray, action: int) -> np.ndarray:
