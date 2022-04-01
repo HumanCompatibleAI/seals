@@ -15,6 +15,7 @@ RUN    apt-get update -q \
     libosmesa6-dev \
     net-tools \
     parallel \
+    patchelf \
     python3.7 \
     python3.7-dev \
     python3-pip \
@@ -28,15 +29,13 @@ RUN    apt-get update -q \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -o /usr/local/bin/patchelf https://s3-us-west-2.amazonaws.com/openai-sci-artifacts/manual-builds/patchelf_0.9_amd64.elf \
-    && chmod +x /usr/local/bin/patchelf
-
 ENV LANG C.UTF-8
 
 RUN    mkdir -p /root/.mujoco \
     && curl -o mjpro150.zip https://www.roboti.us/download/mjpro150_linux.zip \
     && unzip mjpro150.zip -d /root/.mujoco \
-    && rm mjpro150.zip
+    && rm mjpro150.zip \
+    && curl -o /root/.mujoco/mjkey.txt https://www.roboti.us/file/mjkey.txt
 
 # Set the PATH to the venv before we create the venv, so it's visible in base.
 # This is since we may create the venv outside of Docker, e.g. in CI
@@ -61,9 +60,8 @@ COPY ./setup.py ./setup.py
 COPY ./README.md ./README.md
 COPY ./src/seals/version.py ./src/seals/version.py
 COPY ./ci/build_venv.sh ./ci/build_venv.sh
-
-# mjkey.txt needs to exist for build, but doesn't need to be a real key
-RUN touch /root/.mujoco/mjkey.txt && /seals/ci/build_venv.sh /venv
+RUN    /seals/ci/build_venv.sh /venv \
+    && rm -rf $HOME/.cache/pip
 
 # full stage contains everything.
 # Can be used for deployment and local testing.
@@ -72,8 +70,8 @@ FROM python-req as full
 # Delay copying (and installing) the code until the very end
 COPY . /seals
 # Build a wheel then install to avoid copying whole directory (pip issue #2195)
-RUN python setup.py sdist bdist_wheel
-RUN pip install dist/seals-*.whl
+RUN python3 setup.py sdist bdist_wheel
+RUN pip install --upgrade dist/seals-*.whl
 
 # Default entrypoints
 CMD ["pytest", "-n", "auto", "-vv", "tests/"]
