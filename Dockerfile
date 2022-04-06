@@ -6,7 +6,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN    apt-get update -q \
     && apt-get install -y --no-install-recommends \
     build-essential \
-    curl \
     ffmpeg \
     git \
     libgl1-mesa-dev \
@@ -25,23 +24,28 @@ RUN    apt-get update -q \
     vim \
     virtualenv \
     xpra \
+    wget \
     xserver-xorg-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LANG C.UTF-8
 
-RUN    mkdir -p /root/.mujoco \
-    && curl -o mjpro150.zip https://www.roboti.us/download/mjpro150_linux.zip \
-    && unzip mjpro150.zip -d /root/.mujoco \
-    && rm mjpro150.zip \
-    && curl -o /root/.mujoco/mjkey.txt https://www.roboti.us/file/mjkey.txt
+# Install mujoco211
+RUN mkdir -p /root/.mujoco \
+    && wget -P /root/.mujoco "https://github.com/deepmind/mujoco/releases/download/2.1.1/mujoco-2.1.1-linux-x86_64.tar.gz" \
+    && tar -zxvf /root/.mujoco/mujoco-2.1.1-linux-x86_64.tar.gz --no-same-owner -C /root/.mujoco/ \
+    && rm /root/.mujoco/mujoco-2.1.1-linux-x86_64.tar.gz
 
 # Set the PATH to the venv before we create the venv, so it's visible in base.
 # This is since we may create the venv outside of Docker, e.g. in CI
 # or by binding it in for local development.
 ENV PATH="/venv/bin:$PATH"
-ENV LD_LIBRARY_PATH /root/.mujoco/mjpro150/bin:${LD_LIBRARY_PATH}
+
+# From mujoco-py Dockerfile and Documentation https://github.com/openai/mujoco-py/tree/v2.1.2.14
+ENV LD_LIBRARY_PATH /root/.mujoco/mujoco-2.1.1/bin:${LD_LIBRARY_PATH}
+ENV LD_LIBRARY_PATH /usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
+ENV MUJOCO_PY_MUJOCO_PATH /root/.mujoco/mujoco-2.1.1/
 
 # Run Xdummy mock X server by default so that rendering will work.
 COPY ci/xorg.conf /etc/dummy_xorg.conf
