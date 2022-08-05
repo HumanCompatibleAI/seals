@@ -32,7 +32,7 @@ class ParabolaEnv(base_envs.ResettableMDP):
 
         super().__init__(
             state_space=spaces.Box(low=state_low, high=state_high),
-            action_space=spaces.Box(low=-2*bounds, high=2*bounds, shape=()),
+            action_space=spaces.Box(low=(-2) * bounds, high=2 * bounds, shape=()),
         )
 
     def terminal(self, state: int, n_actions_taken: int) -> bool:
