@@ -4,6 +4,7 @@ This is used in our test suite in `tests/test_envs.py`. It is also used in siste
 projects such as `imitation`, and may be useful in other codebases.
 """
 
+import collections
 import re
 from typing import (
     Any,
@@ -137,7 +138,12 @@ def has_same_observations(rollout_a: Rollout, rollout_b: Rollout) -> bool:
     return True
 
 
-def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) -> None:
+def test_seed(
+    env: gym.Env,
+    env_name: str,
+    deterministic_envs: Iterable[str],
+    few_check_envs: Iterable[str],
+) -> None:
     """Tests environment seeding.
 
     If non-deterministic, different seeds should produce different transitions.
@@ -148,10 +154,9 @@ def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) ->
     """
     env.action_space.seed(0)
     actions = [env.action_space.sample() for _ in range(10)]
-
     # With the same seed, should always get the same result
     seeds = env.seed(42)
-    assert isinstance(seeds, list)
+    assert isinstance(seeds, collections.abc.Sequence)
     assert len(seeds) > 0
     rollout_a = get_rollout(env, actions)
 
@@ -164,7 +169,7 @@ def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) ->
     # eventually get a different result. For deterministic environments, all
     # seeds should produce the same starting state.
     def different_seeds_same_rollout(seed1, seed2):
-        new_actions = [env.action_space.sample() for _ in range(10)]
+        new_actions = [env.action_space.sample() for _ in range(100)]
         env.seed(seed1)
         new_rollout_1 = get_rollout(env, new_actions)
         env.seed(seed2)
@@ -172,7 +177,10 @@ def test_seed(env: gym.Env, env_name: str, deterministic_envs: Iterable[str]) ->
         return has_same_observations(new_rollout_1, new_rollout_2)
 
     is_deterministic = matches_list(env_name, deterministic_envs)
-    same_obs = all(different_seeds_same_rollout(seed, seed + 1) for seed in range(100))
+    num_seeds = 100 if not matches_list(env_name, few_check_envs) else 3
+    same_obs = all(
+        different_seeds_same_rollout(seed, seed + 1) for seed in range(num_seeds)
+    )
     assert same_obs == is_deterministic
 
 
@@ -202,7 +210,8 @@ def _is_mujoco_env(env: gym.Env) -> bool:
 def test_rollout_schema(
     env: gym.Env,
     steps_after_done: int = 10,
-    max_steps: int = 10000,
+    max_steps: int = 10_000,
+    check_episode_ends: bool = True,
 ) -> None:
     """Check custom environments have correct types on `step` and `reset`.
 
@@ -225,10 +234,11 @@ def test_rollout_schema(
         if done:
             break
 
-    assert done is True, "did not get to end of episode"
+    if check_episode_ends:
+        assert done is True, "did not get to end of episode"
 
-    for _ in range(steps_after_done):
-        _sample_and_check(env, obs_space)
+        for _ in range(steps_after_done):
+            _sample_and_check(env, obs_space)
 
 
 def test_premature_step(env: gym.Env, skip_fn, raises_fn) -> None:

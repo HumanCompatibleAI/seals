@@ -57,6 +57,13 @@ DOCS_REQUIRE = [
     "sphinx-rtd-theme",
     "sphinxcontrib-napoleon",
 ]
+ATARI_REQUIRE = [
+    "opencv-python",
+    "ale-py==0.7.4",
+    "pillow",
+    "autorom[accept-rom-license]~=0.4.2",
+]
+
 
 setup(
     name="seals",
@@ -73,12 +80,13 @@ setup(
     tests_require=TESTS_REQUIRE,
     extras_require={
         # recommended packages for development
-        "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE],
+        "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE, *ATARI_REQUIRE],
         "docs": DOCS_REQUIRE,
         "test": TESTS_REQUIRE,
         # We'd like to specify `gym[mujoco]`, but this is a no-op when Gym is already
         # installed. See https://github.com/pypa/pip/issues/4957 for issue.
         "mujoco": ["mujoco_py>=1.50, <2.0", "imageio"],
+        "atari": ATARI_REQUIRE,
     },
     url="https://github.com/HumanCompatibleAI/benchmark-environments",
     license="MIT",
