@@ -236,7 +236,7 @@ def test_rollout_schema(
             break
 
     if check_episode_ends:
-        assert done is True, "did not get to end of episode"
+        assert done, "did not get to end of episode"
 
         for _ in range(steps_after_done):
             _sample_and_check(env, obs_space)
