@@ -55,6 +55,7 @@ class TestEnvs:
                 if env_name not in ["seals/Bowling-v5", "seals/NameThisGame-v5"]
                 else 400
             )
+            # those two environments take a while for their non-determinism to show.
             num_seeds = 2 if env_name in ATARI_NO_FRAMESKIP_ENVS else 10
             envs.test_seed(
                 env,
