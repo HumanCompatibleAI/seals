@@ -98,12 +98,13 @@ ATARI_ENV_NAMES = [
 
 for env_name in ATARI_ENV_NAMES:
     for frameskip in [True, False]:
-        if frameskip:
-            seals_name = "seals/" + env_name + ("-v5" if frameskip else "NoFrameskip-v4")
-            func_name = env_name.lower() + ("_v5" if frameskip else "_noframeskip")
-            gym_name = ("ALE/" + env_name + "-v5") if frameskip else (env_name + "NoFrameskip-v4")
-            gym.register(
-                id=seals_name,
-                entry_point=f"seals.atari:{func_name}",
-                max_episode_steps=util.get_gym_max_episode_steps(gym_name),
-            )
+        seals_name = "seals/" + env_name + ("-v5" if frameskip else "NoFrameskip-v4")
+        func_name = env_name.lower() + ("_v5" if frameskip else "_noframeskip")
+        gym_name = (
+            ("ALE/" + env_name + "-v5") if frameskip else (env_name + "NoFrameskip-v4")
+        )
+        gym.register(
+            id=seals_name,
+            entry_point=f"seals.atari:{func_name}",
+            max_episode_steps=util.get_gym_max_episode_steps(gym_name),
+        )

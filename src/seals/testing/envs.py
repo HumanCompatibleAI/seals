@@ -177,7 +177,7 @@ def test_seed(
         return has_same_observations(new_rollout_1, new_rollout_2)
 
     is_deterministic = matches_list(env_name, deterministic_envs)
-    num_seeds = 100 if not matches_list(env_name, few_check_envs) else 3
+    num_seeds = 100 if not matches_list(env_name, few_check_envs) else 2
     same_obs = all(
         different_seeds_same_rollout(seed, seed + 1) for seed in range(num_seeds)
     )
@@ -221,6 +221,8 @@ def test_rollout_schema(
             episode termination. This is an abuse of the Gym API, but we would like the
             environments to handle this case gracefully.
         max_steps: Test fails if we do not get `done` after this many timesteps.
+        check_episode_ends: Check that episode ends after `max_steps` steps, and that
+            steps taken after `done` is true are of the correct type.
 
     Raises:
         AssertionError if test fails.
