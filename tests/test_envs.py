@@ -43,7 +43,12 @@ class TestEnvs:
     """Battery of simple tests for environments."""
 
     def test_seed(self, env: gym.Env, env_name: str):
-        """Tests environment seeding."""
+        """Tests environment seeding.
+
+        Deterministic atari environments are run with fewer seeds to minimize the number
+        of resets done in this test suite, since atari resets take a long time and there
+        are many atari environments.
+        """
         envs.test_seed(env, env_name, DETERMINISTIC_ENVS, ATARI_NO_FRAMESKIP_ENVS)
 
     def test_premature_step(self, env: gym.Env):
@@ -53,7 +58,12 @@ class TestEnvs:
     # if env is atari then don't wait until done else do normal thing
     # or maybe force done=True?
     def test_rollout_schema(self, env: gym.Env, env_name: str):
-        """Tests if environments have correct types on `step()` and `reset()`."""
+        """Tests if environments have correct types on `step()` and `reset()`.
+
+        Atari environments have a very long episode length (~100k observations), so in
+        the interest of time we do not run them to the end of their episodes or check
+        the return time of `env.step` after the end of the episode.
+        """
         if env_name in ATARI_ENVS:
             envs.test_rollout_schema(env, max_steps=1_000, check_episode_ends=False)
         else:
