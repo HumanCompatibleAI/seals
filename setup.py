@@ -82,7 +82,7 @@ setup(
         # recommended packages for development
         "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE, *ATARI_REQUIRE],
         "docs": DOCS_REQUIRE,
-        "test": TESTS_REQUIRE,
+        "test": TESTS_REQUIRE + ATARI_REQUIRE,
         # We'd like to specify `gym[mujoco]`, but this is a no-op when Gym is already
         # installed. See https://github.com/pypa/pip/issues/4957 for issue.
         "mujoco": ["mujoco_py>=1.50, <2.0", "imageio"],
