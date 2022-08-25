@@ -156,6 +156,7 @@ def test_seed(
     # With the same seed, should always get the same result
     seeds = env.seed(42)
     assert isinstance(seeds, (list, tuple))
+    # output of env.seed should be a list, but atari environments return a tuple.
     assert len(seeds) > 0
     rollout_a = get_rollout(env, actions)
 
