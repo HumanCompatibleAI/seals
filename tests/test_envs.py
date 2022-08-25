@@ -49,7 +49,22 @@ class TestEnvs:
         of resets done in this test suite, since atari resets take a long time and there
         are many atari environments.
         """
-        envs.test_seed(env, env_name, DETERMINISTIC_ENVS, ATARI_NO_FRAMESKIP_ENVS)
+        if env_name in ATARI_ENVS:
+            rollout_len = (
+                100
+                if env_name not in ["seals/Bowling-v5", "seals/NameThisGame-v5"]
+                else 400
+            )
+            num_seeds = 2 if env_name in ATARI_NO_FRAMESKIP_ENVS else 10
+            envs.test_seed(
+                env,
+                env_name,
+                DETERMINISTIC_ENVS,
+                rollout_len=rollout_len,
+                num_seeds=num_seeds,
+            )
+        else:
+            envs.test_seed(env, env_name, DETERMINISTIC_ENVS)
 
     def test_premature_step(self, env: gym.Env):
         """Tests if step() before reset() raises error."""

@@ -141,7 +141,8 @@ def test_seed(
     env: gym.Env,
     env_name: str,
     deterministic_envs: Iterable[str],
-    few_check_envs: Iterable[str],
+    rollout_len: int = 10,
+    num_seeds: int = 100,
 ) -> None:
     """Tests environment seeding.
 
@@ -152,7 +153,7 @@ def test_seed(
         AssertionError if test fails.
     """
     env.action_space.seed(0)
-    actions = [env.action_space.sample() for _ in range(10)]
+    actions = [env.action_space.sample() for _ in range(rollout_len)]
     # With the same seed, should always get the same result
     seeds = env.seed(42)
     assert isinstance(seeds, (list, tuple))
@@ -169,7 +170,7 @@ def test_seed(
     # eventually get a different result. For deterministic environments, all
     # seeds should produce the same starting state.
     def different_seeds_same_rollout(seed1, seed2):
-        new_actions = [env.action_space.sample() for _ in range(100)]
+        new_actions = [env.action_space.sample() for _ in range(rollout_len)]
         env.seed(seed1)
         new_rollout_1 = get_rollout(env, new_actions)
         env.seed(seed2)
@@ -177,7 +178,6 @@ def test_seed(
         return has_same_observations(new_rollout_1, new_rollout_2)
 
     is_deterministic = matches_list(env_name, deterministic_envs)
-    num_seeds = 100 if not matches_list(env_name, few_check_envs) else 2
     same_obs = all(
         different_seeds_same_rollout(seed, seed + 1) for seed in range(num_seeds)
     )
