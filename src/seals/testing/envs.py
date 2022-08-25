@@ -4,7 +4,6 @@ This is used in our test suite in `tests/test_envs.py`. It is also used in siste
 projects such as `imitation`, and may be useful in other codebases.
 """
 
-import collections
 import re
 from typing import (
     Any,
@@ -156,7 +155,7 @@ def test_seed(
     actions = [env.action_space.sample() for _ in range(10)]
     # With the same seed, should always get the same result
     seeds = env.seed(42)
-    assert isinstance(seeds, collections.abc.Sequence)
+    assert isinstance(seeds, (list, tuple))
     assert len(seeds) > 0
     rollout_a = get_rollout(env, actions)
 
