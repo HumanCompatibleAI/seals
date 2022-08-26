@@ -140,21 +140,30 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         return obs, reward, done, infos
 
 
-class ExposePOMDPStateWrapper(gym.Wrapper):
-    def __init__(self, env: ResettablePOMDP) -> None:
+class ExposePOMDPStateWrapper(gym.Wrapper, Generic[State, Observation, Action]):
+    """A wrapper that exposes the current state of the POMDP as the observation."""
+    def __init__(self, env: ResettablePOMDP[State, Observation, Action]) -> None:
+        """Build wrapper.
+
+        Args:
+            env: POMDP to wrap.
+        """
         super().__init__(env)
         self._observation_space = env.state_space
 
-    def reset(self):
+    def reset(self) -> State:
+        """Reset environment and return initial state."""
         self.venv.reset()
         return self.env.state
 
-    def step(self, action):
+    def step(self, action) -> Tuple[State, float, bool, dict]:
+        """Transition state using given action."""
         obs, reward, done, info = self.venv.step(action)
         return self.env.state, reward, done, info
 
 
-class ResettableMDP(ResettablePOMDP[State, State, Action], abc.ABC, Generic[State, Action]):
+class ResettableMDP(ResettablePOMDP[State, State, Action],
+                    abc.ABC, Generic[State, Action]):
     """ABC for MDPs that are resettable."""
 
     def __init__(
@@ -204,6 +213,8 @@ class TabularModelPOMDP(ResettablePOMDP[int, np.ndarray, int]):
         Args:
             transition_matrix: 3-D array with transition probabilities for a
                 given state-action pair, of shape `(n_states,n_actions,n_states)`.
+            observation_matrix: 2-D array with observation probabilities for a
+                given state, of shape `(n_states,n_observations)`.
             reward_matrix: 1-D, 2-D or 3-D array corresponding to rewards to a
                 given `(state, action, next_state)` triple. A 2-D array assumes
                 the `next_state` is not used in the reward, and a 1-D array
@@ -219,7 +230,6 @@ class TabularModelPOMDP(ResettablePOMDP[int, np.ndarray, int]):
             ValueError: `transition_matrix`, `reward_matrix` or
                 `initial_state_dist` have shapes different to specified above.
         """
-
         # The following matrices should conform to the shapes below:
         # transition matrix: n_states x n_actions x n_states
         # reward matrix: n_states x n_actions x n_states
@@ -274,7 +284,7 @@ class TabularModelPOMDP(ResettablePOMDP[int, np.ndarray, int]):
         super().__init__(
             state_space=self._construct_state_space(self.state_dim),
             action_space=self._construct_action_space(self.action_dim),
-            observation_space=self._construct_observation_space(self.obs_dim, self.obs_dtype),
+            observation_space=self._construct_obs_space(self.obs_dim, self.obs_dtype),
         )
 
     @staticmethod
@@ -286,7 +296,7 @@ class TabularModelPOMDP(ResettablePOMDP[int, np.ndarray, int]):
         return spaces.Discrete(n_actions)
 
     @staticmethod
-    def _construct_observation_space(obs_dim, obs_dtype) -> gym.Space:
+    def _construct_obs_space(obs_dim, obs_dtype) -> gym.Space:
         return spaces.Box(
             low=float("-inf"),
             high=float("inf"),
@@ -318,6 +328,7 @@ class TabularModelPOMDP(ResettablePOMDP[int, np.ndarray, int]):
         return n_actions_taken >= self.horizon
 
     def obs_from_state(self, state: int) -> np.ndarray:
+        """Computes observation from state."""
         # Copy so it can't be mutated in-place (updates will be reflected in
         # self.observation_matrix!)
         # TODO(juan): what? shouldn't this be an integer?
@@ -331,7 +342,8 @@ class TabularModelPOMDP(ResettablePOMDP[int, np.ndarray, int]):
         """Matrix mapping states to feature vectors."""
         # Construct lazily to save memory in algorithms that don't need features.
         if self._feature_matrix is None:
-            # TODO(juan) Space() does not have an `n` attribute (?). Are we hinting the wrong type?
+            # TODO(juan) Space() does not have an `n` attribute (?).
+            #  Are we hinting the wrong type?
             n_states = self.state_space.n
             self._feature_matrix = np.eye(n_states)
         return self._feature_matrix
