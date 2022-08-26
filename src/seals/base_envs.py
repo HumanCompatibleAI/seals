@@ -142,6 +142,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
 
 class ExposePOMDPStateWrapper(gym.Wrapper, Generic[State, Observation, Action]):
     """A wrapper that exposes the current state of the POMDP as the observation."""
+
     def __init__(self, env: ResettablePOMDP[State, Observation, Action]) -> None:
         """Build wrapper.
 
@@ -162,8 +163,9 @@ class ExposePOMDPStateWrapper(gym.Wrapper, Generic[State, Observation, Action]):
         return self.env.state, reward, done, info
 
 
-class ResettableMDP(ResettablePOMDP[State, State, Action],
-                    abc.ABC, Generic[State, Action]):
+class ResettableMDP(
+    ResettablePOMDP[State, State, Action], abc.ABC, Generic[State, Action]
+):
     """ABC for MDPs that are resettable."""
 
     def __init__(
