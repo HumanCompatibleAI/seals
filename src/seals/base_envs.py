@@ -23,6 +23,12 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
     meet these criteria.
     """
 
+    _state_space: gym.Space
+    _observation_space: gym.Space
+    _action_space: gym.Space
+    _cur_state: Optional[State]
+    _n_actions_taken: Optional[int]
+
     def __init__(
         self,
         *,
@@ -41,8 +47,8 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         self._observation_space = observation_space
         self._action_space = action_space
 
-        self.cur_state: Optional[State] = None
-        self._n_actions_taken: Optional[int] = None
+        self._cur_state = None
+        self._n_actions_taken = None
         self.seed()
 
     @abc.abstractmethod
@@ -86,6 +92,19 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         assert self._n_actions_taken is not None
         return self._n_actions_taken
 
+    @property
+    def state(self) -> State:
+        """Current state."""
+        assert self._cur_state is not None
+        return self._cur_state
+
+    @state.setter
+    def state(self, state: State):
+        """Set current state."""
+        if self._cur_state not in self.state_space:
+            raise ValueError(f"{state} not in {self.state_space}")
+        self._cur_state = state
+
     def seed(self, seed=None) -> Sequence[int]:
         """Set random seed."""
         if seed is None:
@@ -97,32 +116,45 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
 
     def reset(self) -> Observation:
         """Reset episode and return initial observation."""
-        self.cur_state = self.initial_state()
-        assert self.cur_state in self.state_space, f"unexpected state {self.cur_state}"
+        self.state = self.initial_state()
         self._n_actions_taken = 0
-        return self.obs_from_state(self.cur_state)
+        return self.obs_from_state(self._cur_state)
 
     def step(self, action: Action) -> Tuple[Observation, float, bool, dict]:
         """Transition state using given action."""
-        if self.cur_state is None or self._n_actions_taken is None:
+        if self._cur_state is None or self._n_actions_taken is None:
             raise ValueError("Need to call reset() before first step()")
         if action not in self.action_space:
             raise ValueError(f"{action} not in {self.action_space}")
 
-        old_state = self.cur_state
-        self.cur_state = self.transition(self.cur_state, action)
-        assert self.cur_state in self.state_space, f"unexpected state {self.cur_state}"
-        obs = self.obs_from_state(self.cur_state)
-        assert obs in self.observation_space, f"{obs} not in {self.observation_space}"
-        rew = self.reward(old_state, action, self.cur_state)
-        done = self.terminal(self.cur_state, self._n_actions_taken)
+        old_state = self.state
+        self.state = self.transition(self.state, action)
+        obs = self.obs_from_state(self.state)
+        if obs not in self.observation_space:
+            raise ValueError(f"{obs} not in {self.observation_space}")
+        reward = self.reward(old_state, action, self.state)
+        done = self.terminal(self.state, self.n_actions_taken)
         self._n_actions_taken += 1
 
-        infos = {"old_state": old_state, "new_state": self.cur_state}
-        return obs, rew, done, infos
+        infos = {"old_state": old_state, "new_state": self._cur_state}
+        return obs, reward, done, infos
 
 
-class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action]):
+class ExposePOMDPStateWrapper(gym.Wrapper):
+    def __init__(self, env: ResettablePOMDP) -> None:
+        super().__init__(env)
+        self._observation_space = env.state_space
+
+    def reset(self):
+        self.venv.reset()
+        return self.env.state
+
+    def step(self, action):
+        obs, reward, done, info = self.venv.step(action)
+        return self.env.state, reward, done, info
+
+
+class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action], abc.ABC):
     """ABC for MDPs that are resettable."""
 
     def __init__(
@@ -148,13 +180,21 @@ class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action
         return state
 
 
-class TabularModelMDP(ResettableMDP[int, int]):
+# TODO(juan) this does not implement the .render() method,
+#  so in theory it should not be instantiated directly.
+#  Not sure why this is not raising an error?
+class TabularModelPOMDP(ResettablePOMDP[int, int]):
     """Base class for tabular environments with known dynamics."""
+
+    transition_matrix: np.ndarray
+    reward_matrix: np.ndarray
+    observation_matrix: np.ndarray
 
     def __init__(
         self,
         *,
         transition_matrix: np.ndarray,
+        observation_matrix: np.ndarray,
         reward_matrix: np.ndarray,
         horizon: float = np.inf,
         initial_state_dist: Optional[np.ndarray] = None,
@@ -179,26 +219,21 @@ class TabularModelMDP(ResettableMDP[int, int]):
             ValueError: `transition_matrix`, `reward_matrix` or
                 `initial_state_dist` have shapes different to specified above.
         """
-        n_states, n_actions, n_next_states = transition_matrix.shape
-        if n_states != n_next_states:
+
+        # The following matrices should conform to the shapes below:
+        # transition matrix: n_states x n_actions x n_states
+        # reward matrix: n_states x n_actions x n_states
+        #   OR n_states x n_actions
+        #   OR n_states
+        # observation matrix: n_states x n_observations
+        # initial state dist: n_states
+        # we want to make sure that the shapes are correct
+
+        if transition_matrix.shape[0] != transition_matrix.shape[2]:
             raise ValueError(
                 "Malformed transition_matrix:\n"
                 f"transition_matrix.shape: {transition_matrix.shape}\n"
-                f"{n_states} != {n_next_states}",
-            )
-
-        if initial_state_dist is None:
-            initial_state_dist = util.one_hot_encoding(0, n_states)
-        if initial_state_dist.ndim != 1:
-            raise ValueError(
-                "initial_state_dist has multiple dimensions:\n"
-                f"{initial_state_dist.ndim} != 1",
-            )
-        if initial_state_dist.shape[0] != n_states:
-            raise ValueError(
-                "transition_matrix and initial_state_dist are not compatible:\n"
-                f"n_states = {n_states}\n"
-                f"len(initial_state_dist) = {len(initial_state_dist)}",
+                f"{transition_matrix.shape[0]} != {transition_matrix.shape[2]}",
             )
 
         if reward_matrix.shape != transition_matrix.shape[: len(reward_matrix.shape)]:
@@ -208,15 +243,55 @@ class TabularModelMDP(ResettableMDP[int, int]):
                 f"reward_matrix.shape: {reward_matrix.shape}",
             )
 
+        if observation_matrix.shape[0] != transition_matrix.shape[0]:
+            raise ValueError(
+                "transition_matrix and observation_matrix are not compatible:\n"
+                f"transition_matrix.shape[0]: {transition_matrix.shape[0]}\n"
+                f"observation_matrix.shape[0]: {observation_matrix.shape[0]}",
+            )
+
+        if initial_state_dist is None:
+            initial_state_dist = util.one_hot_encoding(0, transition_matrix.shape[0])
+        if initial_state_dist.ndim != 1:
+            raise ValueError(
+                "initial_state_dist has multiple dimensions:\n"
+                f"{initial_state_dist.ndim} != 1",
+            )
+        if initial_state_dist.shape[0] != transition_matrix.shape[0]:
+            raise ValueError(
+                "transition_matrix and initial_state_dist are not compatible:\n"
+                f"number of states = {transition_matrix.shape[0]}\n"
+                f"len(initial_state_dist) = {len(initial_state_dist)}",
+            )
+
         self.transition_matrix = transition_matrix
         self.reward_matrix = reward_matrix
+        self.observation_matrix = observation_matrix
         self._feature_matrix = None
         self.horizon = horizon
         self.initial_state_dist = initial_state_dist
 
         super().__init__(
-            state_space=spaces.Discrete(n_states),
-            action_space=spaces.Discrete(n_actions),
+            state_space=self._construct_state_space(self.state_dim),
+            action_space=self._construct_action_space(self.action_dim),
+            observation_space=self._construct_observation_space(self.obs_dim, self.obs_dtype),
+        )
+
+    @staticmethod
+    def _construct_state_space(n_states: int) -> gym.Space:
+        return spaces.Discrete(n_states)
+
+    @staticmethod
+    def _construct_action_space(n_actions: int) -> gym.Space:
+        return spaces.Discrete(n_actions)
+
+    @staticmethod
+    def _construct_observation_space(obs_dim, obs_dtype) -> gym.Space:
+        return spaces.Box(
+            low=float("-inf"),
+            high=float("inf"),
+            shape=(obs_dim,),
+            dtype=obs_dtype,
         )
 
     def initial_state(self) -> int:
@@ -242,11 +317,79 @@ class TabularModelMDP(ResettableMDP[int, int]):
         """Checks if state is terminal."""
         return n_actions_taken >= self.horizon
 
+    def obs_from_state(self, state: int):
+        # Copy so it can't be mutated in-place (updates will be reflected in
+        # self.observation_matrix!)
+        # TODO(juan): what? shouldn't this be an integer?
+        obs = self.observation_matrix[state].copy()
+        assert obs.ndim == 1, obs.shape
+        return obs
+
     @property
     def feature_matrix(self):
         """Matrix mapping states to feature vectors."""
         # Construct lazily to save memory in algorithms that don't need features.
         if self._feature_matrix is None:
+            # TODO(juan) Space() does not have an `n` attribute (?). Are we hinting the wrong type?
             n_states = self.state_space.n
             self._feature_matrix = np.eye(n_states)
         return self._feature_matrix
+
+    @property
+    def state_dim(self):
+        """Number of states in this MDP (int)."""
+        return self.transition_matrix.shape[0]
+
+    @property
+    def action_dim(self) -> int:
+        """Number of action vectors (int)."""
+        return self.transition_matrix.shape[1]
+
+    @property
+    def obs_dim(self) -> int:
+        """Size of observation vectors for this MDP."""
+        return self.observation_matrix.shape[1]
+
+    @property
+    def obs_dtype(self) -> int:
+        """Data type of observation vectors (e.g. np.float32)."""
+        return self.observation_matrix.dtype
+
+
+class TabularModelMDP(TabularModelPOMDP):
+    """Tabular model MDP.
+
+    A tabular model MDP is a tabular MDP where the transition and reward
+    matrices are constant.
+    """
+
+    def __init__(
+        self,
+        *,
+        transition_matrix: np.ndarray,
+        reward_matrix: np.ndarray,
+        horizon: float = np.inf,
+        initial_state_dist: Optional[np.ndarray] = None,
+    ):
+        """Initializes a tabular model MDP.
+
+        Args:
+            transition_matrix: Matrix of shape `(n_states, n_actions, n_states)`
+                containing transition probabilities.
+            reward_matrix: Matrix of shape `(n_states, n_actions, n_states)`
+                containing reward values.
+            initial_state_dist: Distribution over initial states. Shape `(n_states,)`.
+            horizon: Maximum number of steps to take in an episode.
+        """
+        super().__init__(
+            transition_matrix=transition_matrix,
+            reward_matrix=reward_matrix,
+            horizon=horizon,
+            initial_state_dist=initial_state_dist,
+            observation_matrix=np.eye(transition_matrix.shape[0]),
+        )
+        self._observation_space = self._state_space
+
+    def obs_from_state(self, state: State) -> State:
+        """Identity since observation == state in an MDP."""
+        return state

@@ -69,7 +69,7 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     package_data={"seals": ["py.typed"]},
-    install_requires=["gym"],
+    install_requires=["gym", "numpy"],
     tests_require=TESTS_REQUIRE,
     extras_require={
         # recommended packages for development
