@@ -101,7 +101,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
     @state.setter
     def state(self, state: State):
         """Set current state."""
-        if self._cur_state not in self.state_space:
+        if self._cur_state is not None and self._cur_state not in self.state_space:
             raise ValueError(f"{state} not in {self.state_space}")
         self._cur_state = state
 
@@ -154,7 +154,7 @@ class ExposePOMDPStateWrapper(gym.Wrapper):
         return self.env.state, reward, done, info
 
 
-class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action], abc.ABC):
+class ResettableMDP(ResettablePOMDP[State, State, Action], abc.ABC, Generic[State, Action]):
     """ABC for MDPs that are resettable."""
 
     def __init__(
@@ -183,7 +183,7 @@ class ResettableMDP(ResettablePOMDP[State, State, Action], Generic[State, Action
 # TODO(juan) this does not implement the .render() method,
 #  so in theory it should not be instantiated directly.
 #  Not sure why this is not raising an error?
-class TabularModelPOMDP(ResettablePOMDP[int, int]):
+class TabularModelPOMDP(ResettablePOMDP[int, np.ndarray, int]):
     """Base class for tabular environments with known dynamics."""
 
     transition_matrix: np.ndarray
@@ -317,10 +317,11 @@ class TabularModelPOMDP(ResettablePOMDP[int, int]):
         """Checks if state is terminal."""
         return n_actions_taken >= self.horizon
 
-    def obs_from_state(self, state: int):
+    def obs_from_state(self, state: int) -> np.ndarray:
         # Copy so it can't be mutated in-place (updates will be reflected in
         # self.observation_matrix!)
         # TODO(juan): what? shouldn't this be an integer?
+        #  i.e. an arg choice from the pdf returned below
         obs = self.observation_matrix[state].copy()
         assert obs.ndim == 1, obs.shape
         return obs
