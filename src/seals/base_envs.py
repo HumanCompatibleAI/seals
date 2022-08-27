@@ -118,7 +118,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         """Reset episode and return initial observation."""
         self.state = self.initial_state()
         self._n_actions_taken = 0
-        return self.obs_from_state(self._cur_state)
+        return self.obs_from_state(self.state)
 
     def step(self, action: Action) -> Tuple[Observation, float, bool, dict]:
         """Transition state using given action."""
@@ -196,7 +196,7 @@ class ResettableMDP(
 # TODO(juan) this does not implement the .render() method,
 #  so in theory it should not be instantiated directly.
 #  Not sure why this is not raising an error?
-class TabularModelPOMDP(ResettablePOMDP[int, np.ndarray, int]):
+class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
     """Base class for tabular environments with known dynamics."""
 
     transition_matrix: np.ndarray
@@ -331,15 +331,6 @@ class TabularModelPOMDP(ResettablePOMDP[int, np.ndarray, int]):
         """Checks if state is terminal."""
         return n_actions_taken >= self.horizon
 
-    def obs_from_state(self, state: int) -> np.ndarray:
-        """Computes observation from state."""
-        # Copy so it can't be mutated in-place (updates will be reflected in
-        # self.observation_matrix!)
-        # TODO(juan): what? shouldn't this be an integer?
-        #  i.e. an arg choice from the pdf returned below
-        obs = self.observation_matrix[state].copy()
-        assert obs.ndim == 1, obs.shape
-        return obs
 
     @property
     def feature_matrix(self):
@@ -373,7 +364,17 @@ class TabularModelPOMDP(ResettablePOMDP[int, np.ndarray, int]):
         return self.observation_matrix.dtype
 
 
-class TabularModelMDP(TabularModelPOMDP):
+class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray]):
+    def obs_from_state(self, state: int) -> np.ndarray:
+        """Computes observation from state."""
+        # Copy so it can't be mutated in-place (updates will be reflected in
+        # self.observation_matrix!)
+        obs = self.observation_matrix[state].copy()
+        assert obs.ndim == 1, obs.shape
+        return obs
+
+
+class TabularModelMDP(BaseTabularModelPOMDP[int]):
     """Tabular model MDP.
 
     A tabular model MDP is a tabular MDP where the transition and reward
@@ -407,6 +408,6 @@ class TabularModelMDP(TabularModelPOMDP):
         )
         self._observation_space = self._state_space
 
-    def obs_from_state(self, state: State) -> State:
+    def obs_from_state(self, state: int) -> int:
         """Identity since observation == state in an MDP."""
         return state
