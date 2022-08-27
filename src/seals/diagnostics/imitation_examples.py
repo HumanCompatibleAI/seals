@@ -305,7 +305,7 @@ class CliffWorld(TabularModelPOMDP):
             initial_state_dist=None,
         )
 
-    def draw_value_vec(self, D) -> None:
+    def draw_value_vec(self, D: np.ndarray) -> None:
         """Use matplotlib to plot a vector of values for each state.
 
         The vector could represent things like reward, occupancy measure, etc.
