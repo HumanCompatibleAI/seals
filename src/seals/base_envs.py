@@ -197,7 +197,11 @@ class ResettableMDP(
 #  so in theory it should not be instantiated directly.
 #  Not sure why this is not raising an error?
 class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
-    """Base class for tabular environments with known dynamics."""
+    """Base class for tabular environments with known dynamics.
+
+    This is the general class that also allows subclassing for creating
+    MDP (where observation == state) or POMDP (where observation != state).
+    """
 
     transition_matrix: np.ndarray
     reward_matrix: np.ndarray
@@ -331,7 +335,6 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
         """Checks if state is terminal."""
         return n_actions_taken >= self.horizon
 
-
     @property
     def feature_matrix(self):
         """Matrix mapping states to feature vectors."""
@@ -365,6 +368,17 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
 
 
 class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray]):
+    """Tabular model POMDP.
+
+    This class is specifically for environments where observation != state,
+    from both a typing perspective but also by defining the method that
+    draws observations from the state.
+
+    The tabular model is deterministic in drawing observations from the state,
+    in that given a certain state, the observation is always the same;
+    a vector with self.obs_dim entries.
+    """
+
     def obs_from_state(self, state: int) -> np.ndarray:
         """Computes observation from state."""
         # Copy so it can't be mutated in-place (updates will be reflected in
