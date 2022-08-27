@@ -253,7 +253,7 @@ class CliffWorld(TabularModelPOMDP):
             row = min(max(row, 0), height - 1)
             col = min(max(col, 0), width - 1)
             state_id = row * width + col
-            assert 0 <= state_id < self.state_dim
+            assert 0 <= state_id < T_mat.shape[0]
             return state_id
 
         for row in range(height):
@@ -323,8 +323,8 @@ class CliffWorld(TabularModelPOMDP):
 def register_cliff(suffix, kwargs):
     """Register a CliffWorld with the given suffix and keyword arguments."""
     gym.register(
-        f"imitation/CliffWorld{suffix}-v0",
-        entry_point="imitation.envs.examples.model_envs:CliffWorld",
+        f"seals/CliffWorld{suffix}-v0",
+        entry_point="seals.diagnostics.imitation_examples:CliffWorld",
         kwargs=kwargs,
     )
 
@@ -345,8 +345,8 @@ for width, height, horizon in [(7, 4, 9), (15, 6, 18), (100, 20, 110)]:
 # These parameter choices are somewhat arbitrary.
 # We anticipate most users will want to construct RandomMDP directly.
 gym.register(
-    "imitation/Random-v0",
-    entry_point="imitation.envs.examples.model_envs:RandomMDP",
+    "seals/Random-v0",
+    entry_point="seals.diagnostics.imitation_examples:RandomMDP",
     kwargs={
         "n_states": 16,
         "n_actions": 3,

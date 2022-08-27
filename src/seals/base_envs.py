@@ -154,12 +154,12 @@ class ExposePOMDPStateWrapper(gym.Wrapper, Generic[State, Observation, Action]):
 
     def reset(self) -> State:
         """Reset environment and return initial state."""
-        self.venv.reset()
+        self.env.reset()
         return self.env.state
 
     def step(self, action) -> Tuple[State, float, bool, dict]:
         """Transition state using given action."""
-        obs, reward, done, info = self.venv.step(action)
+        obs, reward, done, info = self.env.step(action)
         return self.env.state, reward, done, info
 
 
