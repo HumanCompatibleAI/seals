@@ -164,7 +164,9 @@ class ExposePOMDPStateWrapper(gym.Wrapper, Generic[State, Observation, Action]):
 
 
 class ResettableMDP(
-    ResettablePOMDP[State, State, Action], abc.ABC, Generic[State, Action],
+    ResettablePOMDP[State, State, Action],
+    abc.ABC,
+    Generic[State, Action],
 ):
     """ABC for MDPs that are resettable."""
 
