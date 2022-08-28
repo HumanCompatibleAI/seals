@@ -306,8 +306,8 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
     @staticmethod
     def _construct_obs_space(obs_dim, obs_dtype) -> gym.Space:
         return spaces.Box(
-            low=float("-inf"),
-            high=float("inf"),
+            low=-np.inf,
+            high=np.inf,
             shape=(obs_dim,),
             dtype=obs_dtype,
         )
