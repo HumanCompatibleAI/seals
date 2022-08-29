@@ -305,9 +305,15 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
 
     @staticmethod
     def _construct_obs_space(obs_dim, obs_dtype) -> gym.Space:
+        try:
+            dtype_iinfo = np.iinfo(obs_dtype)
+            min_val, max_val = dtype_iinfo.min, dtype_iinfo.max
+        except ValueError:
+            min_val = -np.inf
+            max_val = np.inf
         return spaces.Box(
-            low=-np.inf,
-            high=np.inf,
+            low=min_val,
+            high=max_val,
             shape=(obs_dim,),
             dtype=obs_dtype,
         )
