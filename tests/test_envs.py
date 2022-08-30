@@ -50,12 +50,9 @@ class TestEnvs:
         are many atari environments.
         """
         if env_name in ATARI_ENVS:
-            rollout_len = (
-                100
-                if env_name not in ["seals/Bowling-v5", "seals/NameThisGame-v5"]
-                else 400
-            )
-            # those two environments take a while for their non-determinism to show.
+            # these two environments take a while for their non-determinism to show.
+            slow_random_envs = ["seals/Bowling-v5", "seals/NameThisGame-v5"]
+            rollout_len = 100 if env_name not in slow_random_envs else 400
             num_seeds = 2 if env_name in ATARI_NO_FRAMESKIP_ENVS else 10
             envs.test_seed(
                 env,
@@ -71,8 +68,6 @@ class TestEnvs:
         """Tests if step() before reset() raises error."""
         envs.test_premature_step(env, skip_fn=pytest.skip, raises_fn=pytest.raises)
 
-    # if env is atari then don't wait until done else do normal thing
-    # or maybe force done=True?
     def test_rollout_schema(self, env: gym.Env, env_name: str):
         """Tests if environments have correct types on `step()` and `reset()`.
 

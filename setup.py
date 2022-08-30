@@ -27,6 +27,12 @@ def get_readme() -> str:
         return f.read()
 
 
+ATARI_REQUIRE = [
+    "opencv-python",
+    "ale-py==0.7.4",
+    "pillow",
+    "autorom[accept-rom-license]~=0.4.2",
+]
 TESTS_REQUIRE = [
     # remove pin once https://github.com/nedbat/coveragepy/issues/881 fixed
     "black",
@@ -50,18 +56,13 @@ TESTS_REQUIRE = [
     "pytype",
     "stable-baselines3>=0.9.0",
     "pyglet>=1.4.0",
+    *ATARI_REQUIRE,
 ]
 DOCS_REQUIRE = [
     "sphinx",
     "sphinx-autodoc-typehints",
     "sphinx-rtd-theme",
     "sphinxcontrib-napoleon",
-]
-ATARI_REQUIRE = [
-    "opencv-python",
-    "ale-py==0.7.4",
-    "pillow",
-    "autorom[accept-rom-license]~=0.4.2",
 ]
 
 
@@ -80,9 +81,9 @@ setup(
     tests_require=TESTS_REQUIRE,
     extras_require={
         # recommended packages for development
-        "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE, *ATARI_REQUIRE],
+        "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE],
         "docs": DOCS_REQUIRE,
-        "test": TESTS_REQUIRE + ATARI_REQUIRE,
+        "test": TESTS_REQUIRE,
         # We'd like to specify `gym[mujoco]`, but this is a no-op when Gym is already
         # installed. See https://github.com/pypa/pip/issues/4957 for issue.
         "mujoco": ["mujoco_py>=1.50, <2.0", "imageio"],
