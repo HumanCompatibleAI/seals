@@ -48,7 +48,8 @@ def test_some_atari_envs():
 def test_atari_space_invaders():
     """Tests if there's an atari environment called space invaders."""
     space_invader_environments = filter(
-        lambda name: "SpaceInvaders" in name, ATARI_ENVS,
+        lambda name: "SpaceInvaders" in name,
+        ATARI_ENVS,
     )
     try:
         dummy_env = next(space_invader_environments)
