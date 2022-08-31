@@ -31,80 +31,45 @@ for env_base in ["Ant", "HalfCheetah", "Hopper", "Humanoid", "Swimmer", "Walker2
 
 # Atari
 
-ATARI_ENV_NAMES = [
-    "Adventure",
-    "AirRaid",
-    "Alien",
-    "Amidar",
-    "Assault",
-    "Asterix",
-    "Asteroids",
-    "Atlantis",
-    "BankHeist",
-    "BattleZone",
-    "BeamRider",
-    "Berzerk",
-    "Bowling",
-    "Boxing",
-    "Breakout",
-    "Carnival",
-    "Centipede",
-    "ChopperCommand",
-    "CrazyClimber",
-    "Defender",
-    "DemonAttack",
-    "DoubleDunk",
-    "ElevatorAction",
-    "Enduro",
-    "FishingDerby",
-    "Freeway",
-    "Frostbite",
-    "Gopher",
-    "Gravitar",
-    "Hero",
-    "IceHockey",
-    "Jamesbond",
-    "JourneyEscape",
-    "Kangaroo",
-    "Krull",
-    "KungFuMaster",
-    "MontezumaRevenge",
-    "MsPacman",
-    "NameThisGame",
-    "Phoenix",
-    "Pitfall",
-    "Pong",
-    "Pooyan",
-    "PrivateEye",
-    "Qbert",
-    "Riverraid",
-    "RoadRunner",
-    "Robotank",
-    "Seaquest",
-    "Skiing",
-    "Solaris",
-    "SpaceInvaders",
-    "StarGunner",
-    "Tennis",
-    "TimePilot",
-    "Tutankham",
-    "UpNDown",
-    "Venture",
-    "VideoPinball",
-    "WizardOfWor",
-    "YarsRevenge",
-    "Zaxxon",
+
+def _not_ram_or_det(env_id):
+    slash_separated = env_id.split("/")
+    # environment name should look like "ALE/Amidar-v5" or "Amidar-ramNoFrameskip-v4"
+    assert len(slash_separated) in [1, 2]
+    after_slash = slash_separated[-1]
+    hyphen_separated = after_slash.split("-")
+    assert len(hyphen_separated) > 1
+    not_ram = not ("ram" in hyphen_separated[1])
+    not_deterministic = not ("Deterministic" in env_id)
+    return not_ram and not_deterministic
+
+
+def _supported_atari_env(gym_spec):
+    is_atari = gym_spec.entry_point == "gym.envs.atari:AtariEnv"
+    v5_and_plain = gym_spec.id.endswith("-v5") and not ("NoFrameskip" in gym_spec.id)
+    v4_and_no_frameskip = gym_spec.id.endswith("-v4") and "NoFrameskip" in gym_spec.id
+    return (
+        is_atari
+        and _not_ram_or_det(gym_spec.id)
+        and (v5_and_plain or v4_and_no_frameskip)
+    )
+
+
+# not a filter so that it doesn't update during the for loop below.
+GYM_ATARI_ENV_SPECS = [
+    gym_spec for gym_spec in gym.envs.registry.all() if _supported_atari_env(gym_spec)
 ]
 
-for env_name in ATARI_ENV_NAMES:
-    for frameskip in [True, False]:
-        seals_name = "seals/" + env_name + ("-v5" if frameskip else "NoFrameskip-v4")
-        func_name = env_name.lower() + ("_v5" if frameskip else "_noframeskip")
-        gym_name = (
-            ("ALE/" + env_name + "-v5") if frameskip else (env_name + "NoFrameskip-v4")
-        )
-        gym.register(
-            id=seals_name,
-            entry_point=f"seals.atari:{func_name}",
-            max_episode_steps=util.get_gym_max_episode_steps(gym_name),
-        )
+
+def _seals_name(gym_spec):
+    slash_separated = gym_spec.id.split("/")
+    return "seals/" + slash_separated[-1]
+
+
+for gym_spec in GYM_ATARI_ENV_SPECS:
+    gym.register(
+        id=_seals_name(gym_spec),
+        entry_point="seals.atari:fixed_length_atari",
+        max_episode_steps=util.get_gym_max_episode_steps(gym_spec.id),
+        kwargs=dict(atari_env_id=gym_spec.id),
+    )

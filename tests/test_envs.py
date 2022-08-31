@@ -15,6 +15,8 @@ ENV_NAMES: List[str] = [
     if env_spec.id.startswith("seals/")
 ]
 
+# TODO: add test that atari envs contain some things, like asteroids
+
 DETERMINISTIC_ENVS: List[str] = [
     "seals/EarlyTermPos-v0",
     "seals/EarlyTermNeg-v0",
@@ -23,19 +25,36 @@ DETERMINISTIC_ENVS: List[str] = [
     "seals/InitShiftTest-v0",
 ]
 
-ATARI_V5_ENVS: List[str] = [
-    "seals/" + env_name + "-v5" for env_name in seals.ATARI_ENV_NAMES
+ATARI_ENVS: List[str] = [
+    seals._seals_name(gym_spec) for gym_spec in seals.GYM_ATARI_ENV_SPECS
 ]
-ATARI_NO_FRAMESKIP_ENVS: List[str] = [
-    "seals/" + env_name + "NoFrameskip-v4" for env_name in seals.ATARI_ENV_NAMES
-]
+
+ATARI_V5_ENVS: List[str] = list(filter(lambda name: name.endswith("-v5"), ATARI_ENVS))
+ATARI_NO_FRAMESKIP_ENVS: List[str] = list(
+    filter(lambda name: name.endswith("-v4"), ATARI_ENVS),
+)
 
 DETERMINISTIC_ENVS += ATARI_NO_FRAMESKIP_ENVS
 
-ATARI_ENVS: List[str] = ATARI_V5_ENVS + ATARI_NO_FRAMESKIP_ENVS
-
 
 env = pytest.fixture(envs.make_env_fixture(skip_fn=pytest.skip))
+
+
+def test_some_atari_envs():
+    """Tests if we succeeded in finding any atari envs."""
+    assert len(seals.GYM_ATARI_ENV_SPECS) > 0
+
+
+def test_atari_space_invaders():
+    """Tests if there's an atari environment called space invaders."""
+    space_invader_environments = filter(
+        lambda name: "SpaceInvaders" in name, ATARI_ENVS,
+    )
+    try:
+        dummy_env = next(space_invader_environments)
+        locals()
+    except StopIteration:
+        assert False
 
 
 @pytest.mark.parametrize("env_name", ENV_NAMES)
@@ -50,8 +69,14 @@ class TestEnvs:
         are many atari environments.
         """
         if env_name in ATARI_ENVS:
-            # these two environments take a while for their non-determinism to show.
-            slow_random_envs = ["seals/Bowling-v5", "seals/NameThisGame-v5"]
+            # these environments take a while for their non-determinism to show.
+            slow_random_envs = [
+                "seals/Bowling-v5",
+                "seals/Frogger-v5",
+                "seals/KingKong-v5",
+                "seals/Koolaid-v5",
+                "seals/NameThisGame-v5",
+            ]
             rollout_len = 100 if env_name not in slow_random_envs else 400
             num_seeds = 2 if env_name in ATARI_NO_FRAMESKIP_ENVS else 10
             envs.test_seed(
