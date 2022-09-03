@@ -15,7 +15,6 @@ ENV_NAMES: List[str] = [
     if env_spec.id.startswith("seals/")
 ]
 
-# TODO: add test that atari envs contain some things, like asteroids
 
 DETERMINISTIC_ENVS: List[str] = [
     "seals/EarlyTermPos-v0",
