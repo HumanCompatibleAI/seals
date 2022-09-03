@@ -7,6 +7,7 @@ from gym.envs import registration
 import pytest
 
 import seals  # noqa: F401 required for env registration
+from seals.atari import _seals_name
 from seals.testing import envs
 
 ENV_NAMES: List[str] = [
@@ -25,7 +26,7 @@ DETERMINISTIC_ENVS: List[str] = [
 ]
 
 ATARI_ENVS: List[str] = [
-    seals._seals_name(gym_spec) for gym_spec in seals.GYM_ATARI_ENV_SPECS
+    _seals_name(gym_spec) for gym_spec in seals.GYM_ATARI_ENV_SPECS
 ]
 
 ATARI_V5_ENVS: List[str] = list(filter(lambda name: name.endswith("-v5"), ATARI_ENVS))
