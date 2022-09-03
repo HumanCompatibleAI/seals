@@ -46,15 +46,13 @@ def test_some_atari_envs():
 
 def test_atari_space_invaders():
     """Tests if there's an atari environment called space invaders."""
-    space_invader_environments = filter(
-        lambda name: "SpaceInvaders" in name,
-        ATARI_ENVS,
+    space_invader_environments = list(
+        filter(
+            lambda name: "SpaceInvaders" in name,
+            ATARI_ENVS,
+        ),
     )
-    try:
-        dummy_env = next(space_invader_environments)
-        locals()
-    except StopIteration:
-        assert False
+    assert len(space_invader_environments) > 0
 
 
 @pytest.mark.parametrize("env_name", ENV_NAMES)
