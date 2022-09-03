@@ -36,7 +36,7 @@ def _not_ram_or_det(env_id):
     """Checks a gym Atari environment isn't deterministic or using RAM observations."""
     slash_separated = env_id.split("/")
     # environment name should look like "ALE/Amidar-v5" or "Amidar-ramNoFrameskip-v4"
-    assert len(slash_separated) in [1, 2]
+    assert len(slash_separated) in (1, 2)
     after_slash = slash_separated[-1]
     hyphen_separated = after_slash.split("-")
     assert len(hyphen_separated) > 1
