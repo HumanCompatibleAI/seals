@@ -33,6 +33,7 @@ for env_base in ["Ant", "HalfCheetah", "Hopper", "Humanoid", "Swimmer", "Walker2
 
 
 def _not_ram_or_det(env_id):
+    """Checks a gym Atari environment isn't deterministic or using RAM observations."""
     slash_separated = env_id.split("/")
     # environment name should look like "ALE/Amidar-v5" or "Amidar-ramNoFrameskip-v4"
     assert len(slash_separated) in [1, 2]
@@ -45,6 +46,7 @@ def _not_ram_or_det(env_id):
 
 
 def _supported_atari_env(gym_spec):
+    """Checks if a gym Atari environment is one of the ones we will support."""
     is_atari = gym_spec.entry_point == "gym.envs.atari:AtariEnv"
     v5_and_plain = gym_spec.id.endswith("-v5") and not ("NoFrameskip" in gym_spec.id)
     v4_and_no_frameskip = gym_spec.id.endswith("-v4") and "NoFrameskip" in gym_spec.id
@@ -62,6 +64,7 @@ GYM_ATARI_ENV_SPECS = [
 
 
 def _seals_name(gym_spec):
+    """Makes a Gym ID for an Atari environment in the seals namespace."""
     slash_separated = gym_spec.id.split("/")
     return "seals/" + slash_separated[-1]
 
