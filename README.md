@@ -17,8 +17,8 @@ There are two types of environments in *seals*:
 
   - **Diagnostic Tasks** which test individual facets of algorithm performance in isolation.
   - **Renovated Environments**, adaptations of widely-used benchmarks such as MuJoCo continuous
-      control tasks to be suitable for specification learning benchmarks. In particular, we remove
-      any side-channel sources of reward information.
+      control tasks and Atari games to be suitable for specification learning benchmarks. In particular, 
+      we remove any side-channel sources of reward information from MuJoCo tasks, and give Atari games constant-length episodes (although most Atari environments have observations that include the score).
 
 *seals* is under active development and we intend to add more categories of tasks soon.
  

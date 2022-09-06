@@ -2,7 +2,7 @@
 
 import gym
 
-from seals import util
+from seals import atari, util
 import seals.diagnostics  # noqa: F401
 from seals.version import VERSION as __version__  # noqa: F401
 
@@ -28,3 +28,8 @@ for env_base in ["Ant", "HalfCheetah", "Hopper", "Humanoid", "Swimmer", "Walker2
         entry_point=f"seals.mujoco:{env_base}Env",
         max_episode_steps=util.get_gym_max_episode_steps(f"{env_base}-v3"),
     )
+
+# Atari
+
+GYM_ATARI_ENV_SPECS = list(filter(atari._supported_atari_env, gym.envs.registry.all()))
+atari.register_atari_envs(GYM_ATARI_ENV_SPECS)
