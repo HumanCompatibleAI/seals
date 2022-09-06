@@ -41,12 +41,12 @@ env = pytest.fixture(envs.make_env_fixture(skip_fn=pytest.skip))
 
 
 def test_some_atari_envs():
-    """Tests if we succeeded in finding any atari envs."""
+    """Tests if we succeeded in finding any Atari envs."""
     assert len(seals.GYM_ATARI_ENV_SPECS) > 0
 
 
 def test_atari_space_invaders():
-    """Tests if there's an atari environment called space invaders."""
+    """Tests if there's an Atari environment called space invaders."""
     space_invader_environments = list(
         filter(
             lambda name: "SpaceInvaders" in name,
@@ -63,9 +63,9 @@ class TestEnvs:
     def test_seed(self, env: gym.Env, env_name: str):
         """Tests environment seeding.
 
-        Deterministic atari environments are run with fewer seeds to minimize the number
-        of resets done in this test suite, since atari resets take a long time and there
-        are many atari environments.
+        Deterministic Atari environments are run with fewer seeds to minimize the number
+        of resets done in this test suite, since Atari resets take a long time and there
+        are many Atari environments.
         """
         if env_name in ATARI_ENVS:
             # these environments take a while for their non-determinism to show.
