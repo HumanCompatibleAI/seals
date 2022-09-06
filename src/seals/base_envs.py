@@ -133,8 +133,8 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         if obs not in self.observation_space:
             raise ValueError(f"{obs} not in {self.observation_space}")
         reward = self.reward(old_state, action, self.state)
-        done = self.terminal(self.state, self.n_actions_taken)
         self._n_actions_taken += 1
+        done = self.terminal(self.state, self.n_actions_taken)
 
         infos = {"old_state": old_state, "new_state": self._cur_state}
         return obs, reward, done, infos
