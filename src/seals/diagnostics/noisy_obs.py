@@ -31,11 +31,9 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
             state_space=spaces.MultiDiscrete([size, size]),
             action_space=spaces.Discrete(5),
             observation_space=spaces.Box(
-                low=np.concatenate(
-                    ([0, 0], np.full(self._noise_length, -np.inf)),  # type: ignore
-                ),
+                low=np.concatenate(([0, 0], np.full(self._noise_length, -np.inf))),
                 high=np.concatenate(
-                    ([size - 1, size - 1], np.full(self._noise_length, np.inf)),  # type: ignore
+                    ([size - 1, size - 1], np.full(self._noise_length, np.inf)),
                 ),
                 dtype=np.float32,
             ),
