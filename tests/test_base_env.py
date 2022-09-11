@@ -92,6 +92,7 @@ def test_tabular_env_validation():
 
 
 def test_expose_pomdp_state_wrapper():
+    """Test the ExposePOMDPStateWrapper class."""
     env = NewEnv()
     wrapped_env = base_envs.ExposePOMDPStateWrapper(env)
 
