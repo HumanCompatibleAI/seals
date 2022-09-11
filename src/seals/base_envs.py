@@ -101,7 +101,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
     @state.setter
     def state(self, state: State):
         """Set current state."""
-        if self._cur_state is not None and self._cur_state not in self.state_space:
+        if  state not in self.state_space:
             raise ValueError(f"{state} not in {self.state_space}")
         self._cur_state = state
 
@@ -130,8 +130,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
         old_state = self.state
         self.state = self.transition(self.state, action)
         obs = self.obs_from_state(self.state)
-        if obs not in self.observation_space:
-            raise ValueError(f"{obs} not in {self.observation_space}")
+        assert obs in self.observation_space
         reward = self.reward(old_state, action, self.state)
         self._n_actions_taken += 1
         done = self.terminal(self.state, self.n_actions_taken)
@@ -207,6 +206,8 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
     reward_matrix: np.ndarray
     observation_matrix: np.ndarray
 
+    state_space: spaces.Discrete
+
     def __init__(
         self,
         *,
@@ -239,21 +240,19 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
                 `initial_state_dist` have shapes different to specified above.
         """
         # The following matrices should conform to the shapes below:
-        # transition matrix: n_states x n_actions x n_states
-        # reward matrix: n_states x n_actions x n_states
-        #   OR n_states x n_actions
-        #   OR n_states
-        # observation matrix: n_states x n_observations
-        # initial state dist: n_states
-        # we want to make sure that the shapes are correct
 
-        if transition_matrix.shape[0] != transition_matrix.shape[2]:
+        # transition matrix: n_states x n_actions x n_states
+        n_states = transition_matrix.shape[0]
+        if n_states != transition_matrix.shape[2]:
             raise ValueError(
                 "Malformed transition_matrix:\n"
                 f"transition_matrix.shape: {transition_matrix.shape}\n"
-                f"{transition_matrix.shape[0]} != {transition_matrix.shape[2]}",
+                f"{n_states} != {transition_matrix.shape[2]}",
             )
 
+        # reward matrix: n_states x n_actions x n_states
+        #   OR n_states x n_actions
+        #   OR n_states
         if reward_matrix.shape != transition_matrix.shape[: len(reward_matrix.shape)]:
             raise ValueError(
                 "transition_matrix and reward_matrix are not compatible:\n"
@@ -261,24 +260,26 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
                 f"reward_matrix.shape: {reward_matrix.shape}",
             )
 
-        if observation_matrix.shape[0] != transition_matrix.shape[0]:
+        # observation matrix: n_states x n_observations
+        if observation_matrix.shape[0] != n_states:
             raise ValueError(
                 "transition_matrix and observation_matrix are not compatible:\n"
-                f"transition_matrix.shape[0]: {transition_matrix.shape[0]}\n"
+                f"transition_matrix.shape[0]: {n_states}\n"
                 f"observation_matrix.shape[0]: {observation_matrix.shape[0]}",
             )
 
+        # initial state dist: n_states
         if initial_state_dist is None:
-            initial_state_dist = util.one_hot_encoding(0, transition_matrix.shape[0])
+            initial_state_dist = util.one_hot_encoding(0, n_states)
         if initial_state_dist.ndim != 1:
             raise ValueError(
                 "initial_state_dist has multiple dimensions:\n"
                 f"{initial_state_dist.ndim} != 1",
             )
-        if initial_state_dist.shape[0] != transition_matrix.shape[0]:
+        if initial_state_dist.shape[0] != n_states:
             raise ValueError(
                 "transition_matrix and initial_state_dist are not compatible:\n"
-                f"number of states = {transition_matrix.shape[0]}\n"
+                f"number of states = {n_states}\n"
                 f"len(initial_state_dist) = {len(initial_state_dist)}",
             )
 
@@ -346,8 +347,6 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
         """Matrix mapping states to feature vectors."""
         # Construct lazily to save memory in algorithms that don't need features.
         if self._feature_matrix is None:
-            # TODO(juan) Space() does not have an `n` attribute (?).
-            #  Are we hinting the wrong type?
             n_states = self.state_space.n
             self._feature_matrix = np.eye(n_states)
         return self._feature_matrix
