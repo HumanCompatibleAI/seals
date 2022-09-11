@@ -12,7 +12,10 @@ from seals.testing import envs
 
 
 class NewEnv(base_envs.TabularModelMDP):
+    """Test the TabularModelMDP class."""
+
     def __init__(self):
+        """Build environment."""
         nS = 3
         nA = 2
         transition_matrix = np.random.rand(nS, nA, nS)
@@ -26,7 +29,6 @@ class NewEnv(base_envs.TabularModelMDP):
 
 def test_base_envs():
     """Test parts of base_envs not covered elsewhere."""
-
     env = NewEnv()
 
     assert np.all(np.eye(3) == env.feature_matrix)
@@ -89,7 +91,7 @@ def test_tabular_env_validation():
         env.step(4)
 
 
-class test_expose_pomdp_state_wrapper:
+def test_expose_pomdp_state_wrapper():
     env = NewEnv()
     wrapped_env = base_envs.ExposePOMDPStateWrapper(env)
 
