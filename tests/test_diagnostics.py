@@ -1,10 +1,9 @@
 """Test the `diagnostics.*` environments."""
 
-import pytest
 import numpy as np
+import pytest
 
-from seals.diagnostics import init_shift
-from seals.diagnostics import cliff_world
+from seals.diagnostics import cliff_world, init_shift
 
 
 def test_init_shift_validation():
@@ -15,6 +14,7 @@ def test_init_shift_validation():
 
 
 def test_cliff_world_draw_value_vec():
+    """Smoke test for cliff_world.CliffWorldEnv.draw_value_vec()."""
     env = cliff_world.CliffWorldEnv(
         width=7,
         height=4,
