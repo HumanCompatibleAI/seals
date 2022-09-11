@@ -313,7 +313,13 @@ class CliffWorld(TabularModelPOMDP):
         Args:
             D: the vector to plot.
         """
-        import matplotlib.pyplot as plt
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError as exc:
+            raise ImportError(
+                "matplotlib is not installed in your system, "
+                "and is required for this function.",
+            ) from exc
 
         grid = D.reshape(self.height, self.width)
         plt.imshow(grid)
