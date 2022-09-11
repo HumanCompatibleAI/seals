@@ -11,20 +11,21 @@ from seals import base_envs
 from seals.testing import envs
 
 
+class NewEnv(base_envs.TabularModelMDP):
+    def __init__(self):
+        nS = 3
+        nA = 2
+        transition_matrix = np.random.rand(nS, nA, nS)
+        transition_matrix /= transition_matrix.sum(axis=2)[:, :, None]
+        reward_matrix = np.random.rand(nS)
+        super().__init__(
+            transition_matrix=transition_matrix,
+            reward_matrix=reward_matrix,
+        )
+
+
 def test_base_envs():
     """Test parts of base_envs not covered elsewhere."""
-
-    class NewEnv(base_envs.TabularModelMDP):
-        def __init__(self):
-            nS = 3
-            nA = 2
-            transition_matrix = np.random.rand(nS, nA, nS)
-            transition_matrix /= transition_matrix.sum(axis=2)[:, :, None]
-            reward_matrix = np.random.rand(nS)
-            super().__init__(
-                transition_matrix=transition_matrix,
-                reward_matrix=reward_matrix,
-            )
 
     env = NewEnv()
 
@@ -38,6 +39,14 @@ def test_base_envs():
     assert env.n_actions_taken == 1
     env.step(env.action_space.sample())
     assert env.n_actions_taken == 2
+
+    new_state = env.state_space.sample()
+    env.state = new_state
+    assert env.state == new_state
+
+    bad_state = "not a state"
+    with pytest.raises(ValueError, match=r".*not in.*"):
+        env.state = bad_state  # type: ignore
 
 
 def test_tabular_env_validation():
@@ -64,6 +73,12 @@ def test_tabular_env_validation():
             transition_matrix=np.zeros((4, 1, 4)),
             reward_matrix=np.zeros((3,)),
         )
+    with pytest.raises(ValueError, match=r"transition_matrix and observation_matrix.*"):
+        base_envs.TabularModelPOMDP(
+            transition_matrix=np.zeros((3, 1, 3)),
+            reward_matrix=np.zeros((3,)),
+            observation_matrix=np.zeros((4, 3)),
+        )
 
     env = base_envs.TabularModelMDP(
         transition_matrix=np.zeros((3, 1, 3)),
@@ -72,3 +87,18 @@ def test_tabular_env_validation():
     env.reset()
     with pytest.raises(ValueError, match=r".*not in.*"):
         env.step(4)
+
+
+class test_expose_pomdp_state_wrapper:
+    env = NewEnv()
+    wrapped_env = base_envs.ExposePOMDPStateWrapper(env)
+
+    assert wrapped_env.observation_space == env.state_space
+    state = wrapped_env.reset()
+    assert state == env.state
+    assert state in env.state_space
+
+    action = env.action_space.sample()
+    next_state, reward, done, info = wrapped_env.step(action)
+    assert next_state == env.state
+    assert next_state in env.state_space
