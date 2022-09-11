@@ -129,9 +129,9 @@ class CliffWorldEnv(TabularModelPOMDP):
         Raises:
             ImportError: if matplotlib is not installed.
         """
-        try:
+        try:  # pragma: no cover
             import matplotlib.pyplot as plt
-        except ImportError as exc:
+        except ImportError as exc:  # pragma: no cover
             raise ImportError(
                 "matplotlib is not installed in your system, "
                 "and is required for this function.",
