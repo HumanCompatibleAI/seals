@@ -27,14 +27,19 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
         self._noise_length = noise_length
         self._goal = np.array([self._size // 2, self._size // 2])
 
+        obs_box_low = np.concatenate(
+            ([0, 0], np.full(self._noise_length, -np.inf)),  # type: ignore
+        )
+        obs_box_high = np.concatenate(
+            ([size - 1, size - 1], np.full(self._noise_length, np.inf)),  # type: ignore
+        )
+
         super().__init__(
             state_space=spaces.MultiDiscrete([size, size]),
             action_space=spaces.Discrete(5),
             observation_space=spaces.Box(
-                low=np.concatenate(([0, 0], np.full(self._noise_length, -np.inf))),
-                high=np.concatenate(
-                    ([size - 1, size - 1], np.full(self._noise_length, np.inf)),
-                ),
+                low=obs_box_low,
+                high=obs_box_high,
                 dtype=np.float32,
             ),
         )

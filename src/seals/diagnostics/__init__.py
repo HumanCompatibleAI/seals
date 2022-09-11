@@ -67,3 +67,42 @@ gym.register(
     entry_point="seals.diagnostics.sort:SortEnv",
     max_episode_steps=6,
 )
+
+
+def register_cliff_world(suffix, kwargs):
+    """Register a CliffWorld with the given suffix and keyword arguments."""
+    gym.register(
+        f"seals/CliffWorld{suffix}-v0",
+        entry_point="seals.diagnostics.cliff_world:CliffWorldEnv",
+        kwargs=kwargs,
+    )
+
+
+for width, height, horizon in [(7, 4, 9), (15, 6, 18), (100, 20, 110)]:
+    for use_xy in [False, True]:
+        use_xy_str = "XY" if use_xy else ""
+        register_cliff_world(
+            f"{width}x{height}{use_xy_str}",
+            kwargs={
+                "width": width,
+                "height": height,
+                "use_xy_obs": use_xy,
+                "horizon": horizon,
+            },
+        )
+
+# These parameter choices are somewhat arbitrary.
+# We anticipate most users will want to construct RandomTransitionEnv directly.
+gym.register(
+    "seals/Random-v0",
+    entry_point="seals.diagnostics.random_trans:RandomTransitionEnv",
+    kwargs={
+        "n_states": 16,
+        "n_actions": 3,
+        "branch_factor": 2,
+        "horizon": 20,
+        "random_obs": True,
+        "obs_dim": 5,
+        "generator_seed": 42,
+    },
+)

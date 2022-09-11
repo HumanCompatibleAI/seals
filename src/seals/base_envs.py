@@ -101,7 +101,7 @@ class ResettablePOMDP(gym.Env, abc.ABC, Generic[State, Observation, Action]):
     @state.setter
     def state(self, state: State):
         """Set current state."""
-        if  state not in self.state_space:
+        if state not in self.state_space:
             raise ValueError(f"{state} not in {self.state_space}")
         self._cur_state = state
 
@@ -306,6 +306,8 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
 
     @staticmethod
     def _construct_obs_space(obs_dim, obs_dtype) -> gym.Space:
+        min_val: float
+        max_val: float
         try:
             dtype_iinfo = np.iinfo(obs_dtype)
             min_val, max_val = dtype_iinfo.min, dtype_iinfo.max
