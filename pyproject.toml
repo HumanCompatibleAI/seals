@@ -7,6 +7,7 @@ target-version = ["py38"]
 
 [[tool.mypy.overrides]]
 module = [
-    "gym.*"
+    "gym.*",
+    "setuptools_scm.*",
 ]
 ignore_missing_imports = true

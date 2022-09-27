@@ -144,7 +144,7 @@ jobs:
             # later, and CircleCI then parses this to pretty-print results.
             # --shard-id and --num-shards are used to split tests across parallel executors using `pytest-shard`.
             # -n uses `pytest-xdist` to parallelize tests within a single instance.
-            Xdummy-entrypoint.py pytest --cov=/venv/lib/python3.7/site-packages/seals --cov=tests \
+            Xdummy-entrypoint.py pytest --cov=/venv/lib/python3.8/site-packages/seals --cov=tests \
                    --junitxml=/tmp/test-reports/junit.xml \
                     -n ${NUM_CPUS} -vv tests/
             # Following two lines rewrite paths from venv/ to src/, based on `coverage:paths` in `setup.cfg`

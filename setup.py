@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 def get_version(version: "ScmVersion") -> str:
     """Generates the version string for the package.
+
     This function replaces the default version format used by setuptools_scm
     to allow development builds to be versioned using the git commit hash
     instead of the number of commits since the last release, which leads to
@@ -18,9 +19,11 @@ def get_version(version: "ScmVersion") -> str:
     The version has the following format:
     {version}[.dev{build}]
     where build is the shortened commit hash converted to base 10.
+
     Args:
         version: The version object given by setuptools_scm, calculated
             from the git repository.
+
     Returns:
         The formatted version string to use for the package.
     """
@@ -50,6 +53,7 @@ def get_version(version: "ScmVersion") -> str:
 
 def get_local_version(version: "ScmVersion", time_format="%Y%m%d") -> str:
     """Generates the local version string for the package.
+
     By default, when commits are made on top of a release version, setuptools_scm
     sets the version to be {version}.dev{distance}+{node} where {distance} is the number
     of commits since the last release and {node} is the short commit hash.
@@ -60,10 +64,12 @@ def get_local_version(version: "ScmVersion", time_format="%Y%m%d") -> str:
     to TestPyPI (it does not accept local versions).
     Local versions are still present if there are uncommitted changes (if the tree
     is dirty), in which case the current date is added to the version.
+
     Args:
         version: The version object given by setuptools_scm, calculated
             from the git repository.
         time_format: The format to use for the date.
+
     Returns:
         The formatted local version string to use for the package.
     """
