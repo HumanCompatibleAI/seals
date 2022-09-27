@@ -4,7 +4,7 @@
 # list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
-import seals
+from importlib import metadata
 
 # -- Project information -----------------------------------------------------
 
@@ -13,7 +13,7 @@ copyright = "2020, Center for Human-Compatible AI"  # noqa: A001
 author = "Center for Human-Compatible AI"
 
 # The full version, including alpha/beta/rc tags
-release = seals.__version__
+version = metadata.version("imitation")
 
 
 # -- General configuration ---------------------------------------------------
