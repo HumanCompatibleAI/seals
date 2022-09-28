@@ -51,7 +51,7 @@ commands:
       # released that you want to upgrade to, without mandating the newer version in setup.py.
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "setup.py" }}
+            - v2-dependencies-{{ checksum "setup.py" }}
 
       # Create virtual environment and install dependencies using `ci/build_venv.sh`.
       # `mujoco_py` needs a MuJoCo key, so download that first.
@@ -64,7 +64,7 @@ commands:
       - save_cache:
           paths:
             - /venv
-          key: v1-dependencies-{{ checksum "setup.py" }}
+          key: v2-dependencies-{{ checksum "setup.py" }}
 
       # Install seals.
       # Note we install the source distribution, not in developer mode (`pip install -e`).
