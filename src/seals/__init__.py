@@ -8,7 +8,7 @@ from seals import atari, util
 import seals.diagnostics  # noqa: F401
 
 try:
-    __version__ = metadata.version("imitation")
+    __version__ = metadata.version("seals")
 except metadata.PackageNotFoundError:  # pragma: no cover
     # package is not installed
     pass

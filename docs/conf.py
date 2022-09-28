@@ -13,7 +13,7 @@ copyright = "2020, Center for Human-Compatible AI"  # noqa: A001
 author = "Center for Human-Compatible AI"
 
 # The full version, including alpha/beta/rc tags
-version = metadata.version("imitation")
+version = metadata.version("seals")
 
 
 # -- General configuration ---------------------------------------------------
