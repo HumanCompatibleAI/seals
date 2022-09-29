@@ -74,6 +74,7 @@ commands:
           name: install evaluating_rewards
           # Build a wheel then install to avoid copying whole directory (pip issue #2195)
           command: |
+            rm dist/seals-*.whl
             python setup.py sdist bdist_wheel
             pip install --upgrade --force-reinstall --no-deps dist/seals-*.whl
 
