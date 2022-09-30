@@ -211,7 +211,6 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
         self,
         *,
         transition_matrix: np.ndarray,
-        observation_space: Optional[gym.Space],
         reward_matrix: np.ndarray,
         horizon: float = np.inf,
         initial_state_dist: Optional[np.ndarray] = None,
@@ -221,8 +220,6 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
         Args:
             transition_matrix: 3-D array with transition probabilities for a
                 given state-action pair, of shape `(n_states,n_actions,n_states)`.
-            observation_space: gym.Space containing possible observations.
-                If no space is given, the state space is taken.
             reward_matrix: 1-D, 2-D or 3-D array corresponding to rewards to a
                 given `(state, action, next_state)` triple. A 2-D array assumes
                 the `next_state` is not used in the reward, and a 1-D array
@@ -280,21 +277,21 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
         self.horizon = horizon
         self.initial_state_dist = initial_state_dist
 
-        state_space = self._construct_state_space(self.state_dim)
         super().__init__(
-            state_space=state_space,
-            action_space=self._construct_action_space(self.action_dim),
-            observation_space=observation_space or state_space,
+            state_space=self._construct_state_space(),
+            action_space=self._construct_action_space(),
+            observation_space=self._construct_observation_space(),
         )
 
-    @staticmethod
-    def _construct_state_space(n_states: int) -> gym.Space:
-        return spaces.Discrete(n_states)
+    def _construct_state_space(self) -> gym.Space:
+        return spaces.Discrete(self.state_dim)
 
-    @staticmethod
-    def _construct_action_space(n_actions: int) -> gym.Space:
-        return spaces.Discrete(n_actions)
+    def _construct_action_space(self) -> gym.Space:
+        return spaces.Discrete(self.action_dim)
 
+    @abc.abstractmethod
+    def _construct_observation_space(self) -> gym.Space:
+        pass
 
     def initial_state(self) -> int:
         """Samples from the initial state distribution."""
@@ -339,8 +336,6 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
         return self.transition_matrix.shape[1]
 
 
-
-
 class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray]):
     """Tabular model POMDP.
 
@@ -368,9 +363,6 @@ class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray]):
         super().__init__(
             transition_matrix=transition_matrix,
             reward_matrix=reward_matrix,
-            observation_space=self._construct_obs_space(
-                self.obs_dim, self.obs_dtype
-            ),
             horizon=horizon,
             initial_state_dist=initial_state_dist,
         )
@@ -383,12 +375,11 @@ class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray]):
                 f"observation_matrix.shape[0]: {observation_matrix.shape[0]}",
             )
 
-    @staticmethod
-    def _construct_obs_space(obs_dim, obs_dtype) -> gym.Space:
+    def _construct_observation_space(self) -> gym.Space:
         min_val: float
         max_val: float
         try:
-            dtype_iinfo = np.iinfo(obs_dtype)
+            dtype_iinfo = np.iinfo(self.obs_dtype)
             min_val, max_val = dtype_iinfo.min, dtype_iinfo.max
         except ValueError:
             min_val = -np.inf
@@ -396,8 +387,8 @@ class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray]):
         return spaces.Box(
             low=min_val,
             high=max_val,
-            shape=(obs_dim,),
-            dtype=obs_dtype,
+            shape=(self.obs_dim,),
+            dtype=self.obs_dtype,
         )
 
     def obs_from_state(self, state: int) -> np.ndarray:
@@ -412,6 +403,7 @@ class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray]):
     def obs_dim(self) -> int:
         """Size of observation vectors for this MDP."""
         return self.observation_matrix.shape[1]
+
     @property
     def obs_dtype(self) -> int:
         """Data type of observation vectors (e.g. np.float32)."""
@@ -449,8 +441,10 @@ class TabularModelMDP(BaseTabularModelPOMDP[int]):
             horizon=horizon,
             initial_state_dist=initial_state_dist,
         )
-        self._observation_space = self._state_space
 
     def obs_from_state(self, state: int) -> int:
         """Identity since observation == state in an MDP."""
         return state
+
+    def _construct_observation_space(self) -> gym.Space:
+        return self._construct_state_space()
