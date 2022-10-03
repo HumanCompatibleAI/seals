@@ -291,7 +291,7 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
 
     @abc.abstractmethod
     def _construct_observation_space(self) -> gym.Space:
-        pass
+        pass  # pragma: no cover
 
     def initial_state(self) -> int:
         """Samples from the initial state distribution."""

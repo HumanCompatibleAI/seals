@@ -34,6 +34,21 @@ def test_random_transition_env_init():
         horizon=10,
         random_obs=False,
     )
+    random_trans.RandomTransitionEnv(
+        n_states=3,
+        n_actions=2,
+        branch_factor=3,
+        horizon=10,
+        random_obs=True,
+    )
+    random_trans.RandomTransitionEnv(
+        n_states=3,
+        n_actions=2,
+        branch_factor=3,
+        horizon=10,
+        random_obs=True,
+        obs_dim=10,
+    )
     with pytest.raises(ValueError, match="obs_dim must be None if random_obs is False"):
         random_trans.RandomTransitionEnv(
             n_states=3,
