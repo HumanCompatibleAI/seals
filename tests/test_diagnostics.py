@@ -26,6 +26,7 @@ def test_cliff_world_draw_value_vec():
 
 
 def test_random_transition_env_init():
+    """Test that RandomTransitionEnv initializes correctly."""
     random_trans.RandomTransitionEnv(
         n_states=3,
         n_actions=2,
@@ -45,6 +46,7 @@ def test_random_transition_env_init():
 
 
 def test_make_random_matrices_no_explicit_rng():
+    """Test that random matrix maker static methods work without an explicit RNG."""
     random_trans.RandomTransitionEnv.make_random_trans_mat(3, 2, 3)
     random_trans.RandomTransitionEnv.make_random_state_dist(3, 3)
     random_trans.RandomTransitionEnv.make_obs_mat(3, True, 3)

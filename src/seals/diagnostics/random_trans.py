@@ -39,6 +39,10 @@ class RandomTransitionEnv(TabularModelPOMDP):
             obs_dim: The size of the observation vectors; must be `None`
                 if `random_obs == False`.
             generator_seed: Seed for NumPy RNG.
+
+        Raises:
+            ValueError: If ``obs_dim`` is not ``None`` when ``random_obs == False``.
+            ValueError: If ``obs_dim`` is ``None`` when ``random_obs == True``.
         """
         # this generator is ONLY for constructing the MDP, not for controlling
         # random outcomes during rollouts
@@ -179,6 +183,9 @@ class RandomTransitionEnv(TabularModelPOMDP):
 
         Returns:
             A matrix of shape `(n_states, obs_dim if is_random else n_states)`.
+
+        Raises:
+            ValueError: If ``is_random == False`` and ``obs_dim is not None``.
         """
         if rand_state is None:
             rand_state = np.random.RandomState()

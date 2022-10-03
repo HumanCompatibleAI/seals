@@ -109,6 +109,7 @@ def test_expose_pomdp_state_wrapper():
 
 
 def test_tabular_pompd_obs_space_int():
+    """Test the TabularModelPOMDP class with an integer observation space."""
     env = base_envs.TabularModelPOMDP(
         transition_matrix=np.zeros(
             (3, 1, 3),
