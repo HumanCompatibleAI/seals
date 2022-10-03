@@ -1,10 +1,17 @@
 """Benchmark environments for reward modeling and imitation."""
 
+from importlib import metadata
+
 import gym
 
 from seals import atari, util
 import seals.diagnostics  # noqa: F401
-from seals.version import VERSION as __version__  # noqa: F401
+
+try:
+    __version__ = metadata.version("seals")
+except metadata.PackageNotFoundError:  # pragma: no cover
+    # package is not installed
+    pass
 
 # Classic control
 
