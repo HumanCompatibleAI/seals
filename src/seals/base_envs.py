@@ -359,6 +359,7 @@ class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray]):
         horizon: float = np.inf,
         initial_state_dist: Optional[np.ndarray] = None,
     ):
+        """Initializes a tabular model POMDP."""
         self.observation_matrix = observation_matrix
         super().__init__(
             transition_matrix=transition_matrix,
