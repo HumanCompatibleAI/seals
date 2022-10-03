@@ -4,9 +4,9 @@ Note base_envs is also tested indirectly via smoke tests in `test_envs`,
 so the tests in this file focus on features unique to classes in `base_envs`.
 """
 
+import gym
 import numpy as np
 import pytest
-import gym
 
 from seals import base_envs
 from seals.testing import envs
@@ -110,7 +110,9 @@ def test_expose_pomdp_state_wrapper():
 
 def test_tabular_pompd_obs_space_int():
     env = base_envs.TabularModelPOMDP(
-        transition_matrix=np.zeros((3, 1, 3),),
+        transition_matrix=np.zeros(
+            (3, 1, 3),
+        ),
         reward_matrix=np.zeros((3,)),
         observation_matrix=np.zeros((3, 3), dtype=np.int64),
     )
