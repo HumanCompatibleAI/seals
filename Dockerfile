@@ -16,8 +16,8 @@ RUN    apt-get update -q \
     net-tools \
     parallel \
     patchelf \
-    python3.7 \
-    python3.7-dev \
+    python3.8 \
+    python3.8-dev \
     python3-pip \
     rsync \
     software-properties-common \

@@ -7,6 +7,6 @@ if [[ ${venv} == "" ]]; then
 	venv="venv"
 fi
 
-virtualenv -p python3.7 ${venv}
+virtualenv -p python3.8 ${venv}
 source ${venv}/bin/activate
 pip install .[cpu,docs,mujoco,test]
