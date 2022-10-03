@@ -48,7 +48,8 @@ class RandomTransitionEnv(TabularModelPOMDP):
             if obs_dim is None:
                 obs_dim = n_states
         else:
-            assert obs_dim is None
+            if obs_dim is not None:
+                raise ValueError("obs_dim must be None if random_obs is False")
 
         observation_matrix = self.make_obs_mat(
             n_states=n_states,
@@ -162,7 +163,7 @@ class RandomTransitionEnv(TabularModelPOMDP):
     def make_obs_mat(
         n_states: int,
         is_random: bool,
-        obs_dim: Optional[int],
+        obs_dim: Optional[int] = None,
         rand_state: Optional[np.random.RandomState] = None,
     ) -> np.ndarray:
         """Makes an observation matrix with a single observation for each state.
@@ -182,12 +183,13 @@ class RandomTransitionEnv(TabularModelPOMDP):
         if rand_state is None:
             rand_state = np.random.RandomState()
         assert rand_state is not None
-        if not is_random:
-            assert obs_dim is None
         if is_random:
-            assert obs_dim is not None
+            if obs_dim is None:
+                raise ValueError("obs_dim must be set if random_obs is True")
             obs_mat = rand_state.normal(0, 2, (n_states, obs_dim))
         else:
+            if obs_dim is not None:
+                raise ValueError("obs_dim must be None if random_obs is False")
             obs_mat = np.identity(n_states)
         assert (
             obs_mat.ndim == 2

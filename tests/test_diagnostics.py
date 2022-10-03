@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from seals.diagnostics import cliff_world, init_shift
+from seals.diagnostics import cliff_world, init_shift, random_trans
 
 
 def test_init_shift_validation():
@@ -23,3 +23,33 @@ def test_cliff_world_draw_value_vec():
     )
     D = np.zeros(env.state_dim)
     env.draw_value_vec(D)
+
+
+def test_random_transition_env_init():
+    random_trans.RandomTransitionEnv(
+        n_states=3,
+        n_actions=2,
+        branch_factor=3,
+        horizon=10,
+        random_obs=False,
+    )
+    with pytest.raises(ValueError, match="obs_dim must be None if random_obs is False"):
+        random_trans.RandomTransitionEnv(
+            n_states=3,
+            n_actions=2,
+            branch_factor=3,
+            horizon=10,
+            random_obs=False,
+            obs_dim=3,
+        )
+
+
+def test_make_random_matrices_no_explicit_rng():
+    random_trans.RandomTransitionEnv.make_random_trans_mat(3, 2, 3)
+    random_trans.RandomTransitionEnv.make_random_state_dist(3, 3)
+    random_trans.RandomTransitionEnv.make_obs_mat(3, True, 3)
+    with pytest.raises(ValueError, match="obs_dim must be set if random_obs is True"):
+        random_trans.RandomTransitionEnv.make_obs_mat(3, True)
+    random_trans.RandomTransitionEnv.make_obs_mat(3, False)
+    with pytest.raises(ValueError, match="obs_dim must be None if random_obs is False"):
+        random_trans.RandomTransitionEnv.make_obs_mat(3, False, 3)

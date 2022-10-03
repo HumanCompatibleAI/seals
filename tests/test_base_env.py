@@ -6,6 +6,7 @@ so the tests in this file focus on features unique to classes in `base_envs`.
 
 import numpy as np
 import pytest
+import gym
 
 from seals import base_envs
 from seals.testing import envs
@@ -105,3 +106,13 @@ def test_expose_pomdp_state_wrapper():
     next_state, reward, done, info = wrapped_env.step(action)
     assert next_state == env.state
     assert next_state in env.state_space
+
+
+def test_tabular_pompd_obs_space_int():
+    env = base_envs.TabularModelPOMDP(
+        transition_matrix=np.zeros((3, 1, 3),),
+        reward_matrix=np.zeros((3,)),
+        observation_matrix=np.zeros((3, 3), dtype=np.int64),
+    )
+    assert isinstance(env.observation_space, gym.spaces.Box)
+    assert env.observation_space.dtype == np.int64
