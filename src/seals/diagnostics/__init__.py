@@ -78,18 +78,22 @@ def register_cliff_world(suffix, kwargs):
     )
 
 
-for width, height, horizon in [(7, 4, 9), (15, 6, 18), (100, 20, 110)]:
-    for use_xy in [False, True]:
-        use_xy_str = "XY" if use_xy else ""
-        register_cliff_world(
-            f"{width}x{height}{use_xy_str}",
-            kwargs={
-                "width": width,
-                "height": height,
-                "use_xy_obs": use_xy,
-                "horizon": horizon,
-            },
-        )
+def register_all_cliff_worlds():
+    for width, height, horizon in [(7, 4, 9), (15, 6, 18), (100, 20, 110)]:
+        for use_xy in [False, True]:
+            use_xy_str = "XY" if use_xy else ""
+            register_cliff_world(
+                f"{width}x{height}{use_xy_str}",
+                kwargs={
+                    "width": width,
+                    "height": height,
+                    "use_xy_obs": use_xy,
+                    "horizon": horizon,
+                },
+            )
+
+
+register_all_cliff_worlds()
 
 # These parameter choices are somewhat arbitrary.
 # We anticipate most users will want to construct RandomTransitionEnv directly.
