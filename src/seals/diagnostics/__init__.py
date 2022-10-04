@@ -79,6 +79,7 @@ def register_cliff_world(suffix, kwargs):
 
 
 def register_all_cliff_worlds():
+    """Register all CliffWorld environments."""
     for width, height, horizon in [(7, 4, 9), (15, 6, 18), (100, 20, 110)]:
         for use_xy in [False, True]:
             use_xy_str = "XY" if use_xy else ""
