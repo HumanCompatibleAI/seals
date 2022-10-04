@@ -57,10 +57,6 @@ class CliffWorldEnv(TabularModelPOMDP):
         R_vec = np.zeros((n_states,))
         T_mat = np.zeros((n_states, 4, n_states))
 
-        # TODO(juan) this is not very elegant.
-        #  We should move all of this to another function,
-        #  also aiding documentation (I'm not sure what this does).
-
         def to_id_clamp(row, col):
             """Convert (x,y) state to state ID, after clamp x & y to lie in grid."""
             row = min(max(row, 0), height - 1)
