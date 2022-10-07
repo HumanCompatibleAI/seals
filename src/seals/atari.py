@@ -1,15 +1,44 @@
 """Adaptation of Atari environments for specification learning algorithms."""
 
-from typing import Iterable
+from typing import Dict, Iterable, List, Optional
 
 import gym
 
-from seals.util import AutoResetWrapper, get_gym_max_episode_steps
+from seals.util import AutoResetWrapper, MaskScoreWrapper, get_gym_max_episode_steps
+
+SCORE_REGIONS: Dict[str, List[Dict[str, int]]] = {
+    "BeamRider": [
+        dict(x0=5, x1=20, y0=45, y1=120),
+        dict(x0=28, x1=40, y0=15, y1=40),
+    ],
+    "Breakout": [dict(x0=0, x1=16, y0=35, y1=80)],
+    "Enduro": [
+        dict(x0=163, x1=173, y0=55, y1=110),
+        dict(x0=177, x1=188, y0=68, y1=107),
+    ],
+    "Pong": [dict(x0=0, x1=24, y0=0, y1=160)],
+    "Qbert": [dict(x0=6, x1=15, y0=33, y1=71)],
+    "Seaquest": [dict(x0=7, x1=19, y0=80, y1=110)],
+    "SpaceInvaders": [dict(x0=10, x1=20, y0=0, y1=160)],
+}
 
 
-def fixed_length_atari(atari_env_id: str) -> gym.Env:
-    """Fixed-length variant of a given Atari environment."""
-    return AutoResetWrapper(gym.make(atari_env_id))
+def _get_score_region(atari_env_id: str) -> Optional[List[Dict[str, int]]]:
+    basename = atari_env_id.split("/")[-1].split("-")[0]
+    return SCORE_REGIONS.get(basename)
+
+
+def make_atari_env(atari_env_id: str) -> gym.Env:
+    """Fixed-length, masked-score variant of a given Atari environment."""
+    score_region = _get_score_region(atari_env_id)
+    if score_region is None:
+        raise ValueError(
+            "Requested environment not supported. "
+            + "See https://github.com/HumanCompatibleAI/seals/issues/61.",
+        )
+
+    env = MaskScoreWrapper(gym.make(atari_env_id), score_region)
+    return AutoResetWrapper(env)
 
 
 def _not_ram_or_det(env_id: str) -> bool:
@@ -30,10 +59,12 @@ def _supported_atari_env(gym_spec: gym.envs.registration.EnvSpec) -> bool:
     is_atari = gym_spec.entry_point == "gym.envs.atari:AtariEnv"
     v5_and_plain = gym_spec.id.endswith("-v5") and not ("NoFrameskip" in gym_spec.id)
     v4_and_no_frameskip = gym_spec.id.endswith("-v4") and "NoFrameskip" in gym_spec.id
+    score_regions_available = _get_score_region(gym_spec.id) is not None
     return (
         is_atari
         and _not_ram_or_det(gym_spec.id)
         and (v5_and_plain or v4_and_no_frameskip)
+        and score_regions_available
     )
 
 
@@ -50,7 +81,7 @@ def register_atari_envs(
     for gym_spec in gym_atari_env_specs:
         gym.register(
             id=_seals_name(gym_spec),
-            entry_point="seals.atari:fixed_length_atari",
+            entry_point="seals.atari:make_atari_env",
             max_episode_steps=get_gym_max_episode_steps(gym_spec.id),
             kwargs=dict(atari_env_id=gym_spec.id),
         )

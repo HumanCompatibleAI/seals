@@ -7,7 +7,7 @@ from gym.envs import registration
 import pytest
 
 import seals  # noqa: F401 required for env registration
-from seals.atari import _seals_name
+from seals.atari import _get_score_region, _seals_name
 from seals.testing import envs
 
 ENV_NAMES: List[str] = [
@@ -54,6 +54,17 @@ def test_atari_space_invaders():
         ),
     )
     assert len(space_invader_environments) > 0
+
+
+def test_no_atari_unmasked():
+    """Tests that we only load Atari envs with score masking implemented."""
+    non_masked_environments = list(
+        filter(
+            lambda name: _get_score_region(name) is None,
+            ATARI_ENVS,
+        ),
+    )
+    assert len(non_masked_environments) == 0
 
 
 @pytest.mark.parametrize("env_name", ENV_NAMES)

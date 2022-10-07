@@ -1,6 +1,6 @@
 """Miscellaneous utilities."""
 
-from typing import Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import gym
 import numpy as np
@@ -21,6 +21,47 @@ class AutoResetWrapper(gym.Wrapper):
             info["terminal_observation"] = obs
             obs = self.env.reset()
         return obs, rew, False, info
+
+
+class MaskScoreWrapper(gym.Wrapper):
+    """Mask a list of box-shaped regions in the observation to hide reward info.
+
+    Intended for environments whose observations are raw pixels (like atari
+    environments). Used to mask regions of the observation that include information
+    that could be used to infer the reward, like the game score or enemy ship count.
+    """
+
+    def __init__(
+        self,
+        env: gym.Env,
+        score_regions: List[Dict[str, int]],
+        fill_value: Union[float, Sequence[float]] = 0,
+    ):
+        """Builds MaskScoreWrapper.
+
+        Args:
+            env: The environment to wrap.
+            score_regions: A list of box-shaped regions to mask, each denoted by
+                a dictionary `{"x0": x0, "x1": x1, "y0": y0, "y1": y1}`.
+            fill_value: The fill_value for the masked region. By default is black.
+                Can support RGB colors by being a sequence of values [r, g, b].
+        """
+        super().__init__(env)
+        self.fill_value = np.array(fill_value, env.observation_space.dtype)
+
+        self.mask = np.ones(env.observation_space.shape, dtype=bool)
+        for r in score_regions:
+            self.mask[r["x0"] : r["x1"], r["y0"] : r["y1"]] = 0
+
+    def step(self, action):
+        """Returns (obs, rew, done, info) with masked obs."""
+        obs, rew, done, info = self.env.step(action)
+        return np.where(self.mask, obs, self.fill_value), rew, done, info
+
+    def reset(self, **kwargs):
+        """Returns masked reset observation."""
+        obs = self.env.reset(**kwargs)
+        return np.where(self.mask, obs, self.fill_value)
 
 
 class ObsCastWrapper(gym.Wrapper):
