@@ -34,7 +34,7 @@ class MaskScoreWrapper(gym.Wrapper):
     def __init__(
         self,
         env: gym.Env,
-        score_regions: List[Dict[str, int]],
+        score_regions: List[Dict[str, Tuple[int, int]]],
         fill_value: Union[float, Sequence[float]] = 0,
     ):
         """Builds MaskScoreWrapper.
@@ -42,7 +42,8 @@ class MaskScoreWrapper(gym.Wrapper):
         Args:
             env: The environment to wrap.
             score_regions: A list of box-shaped regions to mask, each denoted by
-                a dictionary `{"x0": x0, "x1": x1, "y0": y0, "y1": y1}`.
+                a dictionary `{"x": (x0, x1), "y": (y0, y1)}`, where `x0 < x1`
+                and `y0 < y1`.
             fill_value: The fill_value for the masked region. By default is black.
                 Can support RGB colors by being a sequence of values [r, g, b].
         """
@@ -51,17 +52,21 @@ class MaskScoreWrapper(gym.Wrapper):
 
         self.mask = np.ones(env.observation_space.shape, dtype=bool)
         for r in score_regions:
-            self.mask[r["x0"] : r["x1"], r["y0"] : r["y1"]] = 0
+            assert r["x"][0] < r["x"][1] and r["y"][0] < r["y"][1]
+            self.mask[r["x"][0] : r["x"][1], r["y"][0] : r["y"][1]] = 0
+
+    def _mask_obs(self, obs):
+        return np.where(self.mask, obs, self.fill_value)
 
     def step(self, action):
         """Returns (obs, rew, done, info) with masked obs."""
         obs, rew, done, info = self.env.step(action)
-        return np.where(self.mask, obs, self.fill_value), rew, done, info
+        return self._mask_obs(obs), rew, done, info
 
     def reset(self, **kwargs):
         """Returns masked reset observation."""
         obs = self.env.reset(**kwargs)
-        return np.where(self.mask, obs, self.fill_value)
+        return self._mask_obs(obs)
 
 
 class ObsCastWrapper(gym.Wrapper):

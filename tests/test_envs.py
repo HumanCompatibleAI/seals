@@ -26,7 +26,11 @@ DETERMINISTIC_ENVS: List[str] = [
 ]
 
 ATARI_ENVS: List[str] = [
-    _seals_name(gym_spec) for gym_spec in seals.GYM_ATARI_ENV_SPECS
+    _seals_name(gym_spec, masked=False) for gym_spec in seals.GYM_ATARI_ENV_SPECS
+] + [
+    _seals_name(gym_spec, masked=True)
+    for gym_spec in seals.GYM_ATARI_ENV_SPECS
+    if _get_score_region(gym_spec.id) is not None
 ]
 
 ATARI_V5_ENVS: List[str] = list(filter(lambda name: name.endswith("-v5"), ATARI_ENVS))
@@ -46,25 +50,31 @@ def test_some_atari_envs():
 
 
 def test_atari_space_invaders():
-    """Tests if there's an Atari environment called space invaders."""
-    space_invader_environments = list(
+    """Tests for masked and unmasked Atari space invaders environments."""
+    masked_space_invader_environments = list(
         filter(
-            lambda name: "SpaceInvaders" in name,
+            lambda name: "SpaceInvaders" in name and "Unmasked" not in name,
             ATARI_ENVS,
         ),
     )
-    assert len(space_invader_environments) > 0
+    assert len(masked_space_invader_environments) > 0
 
-
-def test_no_atari_unmasked():
-    """Tests that we only load Atari envs with score masking implemented."""
-    non_masked_environments = list(
+    unmasked_space_invader_environments = list(
         filter(
-            lambda name: _get_score_region(name) is None,
+            lambda name: "SpaceInvaders" in name and "Unmasked" in name,
             ATARI_ENVS,
         ),
     )
-    assert len(non_masked_environments) == 0
+    assert len(unmasked_space_invader_environments) > 0
+
+
+def test_atari_unmasked_env_naming():
+    """Tests that all unmasked Atari envs have the appropriate name qualifier."""
+    noncompliant_envs = [
+        (_get_score_region(name) is None and "Unmasked" not in name)
+        for name in ATARI_ENVS
+    ]
+    assert len(noncompliant_envs) == 0
 
 
 @pytest.mark.parametrize("env_name", ENV_NAMES)
