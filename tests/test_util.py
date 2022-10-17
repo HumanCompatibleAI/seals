@@ -2,9 +2,20 @@
 
 import collections
 
+import gym
 import numpy as np
+import pytest
 
-from seals import util
+from seals import GYM_ATARI_ENV_SPECS, util
+
+
+def test_mask_score_wrapper_enforces_spec():
+    """Test that MaskScoreWrapper enforces the spec."""
+    atari_env = gym.make(GYM_ATARI_ENV_SPECS[0].id)
+    with pytest.raises():
+        util.MaskScoreWrapper(atari_env, [dict(x=(0, 1), y=(1, 0))])
+    with pytest.raises():
+        util.MaskScoreWrapper(atari_env, [dict(x=(1, 0), y=(0, 1))])
 
 
 def test_sample_distribution():

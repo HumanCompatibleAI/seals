@@ -38,7 +38,7 @@ def make_atari_env(atari_env_id: str, masked: bool) -> gym.Env:
         if score_region is None:
             raise ValueError(
                 "Requested environment does not yet support masking. "
-                + "See https://github.com/HumanCompatibleAI/seals/issues/61.",
+                "See https://github.com/HumanCompatibleAI/seals/issues/61.",
             )
         env = MaskScoreWrapper(env, score_region)
 
@@ -76,7 +76,7 @@ def _seals_name(gym_spec: gym.envs.registration.EnvSpec, masked: bool) -> str:
     name = "seals/" + slash_separated[-1]
 
     if not masked:
-        last_hyphen_idx = name.rfind("-")
+        last_hyphen_idx = name.rfind("-v")
         name = name[:last_hyphen_idx] + "-Unmasked" + name[last_hyphen_idx:]
     return name
 
@@ -85,17 +85,16 @@ def register_atari_envs(
     gym_atari_env_specs: Iterable[gym.envs.registration.EnvSpec],
 ) -> None:
     """Register masked and unmasked wrapped gym Atari environments."""
-    for gym_spec in gym_atari_env_specs:
+
+    def register_gym(masked):
         gym.register(
-            id=_seals_name(gym_spec, masked=False),
+            id=_seals_name(gym_spec, masked=masked),
             entry_point="seals.atari:make_atari_env",
             max_episode_steps=get_gym_max_episode_steps(gym_spec.id),
-            kwargs=dict(atari_env_id=gym_spec.id, masked=False),
+            kwargs=dict(atari_env_id=gym_spec.id, masked=masked),
         )
+
+    for gym_spec in gym_atari_env_specs:
+        register_gym(masked=False)
         if _get_score_region(gym_spec.id) is not None:
-            gym.register(
-                id=_seals_name(gym_spec, masked=True),
-                entry_point="seals.atari:make_atari_env",
-                max_episode_steps=get_gym_max_episode_steps(gym_spec.id),
-                kwargs=dict(atari_env_id=gym_spec.id, masked=True),
-            )
+            register_gym(masked=True)

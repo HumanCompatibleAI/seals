@@ -7,7 +7,7 @@ from gym.envs import registration
 import pytest
 
 import seals  # noqa: F401 required for env registration
-from seals.atari import _get_score_region, _seals_name
+from seals.atari import SCORE_REGIONS, _get_score_region, _seals_name
 from seals.testing import envs
 
 ENV_NAMES: List[str] = [
@@ -25,13 +25,15 @@ DETERMINISTIC_ENVS: List[str] = [
     "seals/InitShiftTest-v0",
 ]
 
-ATARI_ENVS: List[str] = [
+UNMASKED_ATARI_ENVS: List[str] = [
     _seals_name(gym_spec, masked=False) for gym_spec in seals.GYM_ATARI_ENV_SPECS
-] + [
+]
+MASKED_ATARI_ENVS: List[str] = [
     _seals_name(gym_spec, masked=True)
     for gym_spec in seals.GYM_ATARI_ENV_SPECS
     if _get_score_region(gym_spec.id) is not None
 ]
+ATARI_ENVS = UNMASKED_ATARI_ENVS + MASKED_ATARI_ENVS
 
 ATARI_V5_ENVS: List[str] = list(filter(lambda name: name.endswith("-v5"), ATARI_ENVS))
 ATARI_NO_FRAMESKIP_ENVS: List[str] = list(
@@ -75,6 +77,16 @@ def test_atari_unmasked_env_naming():
         for name in ATARI_ENVS
     ]
     assert len(noncompliant_envs) == 0
+
+
+def test_atari_masks_satisfy_spec():
+    """Tests that all Atari masks satisfy the spec."""
+    masks_satisfy_spec = [
+        mask["x"][0] < mask["x"][1] and mask["y"][0] < mask["y"][1]
+        for env_regions in SCORE_REGIONS.values()
+        for mask in env_regions
+    ]
+    assert all(masks_satisfy_spec)
 
 
 @pytest.mark.parametrize("env_name", ENV_NAMES)

@@ -46,13 +46,17 @@ class MaskScoreWrapper(gym.Wrapper):
                 and `y0 < y1`.
             fill_value: The fill_value for the masked region. By default is black.
                 Can support RGB colors by being a sequence of values [r, g, b].
+
+        Raises:
+            ValueError: If a score region does not conform to the spec.
         """
         super().__init__(env)
         self.fill_value = np.array(fill_value, env.observation_space.dtype)
 
         self.mask = np.ones(env.observation_space.shape, dtype=bool)
         for r in score_regions:
-            assert r["x"][0] < r["x"][1] and r["y"][0] < r["y"][1]
+            if r["x"][0] >= r["x"][1] or r["y"][0] >= r["y"][1]:
+                raise ValueError('Invalid region: "x" and "y" must be increasing.')
             self.mask[r["x"][0] : r["x"][1], r["y"][0] : r["y"][1]] = 0
 
     def _mask_obs(self, obs):
