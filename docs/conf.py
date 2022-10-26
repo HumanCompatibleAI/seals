@@ -22,18 +22,15 @@ version = metadata.version("seals")
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinxcontrib.napoleon",
     "sphinx.ext.autodoc",
     "sphinx_autodoc_typehints",
     "sphinx.ext.autosummary",
     "sphinx.ext.mathjax",
+    "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_rtd_theme",
 ]
 autodoc_mock_imports = ["mujoco_py"]
-
-napoleon_google_docstring = True
-napoleon_numpy_docstring = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
