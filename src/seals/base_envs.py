@@ -212,7 +212,7 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
         *,
         transition_matrix: np.ndarray,
         reward_matrix: np.ndarray,
-        horizon: float = np.inf,
+        horizon: Optional[int] = None,
         initial_state_dist: Optional[np.ndarray] = None,
     ):
         """Build tabular environment.
@@ -226,7 +226,8 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
                 assumes neither the `action` nor `next_state` are used.
                 Of shape `(n_states,n_actions,n_states)[:n]` where `n`
                 is the dimensionality of the array.
-            horizon: Maximum number of timesteps, default `np.inf`.
+            horizon: Maximum number of timesteps. The default is `None`,
+                which represents an infinite horizon.
             initial_state_dist: Distribution from which state is sampled at the
                 start of the episode.  If `None`, it is assumed initial state
                 is always 0. Shape `(n_states,)`.
@@ -314,7 +315,7 @@ class BaseTabularModelPOMDP(ResettablePOMDP[int, Observation, int]):
 
     def terminal(self, state: int, n_actions_taken: int) -> bool:
         """Checks if state is terminal."""
-        return n_actions_taken >= self.horizon
+        return self.horizon is not None and n_actions_taken >= self.horizon
 
     @property
     def feature_matrix(self):
@@ -356,7 +357,7 @@ class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray]):
         transition_matrix: np.ndarray,
         observation_matrix: np.ndarray,
         reward_matrix: np.ndarray,
-        horizon: float = np.inf,
+        horizon: Optional[int] = None,
         initial_state_dist: Optional[np.ndarray] = None,
     ):
         """Initializes a tabular model POMDP."""
@@ -423,7 +424,7 @@ class TabularModelMDP(BaseTabularModelPOMDP[int]):
         *,
         transition_matrix: np.ndarray,
         reward_matrix: np.ndarray,
-        horizon: float = np.inf,
+        horizon: Optional[int] = None,
         initial_state_dist: Optional[np.ndarray] = None,
     ):
         """Initializes a tabular model MDP.
