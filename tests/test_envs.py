@@ -72,10 +72,12 @@ def test_atari_space_invaders():
 
 def test_atari_unmasked_env_naming():
     """Tests that all unmasked Atari envs have the appropriate name qualifier."""
-    noncompliant_envs = [
-        (_get_score_region(name) is None and "Unmasked" not in name)
-        for name in ATARI_ENVS
-    ]
+    noncompliant_envs = list(
+        filter(
+            lambda name: _get_score_region(name) is None and "Unmasked" not in name,
+            ATARI_ENVS,
+        )
+    )
     assert len(noncompliant_envs) == 0
 
 
@@ -103,11 +105,11 @@ class TestEnvs:
         if env_name in ATARI_ENVS:
             # these environments take a while for their non-determinism to show.
             slow_random_envs = [
-                "seals/Bowling-v5",
-                "seals/Frogger-v5",
-                "seals/KingKong-v5",
-                "seals/Koolaid-v5",
-                "seals/NameThisGame-v5",
+                "seals/Bowling-Unmasked-v5",
+                "seals/Frogger-Unmasked-v5",
+                "seals/KingKong-Unmasked-v5",
+                "seals/Koolaid-Unmasked-v5",
+                "seals/NameThisGame-Unmasked-v5",
             ]
             rollout_len = 100 if env_name not in slow_random_envs else 400
             num_seeds = 2 if env_name in ATARI_NO_FRAMESKIP_ENVS else 10
