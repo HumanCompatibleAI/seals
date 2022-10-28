@@ -68,7 +68,7 @@ pip install -e .[dev]  # install extra tools useful for development
 We follow a PEP8 code style with line length 88, and typically follow the [Google Code Style Guide](http://google.github.io/styleguide/pyguide.html),
 but defer to PEP8 where they conflict. We use the `black` autoformatter to avoid arguing over formatting.
 Docstrings follow the Google docstring convention defined [here](http://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings),
-with an extensive example in the [Sphinx docs](https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html).
+with an extensive example in the [Sphinx docs](https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html).
 
 All PRs must pass linting via the `ci/code_checks.sh` script. It is convenient to install this as a commit hook:
 
