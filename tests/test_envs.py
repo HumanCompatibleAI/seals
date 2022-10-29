@@ -76,7 +76,7 @@ def test_atari_unmasked_env_naming():
         filter(
             lambda name: _get_score_region(name) is None and "Unmasked" not in name,
             ATARI_ENVS,
-        )
+        ),
     )
     assert len(noncompliant_envs) == 0
 
