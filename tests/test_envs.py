@@ -7,7 +7,7 @@ from gym.envs import registration
 import pytest
 
 import seals  # noqa: F401 required for env registration
-from seals.atari import SCORE_REGIONS, _get_score_region, _seals_name
+from seals.atari import SCORE_REGIONS, _get_score_region, _seals_name, make_atari_env
 from seals.testing import envs
 
 ENV_NAMES: List[str] = [
@@ -79,6 +79,16 @@ def test_atari_unmasked_env_naming():
         ),
     )
     assert len(noncompliant_envs) == 0
+
+
+def test_make_unsupported_masked_atari_env_throws_error():
+    """Tests that making an unsupported masked Atari env throws an error."""
+    match_str = (
+        "Requested environment does not yet support masking. "
+        "See https://github.com/HumanCompatibleAI/seals/issues/61."
+    )
+    with pytest.raises(ValueError, match=match_str):
+        make_atari_env("ALE/Bowling-v5", masked=True)
 
 
 def test_atari_masks_satisfy_spec():
