@@ -94,7 +94,7 @@ def test_make_unsupported_masked_atari_env_throws_error():
 def test_atari_masks_satisfy_spec():
     """Tests that all Atari masks satisfy the spec."""
     masks_satisfy_spec = [
-        mask["x"][0] < mask["x"][1] and mask["y"][0] < mask["y"][1]
+        mask.x[0] < mask.x[1] and mask.y[0] < mask.y[1]
         for env_regions in SCORE_REGIONS.values()
         for mask in env_regions
     ]

@@ -1,6 +1,7 @@
 """Miscellaneous utilities."""
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from dataclasses import dataclass
+from typing import List, Optional, Sequence, Tuple, Union
 
 import gym
 import numpy as np
@@ -23,10 +24,21 @@ class AutoResetWrapper(gym.Wrapper):
         return obs, rew, False, info
 
 
+@dataclass
+class BoxRegion:
+    """A rectangular region dataclass used by MaskScoreWrapper."""
+
+    x: Tuple
+    y: Tuple
+
+
+MaskedRegionSpecifier = List[BoxRegion]
+
+
 class MaskScoreWrapper(gym.Wrapper):
     """Mask a list of box-shaped regions in the observation to hide reward info.
 
-    Intended for environments whose observations are raw pixels (like atari
+    Intended for environments whose observations are raw pixels (like Atari
     environments). Used to mask regions of the observation that include information
     that could be used to infer the reward, like the game score or enemy ship count.
     """
@@ -34,7 +46,7 @@ class MaskScoreWrapper(gym.Wrapper):
     def __init__(
         self,
         env: gym.Env,
-        score_regions: List[Dict[str, Tuple[int, int]]],
+        score_regions: MaskedRegionSpecifier,
         fill_value: Union[float, Sequence[float]] = 0,
     ):
         """Builds MaskScoreWrapper.
@@ -55,9 +67,9 @@ class MaskScoreWrapper(gym.Wrapper):
 
         self.mask = np.ones(env.observation_space.shape, dtype=bool)
         for r in score_regions:
-            if r["x"][0] >= r["x"][1] or r["y"][0] >= r["y"][1]:
+            if r.x[0] >= r.x[1] or r.y[0] >= r.y[1]:
                 raise ValueError('Invalid region: "x" and "y" must be increasing.')
-            self.mask[r["x"][0] : r["x"][1], r["y"][0] : r["y"][1]] = 0
+            self.mask[r.x[0] : r.x[1], r.y[0] : r.y[1]] = 0
 
     def _mask_obs(self, obs):
         return np.where(self.mask, obs, self.fill_value)
