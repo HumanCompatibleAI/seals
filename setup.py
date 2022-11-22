@@ -115,7 +115,10 @@ TESTS_REQUIRE = [
     "pytest-xdist",
     "pytype",
     "stable-baselines3>=0.9.0",
-    "pyglet>=1.4.0",
+    # TODO(adam): remove pyglet pin once Gym upgraded to >0.21
+    # Workaround for https://github.com/openai/gym/issues/2986
+    # Discussed in https://github.com/HumanCompatibleAI/imitation/pull/603
+    "pyglet==1.5.27",
     "setuptools_scm~=7.0.5",
     *ATARI_REQUIRE,
 ]
