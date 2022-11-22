@@ -1,15 +1,54 @@
 """Adaptation of Atari environments for specification learning algorithms."""
 
-from typing import Iterable
+from typing import Dict, Iterable, Optional
 
 import gym
 
-from seals.util import AutoResetWrapper, get_gym_max_episode_steps
+from seals.util import (
+    AutoResetWrapper,
+    BoxRegion,
+    MaskedRegionSpecifier,
+    MaskScoreWrapper,
+    get_gym_max_episode_steps,
+)
+
+SCORE_REGIONS: Dict[str, MaskedRegionSpecifier] = {
+    "BeamRider": [
+        BoxRegion(x=(5, 20), y=(45, 120)),
+        BoxRegion(x=(28, 40), y=(15, 40)),
+    ],
+    "Breakout": [BoxRegion(x=(0, 16), y=(35, 80))],
+    "Enduro": [
+        BoxRegion(x=(163, 173), y=(55, 110)),
+        BoxRegion(x=(177, 188), y=(68, 107)),
+    ],
+    "Pong": [BoxRegion(x=(0, 24), y=(0, 160))],
+    "Qbert": [BoxRegion(x=(6, 15), y=(33, 71))],
+    "Seaquest": [BoxRegion(x=(7, 19), y=(80, 110))],
+    "SpaceInvaders": [BoxRegion(x=(10, 20), y=(0, 160))],
+}
 
 
-def fixed_length_atari(atari_env_id: str) -> gym.Env:
-    """Fixed-length variant of a given Atari environment."""
-    return AutoResetWrapper(gym.make(atari_env_id))
+def _get_score_region(atari_env_id: str) -> Optional[MaskedRegionSpecifier]:
+    basename = atari_env_id.split("/")[-1].split("-")[0]
+    basename = basename.replace("NoFrameskip", "")
+    return SCORE_REGIONS.get(basename)
+
+
+def make_atari_env(atari_env_id: str, masked: bool) -> gym.Env:
+    """Fixed-length, optionally masked-score variant of a given Atari environment."""
+    env = AutoResetWrapper(gym.make(atari_env_id))
+
+    if masked:
+        score_region = _get_score_region(atari_env_id)
+        if score_region is None:
+            raise ValueError(
+                "Requested environment does not yet support masking. "
+                "See https://github.com/HumanCompatibleAI/seals/issues/61.",
+            )
+        env = MaskScoreWrapper(env, score_region)
+
+    return env
 
 
 def _not_ram_or_det(env_id: str) -> bool:
@@ -37,20 +76,31 @@ def _supported_atari_env(gym_spec: gym.envs.registration.EnvSpec) -> bool:
     )
 
 
-def _seals_name(gym_spec: gym.envs.registration.EnvSpec) -> str:
+def _seals_name(gym_spec: gym.envs.registration.EnvSpec, masked: bool) -> str:
     """Makes a Gym ID for an Atari environment in the seals namespace."""
     slash_separated = gym_spec.id.split("/")
-    return "seals/" + slash_separated[-1]
+    name = "seals/" + slash_separated[-1]
+
+    if not masked:
+        last_hyphen_idx = name.rfind("-v")
+        name = name[:last_hyphen_idx] + "-Unmasked" + name[last_hyphen_idx:]
+    return name
 
 
 def register_atari_envs(
     gym_atari_env_specs: Iterable[gym.envs.registration.EnvSpec],
 ) -> None:
-    """Register wrapped gym Atari environments."""
-    for gym_spec in gym_atari_env_specs:
+    """Register masked and unmasked wrapped gym Atari environments."""
+
+    def register_gym(masked):
         gym.register(
-            id=_seals_name(gym_spec),
-            entry_point="seals.atari:fixed_length_atari",
+            id=_seals_name(gym_spec, masked=masked),
+            entry_point="seals.atari:make_atari_env",
             max_episode_steps=get_gym_max_episode_steps(gym_spec.id),
-            kwargs=dict(atari_env_id=gym_spec.id),
+            kwargs=dict(atari_env_id=gym_spec.id, masked=masked),
         )
+
+    for gym_spec in gym_atari_env_specs:
+        register_gym(masked=False)
+        if _get_score_region(gym_spec.id) is not None:
+            register_gym(masked=True)

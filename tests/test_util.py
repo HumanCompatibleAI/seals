@@ -2,9 +2,21 @@
 
 import collections
 
+import gym
 import numpy as np
+import pytest
 
-from seals import util
+from seals import GYM_ATARI_ENV_SPECS, util
+
+
+def test_mask_score_wrapper_enforces_spec():
+    """Test that MaskScoreWrapper enforces the spec."""
+    atari_env = gym.make(GYM_ATARI_ENV_SPECS[0].id)
+    desired_error_message = 'Invalid region: "x" and "y" must be increasing.'
+    with pytest.raises(ValueError, match=desired_error_message):
+        util.MaskScoreWrapper(atari_env, [util.BoxRegion(x=(0, 1), y=(1, 0))])
+    with pytest.raises(ValueError, match=desired_error_message):
+        util.MaskScoreWrapper(atari_env, [util.BoxRegion(x=(1, 0), y=(0, 1))])
 
 
 def test_sample_distribution():
