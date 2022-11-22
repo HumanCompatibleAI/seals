@@ -7,7 +7,7 @@ from gym.envs import registration
 import pytest
 
 import seals  # noqa: F401 required for env registration
-from seals.atari import _seals_name
+from seals.atari import SCORE_REGIONS, _get_score_region, _seals_name, make_atari_env
 from seals.testing import envs
 
 ENV_NAMES: List[str] = [
@@ -25,9 +25,15 @@ DETERMINISTIC_ENVS: List[str] = [
     "seals/InitShiftTest-v0",
 ]
 
-ATARI_ENVS: List[str] = [
-    _seals_name(gym_spec) for gym_spec in seals.GYM_ATARI_ENV_SPECS
+UNMASKED_ATARI_ENVS: List[str] = [
+    _seals_name(gym_spec, masked=False) for gym_spec in seals.GYM_ATARI_ENV_SPECS
 ]
+MASKED_ATARI_ENVS: List[str] = [
+    _seals_name(gym_spec, masked=True)
+    for gym_spec in seals.GYM_ATARI_ENV_SPECS
+    if _get_score_region(gym_spec.id) is not None
+]
+ATARI_ENVS = UNMASKED_ATARI_ENVS + MASKED_ATARI_ENVS
 
 ATARI_V5_ENVS: List[str] = list(filter(lambda name: name.endswith("-v5"), ATARI_ENVS))
 ATARI_NO_FRAMESKIP_ENVS: List[str] = list(
@@ -46,14 +52,53 @@ def test_some_atari_envs():
 
 
 def test_atari_space_invaders():
-    """Tests if there's an Atari environment called space invaders."""
-    space_invader_environments = list(
+    """Tests for masked and unmasked Atari space invaders environments."""
+    masked_space_invader_environments = list(
         filter(
-            lambda name: "SpaceInvaders" in name,
+            lambda name: "SpaceInvaders" in name and "Unmasked" not in name,
             ATARI_ENVS,
         ),
     )
-    assert len(space_invader_environments) > 0
+    assert len(masked_space_invader_environments) > 0
+
+    unmasked_space_invader_environments = list(
+        filter(
+            lambda name: "SpaceInvaders" in name and "Unmasked" in name,
+            ATARI_ENVS,
+        ),
+    )
+    assert len(unmasked_space_invader_environments) > 0
+
+
+def test_atari_unmasked_env_naming():
+    """Tests that all unmasked Atari envs have the appropriate name qualifier."""
+    noncompliant_envs = list(
+        filter(
+            lambda name: _get_score_region(name) is None and "Unmasked" not in name,
+            ATARI_ENVS,
+        ),
+    )
+    assert len(noncompliant_envs) == 0
+
+
+def test_make_unsupported_masked_atari_env_throws_error():
+    """Tests that making an unsupported masked Atari env throws an error."""
+    match_str = (
+        "Requested environment does not yet support masking. "
+        "See https://github.com/HumanCompatibleAI/seals/issues/61."
+    )
+    with pytest.raises(ValueError, match=match_str):
+        make_atari_env("ALE/Bowling-v5", masked=True)
+
+
+def test_atari_masks_satisfy_spec():
+    """Tests that all Atari masks satisfy the spec."""
+    masks_satisfy_spec = [
+        mask.x[0] < mask.x[1] and mask.y[0] < mask.y[1]
+        for env_regions in SCORE_REGIONS.values()
+        for mask in env_regions
+    ]
+    assert all(masks_satisfy_spec)
 
 
 @pytest.mark.parametrize("env_name", ENV_NAMES)
@@ -70,11 +115,11 @@ class TestEnvs:
         if env_name in ATARI_ENVS:
             # these environments take a while for their non-determinism to show.
             slow_random_envs = [
-                "seals/Bowling-v5",
-                "seals/Frogger-v5",
-                "seals/KingKong-v5",
-                "seals/Koolaid-v5",
-                "seals/NameThisGame-v5",
+                "seals/Bowling-Unmasked-v5",
+                "seals/Frogger-Unmasked-v5",
+                "seals/KingKong-Unmasked-v5",
+                "seals/Koolaid-Unmasked-v5",
+                "seals/NameThisGame-Unmasked-v5",
             ]
             rollout_len = 100 if env_name not in slow_random_envs else 400
             num_seeds = 2 if env_name in ATARI_NO_FRAMESKIP_ENVS else 10

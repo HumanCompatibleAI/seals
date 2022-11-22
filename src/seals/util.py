@@ -1,6 +1,7 @@
 """Miscellaneous utilities."""
 
-from typing import Optional, Tuple
+from dataclasses import dataclass
+from typing import List, Optional, Sequence, Tuple, Union
 
 import gym
 import numpy as np
@@ -21,6 +22,67 @@ class AutoResetWrapper(gym.Wrapper):
             info["terminal_observation"] = obs
             obs = self.env.reset()
         return obs, rew, False, info
+
+
+@dataclass
+class BoxRegion:
+    """A rectangular region dataclass used by MaskScoreWrapper."""
+
+    x: Tuple
+    y: Tuple
+
+
+MaskedRegionSpecifier = List[BoxRegion]
+
+
+class MaskScoreWrapper(gym.Wrapper):
+    """Mask a list of box-shaped regions in the observation to hide reward info.
+
+    Intended for environments whose observations are raw pixels (like Atari
+    environments). Used to mask regions of the observation that include information
+    that could be used to infer the reward, like the game score or enemy ship count.
+    """
+
+    def __init__(
+        self,
+        env: gym.Env,
+        score_regions: MaskedRegionSpecifier,
+        fill_value: Union[float, Sequence[float]] = 0,
+    ):
+        """Builds MaskScoreWrapper.
+
+        Args:
+            env: The environment to wrap.
+            score_regions: A list of box-shaped regions to mask, each denoted by
+                a dictionary `{"x": (x0, x1), "y": (y0, y1)}`, where `x0 < x1`
+                and `y0 < y1`.
+            fill_value: The fill_value for the masked region. By default is black.
+                Can support RGB colors by being a sequence of values [r, g, b].
+
+        Raises:
+            ValueError: If a score region does not conform to the spec.
+        """
+        super().__init__(env)
+        self.fill_value = np.array(fill_value, env.observation_space.dtype)
+
+        self.mask = np.ones(env.observation_space.shape, dtype=bool)
+        for r in score_regions:
+            if r.x[0] >= r.x[1] or r.y[0] >= r.y[1]:
+                raise ValueError('Invalid region: "x" and "y" must be increasing.')
+            self.mask[r.x[0] : r.x[1], r.y[0] : r.y[1]] = 0
+
+    def _mask_obs(self, obs):
+        return np.where(self.mask, obs, self.fill_value)
+
+    def step(self, action):
+        """Returns (obs, rew, done, info) with masked obs."""
+        obs, rew, done, info = self.env.step(action)
+        return self._mask_obs(obs), rew, done, info
+
+    def reset(self, **kwargs):
+        """Returns masked reset observation."""
+        obs = self.env.reset(**kwargs)
+        return self._mask_obs(obs)
 
 
 class ObsCastWrapper(gym.Wrapper):
