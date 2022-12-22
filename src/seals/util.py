@@ -9,6 +9,7 @@ import numpy as np
 
 class AutoResetWrapper(gym.Wrapper):
     """Hides done=True and auto-resets at the end of each episode.
+
     Depending on the flag 'discard_terminal_observation', either discards the terminal
     observation or pads with an additional 'reset transition'. The latter is the default
     behavior.
@@ -22,29 +23,33 @@ class AutoResetWrapper(gym.Wrapper):
         Args:
             env: The environment to wrap.
             discard_terminal_observation: Defaults to False. If True, the terminal
-            observation is discarded and the environment is reset immediately. The
-            returned observation will then be the start of the next episode. The
-            overridden observation is stored in `info["terminal_observation"]`.
-            If False, the terminal observation is returned and the environment is reset
-            in the next step.
+                observation is discarded and the environment is reset immediately. The
+                returned observation will then be the start of the next episode. The
+                overridden observation is stored in `info["terminal_observation"]`.
+                If False, the terminal observation is returned and the environment is
+                reset in the next step.
         """
         super().__init__(env)
         self.discard_terminal_observation = discard_terminal_observation
         self.previous_done = False  # Whether the previous step returned done=True.
 
     def step(self, action):
-        """When done=True, returns done=False. Then, depending on whether we are
-        discarding the terminal observation, either resets the environment and discards,
+        """When done=True, returns done=False, then reset depending on flag.
+
+        Depending on whether we are discarding the terminal observation,
+        either resets the environment and discards,
         or returns the terminal observation, and then uses the next step to reset the
-        environment, after which steps will be performed as normal."""
+        environment, after which steps will be performed as normal.
+        """
         if self.discard_terminal_observation:
             return self._step_discard(action)
         else:
             return self._step_pad(action)
 
     def _step_pad(self, action):
-        """When done=True, returns done=False instead and returns the terminal
-        observation. The agent will then usually be asked to perform an action based on
+        """When done=True, return done=False instead and return the terminal obs.
+
+        The agent will then usually be asked to perform an action based on
         the terminal observation. In the next step, this final action will be ignored
         to instead reset the environment and return the initial observation of the new
         episode.
