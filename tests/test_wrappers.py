@@ -40,7 +40,7 @@ def test_auto_reset_wrapper_pad(episode_length=3, n_steps=100, n_manual_reset=2)
                 # Unlike the AutoResetWrapper that discards terminal observations,
                 # here the final observation is returned directly, and is not stored
                 # in the info dict.
-                # Due to padding, for every episode the final observation is offest from
+                # Due to padding, for every episode the final observation is offset from
                 # the outer step by one.
                 assert obs == (t - num_episodes) / (num_episodes + 1)
                 assert rew == episode_length * 10
