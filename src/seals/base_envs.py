@@ -1,7 +1,7 @@
 """Base environment classes."""
 
 import abc
-from typing import Generic, Optional, Sequence, Tuple, TypeVar
+from typing import Any, Generic, Optional, Sequence, Tuple, TypeVar
 
 import gym
 from gym import spaces
@@ -407,7 +407,7 @@ class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray]):
         return self.observation_matrix.shape[1]
 
     @property
-    def obs_dtype(self) -> int:
+    def obs_dtype(self) -> np.dtype[Any]:
         """Data type of observation vectors (e.g. np.float32)."""
         return self.observation_matrix.dtype
 
