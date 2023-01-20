@@ -124,7 +124,7 @@ TESTS_REQUIRE = [
 ]
 DOCS_REQUIRE = [
     "sphinx",
-    "sphinx-autodoc-typehints",
+    "sphinx-autodoc-typehints>=1.21.5",
     "sphinx-rtd-theme",
 ]
 
