@@ -2,7 +2,7 @@
 
 from typing import Tuple
 
-import gym
+import gymnasium as gym
 import pytest
 import stable_baselines3
 from stable_baselines3.common import evaluation

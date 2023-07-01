@@ -2,10 +2,10 @@
 
 from importlib import metadata
 
-import gym
+import gymnasium as gym
 
-from seals import atari, util
 import seals.diagnostics  # noqa: F401
+from seals import atari, util
 
 try:
     __version__ = metadata.version("seals")
@@ -38,5 +38,5 @@ for env_base in ["Ant", "HalfCheetah", "Hopper", "Humanoid", "Swimmer", "Walker2
 
 # Atari
 
-GYM_ATARI_ENV_SPECS = list(filter(atari._supported_atari_env, gym.envs.registry.all()))
+GYM_ATARI_ENV_SPECS = list(filter(atari._supported_atari_env, gym.registry.values()))
 atari.register_atari_envs(GYM_ATARI_ENV_SPECS)

@@ -2,7 +2,7 @@
 
 import functools
 
-from gym.envs.mujoco import (
+from gymnasium.envs.mujoco import (
     ant_v3,
     half_cheetah_v3,
     hopper_v3,

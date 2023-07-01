@@ -1,7 +1,7 @@
 """Environment testing for generalization in continuous spaces."""
 
-from gym import spaces
 import numpy as np
+from gymnasium import spaces
 
 from seals import base_envs
 
@@ -24,16 +24,15 @@ class ParabolaEnv(base_envs.ResettableMDP):
             bounds: limits coordinates, useful for keeping rewards in
                 a small bounded range.
         """
+        super().__init__()
         self._x_step = x_step
         self._bounds = bounds
 
         state_high = np.array([bounds, bounds, 1.0, 1.0, 1.0])
         state_low = (-1) * state_high
 
-        super().__init__(
-            state_space=spaces.Box(low=state_low, high=state_high),
-            action_space=spaces.Box(low=(-2) * bounds, high=2 * bounds, shape=()),
-        )
+        self.state_space = spaces.Box(low=state_low, high=state_high)
+        self.action_space = spaces.Box(low=(-2) * bounds, high=2 * bounds, shape=())
 
     def terminal(self, state: int, n_actions_taken: int) -> bool:
         """Always returns False."""
@@ -41,7 +40,7 @@ class ParabolaEnv(base_envs.ResettableMDP):
 
     def initial_state(self) -> np.ndarray:
         """Get state by sampling a random parabola."""
-        a, b, c = -1 + 2 * self.rand_state.rand(3)
+        a, b, c = -1 + 2 * self.rand_state.random((3,))
         x, y = 0, c
         return np.array([x, y, a, b, c], dtype=self.state_space.dtype)
 

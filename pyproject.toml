@@ -6,8 +6,8 @@ build-backend = "setuptools.build_meta"
 target-version = ["py38"]
 
 [[tool.mypy.overrides]]
-module = [
-    "gym.*",
-    "setuptools_scm.*",
-]
+module = ["gym.*", "setuptools_scm.*"]
 ignore_missing_imports = true
+
+[tool.ruff]
+select = ["E", "F"]

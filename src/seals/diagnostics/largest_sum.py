@@ -1,7 +1,7 @@
 """Environment testing scalability to high-dimensional tasks."""
 
-from gym import spaces
 import numpy as np
+from gymnasium import spaces
 
 from seals import base_envs
 
@@ -23,12 +23,10 @@ class LargestSumEnv(base_envs.ResettableMDP):
         Args:
             length: dimensionality of state space vector.
         """
+        super().__init__()
         self._length = length
-        state_space = spaces.Box(low=0.0, high=1.0, shape=(length,))
-        super().__init__(
-            state_space=state_space,
-            action_space=spaces.Discrete(2),
-        )
+        self.state_space = spaces.Box(low=0.0, high=1.0, shape=(length,))
+        self.action_space = spaces.Discrete(2)
 
     def terminal(self, state: np.ndarray, n_actions_taken: int) -> bool:
         """Always returns True, since this task should have a 1-timestep horizon."""
@@ -36,7 +34,7 @@ class LargestSumEnv(base_envs.ResettableMDP):
 
     def initial_state(self) -> np.ndarray:
         """Returns vector sampled uniformly in [0, 1]**L."""
-        init_state = self.rand_state.rand(self._length)
+        init_state = self.rand_state.random((self._length,))
         return init_state.astype(self.observation_space.dtype)
 
     def reward(self, state: np.ndarray, act: int, next_state: np.ndarray) -> float:

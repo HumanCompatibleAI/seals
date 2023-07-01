@@ -2,11 +2,10 @@
 
 from typing import List
 
-import gym
-from gym.envs import registration
+import gymnasium as gym
 import pytest
-
 import seals  # noqa: F401 required for env registration
+from gymnasium.envs import registration
 from seals.atari import SCORE_REGIONS, _get_score_region, _seals_name, make_atari_env
 from seals.testing import envs
 

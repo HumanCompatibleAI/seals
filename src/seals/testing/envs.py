@@ -17,12 +17,12 @@ from typing import (
     Tuple,
 )
 
-import gym
+import gymnasium as gym
 import numpy as np
 
-Step = Tuple[Any, Optional[float], bool, Mapping[str, Any]]
+Step = Tuple[Any, Optional[float], bool, bool, Mapping[str, Any]]
 Rollout = Sequence[Step]
-"""A sequence of 4-tuples (obs, rew, done, info) as returned by `get_rollout`."""
+"""A sequence of 4-tuples (obs, rew, terminated, truncated, info) as returned by `get_rollout`."""
 
 
 def make_env_fixture(
@@ -95,9 +95,9 @@ def get_rollout(env: gym.Env, actions: Iterable[Any]) -> Rollout:
       actions: the actions to perform.
 
     Returns:
-      A sequence of 4-tuples (obs, rew, done, info).
+      A sequence of 4-tuples (obs, rew, terminated, truncated, info).
     """
-    ret: List[Step] = [(env.reset(), None, False, {})]
+    ret: List[Step] = [(env.reset(), None, False, False, {})]
     for act in actions:
         ret.append(env.step(act))
     return ret
@@ -110,11 +110,12 @@ def assert_equal_rollout(rollout_a: Rollout, rollout_b: Rollout) -> None:
         AssertionError if they are not equal.
     """
     for step_a, step_b in zip(rollout_a, rollout_b):
-        ob_a, rew_a, done_a, info_a = step_a
-        ob_b, rew_b, done_b, info_b = step_b
+        ob_a, rew_a, terminated_a, truncated_a, info_a = step_a
+        ob_b, rew_b, terminated_b, truncated_b, info_b = step_b
         np.testing.assert_equal(ob_a, ob_b)
         assert rew_a == rew_b
-        assert done_a == done_b
+        assert terminated_a == terminated_b
+        assert truncated_a == truncated_b
         np.testing.assert_equal(info_a, info_b)
 
 
@@ -155,13 +156,13 @@ def test_seed(
     env.action_space.seed(0)
     actions = [env.action_space.sample() for _ in range(rollout_len)]
     # With the same seed, should always get the same result
-    seeds = env.seed(42)
+    seeds = env.reset(seed=42)
     # output of env.seed should be a list, but atari environments return a tuple.
     assert isinstance(seeds, (list, tuple))
     assert len(seeds) > 0
     rollout_a = get_rollout(env, actions)
 
-    env.seed(42)
+    env.reset(seed=42)
     rollout_b = get_rollout(env, actions)
 
     assert_equal_rollout(rollout_a, rollout_b)
@@ -171,9 +172,9 @@ def test_seed(
     # seeds should produce the same starting state.
     def different_seeds_same_rollout(seed1, seed2):
         new_actions = [env.action_space.sample() for _ in range(rollout_len)]
-        env.seed(seed1)
+        env.reset(seed=seed1)
         new_rollout_1 = get_rollout(env, new_actions)
-        env.seed(seed2)
+        env.reset(seed=seed2)
         new_rollout_2 = get_rollout(env, new_actions)
         return has_same_observations(new_rollout_1, new_rollout_2)
 
@@ -192,15 +193,16 @@ def _check_obs(obs: np.ndarray, obs_space: gym.Space) -> None:
     assert obs in obs_space
 
 
-def _sample_and_check(env: gym.Env, obs_space: gym.Space) -> bool:
+def _sample_and_check(env: gym.Env, obs_space: gym.Space) -> Tuple[bool, bool]:
     """Sample from env and check return value is of valid type."""
     act = env.action_space.sample()
-    obs, rew, done, info = env.step(act)
+    obs, rew, terminated, truncated, info = env.step(act)
     _check_obs(obs, obs_space)
     assert isinstance(rew, float)
-    assert isinstance(done, bool)
+    assert isinstance(terminated, bool)
+    assert isinstance(truncated, bool)
     assert isinstance(info, dict)
-    return done
+    return terminated, truncated
 
 
 def _is_mujoco_env(env: gym.Env) -> bool:
@@ -228,16 +230,17 @@ def test_rollout_schema(
         AssertionError if test fails.
     """
     obs_space = env.observation_space
-    obs = env.reset()
+    obs, _ = env.reset()
     _check_obs(obs, obs_space)
 
+    terminated = False
     for _ in range(max_steps):
-        done = _sample_and_check(env, obs_space)
-        if done:
+        terminated, _ = _sample_and_check(env, obs_space)
+        if terminated:
             break
 
     if check_episode_ends:
-        assert done, "did not get to end of episode"
+        assert terminated, "did not get to end of episode"
 
         for _ in range(steps_after_done):
             _sample_and_check(env, obs_space)
@@ -352,5 +355,5 @@ class CountingEnv(gym.Env):
         t, self.timestep = self.timestep, self.timestep + 1
         obs = np.array(t, dtype=self.observation_space.dtype)
         rew = t * 10.0
-        done = t == self.episode_length
-        return obs, rew, done, {}
+        terminated = t == self.episode_length
+        return obs, rew, terminated, False, {}

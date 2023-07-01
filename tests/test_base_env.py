@@ -4,10 +4,9 @@ Note base_envs is also tested indirectly via smoke tests in `test_envs`,
 so the tests in this file focus on features unique to classes in `base_envs`.
 """
 
-import gym
+import gymnasium as gym
 import numpy as np
 import pytest
-
 from seals import base_envs
 from seals.testing import envs
 
@@ -19,9 +18,9 @@ class NewEnv(base_envs.TabularModelMDP):
         """Build environment."""
         nS = 3
         nA = 2
-        transition_matrix = np.random.rand(nS, nA, nS)
+        transition_matrix = np.random.random((nS, nA, nS))
         transition_matrix /= transition_matrix.sum(axis=2)[:, :, None]
-        reward_matrix = np.random.rand(nS)
+        reward_matrix = np.random.random((nS,))
         super().__init__(
             transition_matrix=transition_matrix,
             reward_matrix=reward_matrix,

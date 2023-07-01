@@ -1,7 +1,7 @@
 """Environment testing for robustness to noise."""
 
-from gym import spaces
 import numpy as np
+from gymnasium import spaces
 
 from seals import base_envs, util
 
@@ -23,6 +23,8 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
             size: width and height of gridworld.
             noise_length: dimension of noise vector in observation.
         """
+        super().__init__()
+
         self._size = size
         self._noise_length = noise_length
         self._goal = np.array([self._size // 2, self._size // 2])
@@ -34,14 +36,12 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
             ([size - 1, size - 1], np.full(self._noise_length, np.inf)),  # type: ignore
         )
 
-        super().__init__(
-            state_space=spaces.MultiDiscrete([size, size]),
-            action_space=spaces.Discrete(5),
-            observation_space=spaces.Box(
-                low=obs_box_low,
-                high=obs_box_high,
-                dtype=np.float32,
-            ),
+        self.state_space = spaces.MultiDiscrete([size, size])
+        self.action_space = spaces.Discrete(5)
+        self.observation_space = spaces.Box(
+            low=obs_box_low,
+            high=obs_box_high,
+            dtype=np.float32,
         )
 
     def terminal(self, state: np.ndarray, n_actions_taken: int) -> bool:
@@ -52,7 +52,7 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
         """Returns one of the grid's corners."""
         n = self._size
         corners = np.array([[0, 0], [n - 1, 0], [0, n - 1], [n - 1, n - 1]])
-        return corners[self.rand_state.randint(4)]
+        return corners[self.rand_state.integers(4)]
 
     def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
         """Returns  +1.0 reward if state is the goal and 0.0 otherwise."""

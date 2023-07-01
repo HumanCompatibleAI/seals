@@ -115,10 +115,6 @@ TESTS_REQUIRE = [
     "pytest-xdist",
     "pytype",
     "stable-baselines3>=0.9.0",
-    # TODO(adam): remove pyglet pin once Gym upgraded to >0.21
-    # Workaround for https://github.com/openai/gym/issues/2986
-    # Discussed in https://github.com/HumanCompatibleAI/imitation/pull/603
-    "pyglet==1.5.27",
     "setuptools_scm~=7.0.5",
     *ATARI_REQUIRE,
 ]
@@ -140,7 +136,7 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     package_data={"seals": ["py.typed"]},
-    install_requires=["gym", "numpy"],
+    install_requires=["gymnasium", "numpy"],
     tests_require=TESTS_REQUIRE,
     extras_require={
         # recommended packages for development
@@ -149,7 +145,7 @@ setup(
         "test": TESTS_REQUIRE,
         # We'd like to specify `gym[mujoco]`, but this is a no-op when Gym is already
         # installed. See https://github.com/pypa/pip/issues/4957 for issue.
-        "mujoco": ["mujoco_py>=1.50, <2.0", "imageio"],
+        "mujoco": ["mujoco", "imageio"],
         "atari": ATARI_REQUIRE,
     },
     url="https://github.com/HumanCompatibleAI/benchmark-environments",

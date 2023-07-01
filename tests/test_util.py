@@ -2,10 +2,9 @@
 
 import collections
 
-import gym
+import gymnasium as gym
 import numpy as np
 import pytest
-
 from seals import GYM_ATARI_ENV_SPECS, util
 
 
@@ -22,11 +21,11 @@ def test_mask_score_wrapper_enforces_spec():
 def test_sample_distribution():
     """Test util.sample_distribution."""
     distr_size = 5
-    distr = np.random.rand(distr_size)
+    distr = np.random.random((distr_size,))
     distr /= distr.sum()
 
     n_samples = 1000
-    rng = np.random.RandomState()
+    rng = np.random.default_rng()
     sample_count = collections.Counter(
         util.sample_distribution(distr, rng) for _ in range(n_samples)
     )
@@ -39,8 +38,8 @@ def test_sample_distribution():
 
     # Same seed gives same samples
     assert all(
-        util.sample_distribution(distr, random=np.random.RandomState(seed))
-        == util.sample_distribution(distr, random=np.random.RandomState(seed))
+        util.sample_distribution(distr, random=np.random.default_rng(seed))
+        == util.sample_distribution(distr, random=np.random.default_rng(seed))
         for seed in range(20)
     )
 

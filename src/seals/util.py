@@ -1,13 +1,17 @@
 """Miscellaneous utilities."""
 
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import Any, Generic, List, Optional, Sequence, SupportsFloat, Tuple, Union
 
-import gym
+import gymnasium as gym
 import numpy as np
+import numpy.typing as npt
+from gymnasium.core import ActType, ObsType, WrapperActType, WrapperObsType
 
 
-class AutoResetWrapper(gym.Wrapper):
+class AutoResetWrapper(
+    gym.Wrapper, Generic[WrapperObsType, WrapperActType, ObsType, ActType]
+):
     """Hides done=True and auto-resets at the end of each episode.
 
     Depending on the flag 'discard_terminal_observation', either discards the terminal
@@ -37,7 +41,9 @@ class AutoResetWrapper(gym.Wrapper):
         self.reset_reward = reset_reward
         self.previous_done = False  # Whether the previous step returned done=True.
 
-    def step(self, action):
+    def step(
+        self, action: WrapperActType
+    ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """When done=True, returns done=False, then reset depending on flag.
 
         Depending on whether we are discarding the terminal observation,
@@ -50,7 +56,9 @@ class AutoResetWrapper(gym.Wrapper):
         else:
             return self._step_pad(action)
 
-    def _step_pad(self, action):
+    def _step_pad(
+        self, action: WrapperActType
+    ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """When done=True, return done=False instead and return the terminal obs.
 
         The agent will then usually be asked to perform an action based on
@@ -67,26 +75,31 @@ class AutoResetWrapper(gym.Wrapper):
         """
         if self.previous_done:
             self.previous_done = False
+            reset_obs, reset_info_dict = self.env.reset()
+            info = {"reset_info_dict": reset_info_dict}
             # This transition will only reset the environment, the action is ignored.
-            return self.env.reset(), self.reset_reward, False, {}
+            return reset_obs, self.reset_reward, False, False, info
 
-        obs, rew, done, info = self.env.step(action)
-        if done:
+        obs, rew, terminated, truncated, info = self.env.step(action)
+        if terminated:
             self.previous_done = True
-        return obs, rew, False, info
+        return obs, rew, False, truncated, info
 
-    def _step_discard(self, action):
+    def _step_discard(
+        self, action: WrapperActType
+    ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         """When done=True, returns done=False instead and automatically resets.
 
         When an automatic reset happens, the observation from reset is returned,
         and the overridden observation is stored in
         `info["terminal_observation"]`.
         """
-        obs, rew, done, info = self.env.step(action)
-        if done:
+        obs, rew, terminated, truncated, info = self.env.step(action)
+        if terminated:
             info["terminal_observation"] = obs
-            obs = self.env.reset()
-        return obs, rew, False, info
+            obs, reset_info_dict = self.env.reset()
+            info["reset_info_dict"] = reset_info_dict
+        return obs, rew, False, truncated, info
 
 
 @dataclass
@@ -100,7 +113,10 @@ class BoxRegion:
 MaskedRegionSpecifier = List[BoxRegion]
 
 
-class MaskScoreWrapper(gym.Wrapper):
+class MaskScoreWrapper(
+    gym.Wrapper[npt.NDArray, ActType, npt.NDArray, ActType],
+    Generic[ActType],
+):
     """Mask a list of box-shaped regions in the observation to hide reward info.
 
     Intended for environments whose observations are raw pixels (like Atari
@@ -130,19 +146,22 @@ class MaskScoreWrapper(gym.Wrapper):
         super().__init__(env)
         self.fill_value = np.array(fill_value, env.observation_space.dtype)
 
+        assert env.observation_space.shape is not None
         self.mask = np.ones(env.observation_space.shape, dtype=bool)
         for r in score_regions:
             if r.x[0] >= r.x[1] or r.y[0] >= r.y[1]:
                 raise ValueError('Invalid region: "x" and "y" must be increasing.')
             self.mask[r.x[0] : r.x[1], r.y[0] : r.y[1]] = 0
 
-    def _mask_obs(self, obs):
+    def _mask_obs(self, obs) -> npt.NDArray:
         return np.where(self.mask, obs, self.fill_value)
 
-    def step(self, action):
-        """Returns (obs, rew, done, info) with masked obs."""
-        obs, rew, done, info = self.env.step(action)
-        return self._mask_obs(obs), rew, done, info
+    def step(
+        self, action: ActType
+    ) -> tuple[npt.NDArray, SupportsFloat, bool, bool, dict[str, Any]]:
+        """Returns (obs, rew, terminated, truncated, info) with masked obs."""
+        obs, rew, terminated, truncated, info = self.env.step(action)
+        return self._mask_obs(obs), rew, terminated, truncated, info
 
     def reset(self, **kwargs):
         """Returns masked reset observation."""
@@ -174,9 +193,9 @@ class ObsCastWrapper(gym.Wrapper):
         return super().reset().astype(self.dtype)
 
     def step(self, action):
-        """Returns (obs, rew, done, info) with obs cast to self.dtype."""
-        obs, rew, done, info = super().step(action)
-        return obs.astype(self.dtype), rew, done, info
+        """Returns (obs, rew, terminated, truncated, info) with obs cast to self.dtype."""
+        obs, rew, terminated, truncated, info = super().step(action)
+        return obs.astype(self.dtype), rew, terminated, truncated, info
 
 
 class AbsorbAfterDoneWrapper(gym.Wrapper):
@@ -228,8 +247,10 @@ class AbsorbAfterDoneWrapper(gym.Wrapper):
         `rew` depend on initialization arguments. `info` is always an empty dictionary.
         """
         if not self.at_absorb_state:
-            inner_obs, inner_rew, done, inner_info = self.env.step(action)
-            if done:
+            inner_obs, inner_rew, terminated, truncated, inner_info = self.env.step(
+                action
+            )
+            if terminated:
                 # Initialize the artificial absorb state, which we will repeatedly use
                 # starting on the next call to `step()`.
                 self.at_absorb_state = True
@@ -245,26 +266,27 @@ class AbsorbAfterDoneWrapper(gym.Wrapper):
             obs = self.absorb_obs_this_episode
             rew = self.absorb_reward
             info = {}
+            truncated = False
 
-        return obs, rew, False, info
+        return obs, rew, False, truncated, info
 
 
 def make_env_no_wrappers(env_name: str, **kwargs) -> gym.Env:
-    """Gym sometimes wraps envs in TimeLimit before returning from gym.make().
+    """Gym sometimes wraps envs in TimeLimit before returning from gymnasium.make().
 
     This helper method builds directly from spec to avoid this wrapper.
     """
-    return gym.envs.registry.env_specs[env_name].make(**kwargs)
+    return gym.spec(env_name).make(**kwargs)
 
 
 def get_gym_max_episode_steps(env_name: str) -> Optional[int]:
     """Get the `max_episode_steps` attribute associated with a gym Spec."""
-    return gym.envs.registry.env_specs[env_name].max_episode_steps
+    return gym.spec(env_name).max_episode_steps
 
 
 def sample_distribution(
     p: np.ndarray,
-    random: np.random.RandomState,
+    random: np.random.Generator,
 ) -> int:
     """Samples an integer with probabilities given by p."""
     return random.choice(np.arange(len(p)), p=p)

@@ -27,7 +27,7 @@ class InitShiftEnv(base_envs.TabularModelMDP):
     disambiguate this case.
     """
 
-    def __init__(self, initial_state: int):
+    def __init__(self, initial_state: base_envs.DiscreteSpaceInt):
         """Constructs environment.
 
         Args:
@@ -63,7 +63,7 @@ class InitShiftEnv(base_envs.TabularModelMDP):
             reward_matrix=reward_matrix,
         )
 
-    def initial_state(self) -> int:
+    def initial_state(self) -> base_envs.DiscreteSpaceInt:
         """Returns initial state defined in constructor."""
         return self._initial_state
 

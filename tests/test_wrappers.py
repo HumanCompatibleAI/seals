@@ -2,7 +2,6 @@
 
 import numpy as np
 import pytest
-
 from seals import util
 from seals.testing import envs
 
@@ -31,10 +30,11 @@ def test_auto_reset_wrapper_pad(episode_length=3, n_steps=100, n_manual_reset=2)
         next_episode_end = episode_length
         for t in range(1, n_steps + 1):
             act = env.action_space.sample()
-            obs, rew, done, info = env.step(act)
+            obs, rew, terminated, truncated, info = env.step(act)
 
             # AutoResetWrapper overrides all done signals.
-            assert done is False
+            assert terminated is False
+            assert truncated is False
 
             if t == next_episode_end:
                 # Unlike the AutoResetWrapper that discards terminal observations,
@@ -80,11 +80,12 @@ def test_auto_reset_wrapper_discard(episode_length=3, n_steps=100, n_manual_rese
 
         for t in range(1, n_steps + 1):
             act = env.action_space.sample()
-            obs, rew, done, info = env.step(act)
+            obs, rew, terminated, truncated, info = env.step(act)
             expected_obs = t % episode_length
 
             assert obs == expected_obs
-            assert done is False
+            assert terminated is False
+            assert truncated is False
 
             if expected_obs == 0:  # End of episode
                 assert info.get("terminal_observation", None) == episode_length
@@ -113,8 +114,9 @@ def test_absorb_repeat_custom_state(
         env.reset()
         for t in range(1, n_steps + 1):
             act = env.action_space.sample()
-            obs, rew, done, _ = env.step(act)
-            assert done is False
+            obs, rew, terminated, truncated, _ = env.step(act)
+            assert terminated is False
+            assert truncated is False
             if t > episode_length:
                 expected_obs = absorb_obs
                 expected_rew = absorb_reward
@@ -134,8 +136,9 @@ def test_absorb_repeat_final_state(episode_length=6, n_steps=100, n_manual_reset
         env.reset()
         for t in range(1, n_steps + 1):
             act = env.action_space.sample()
-            obs, rew, done, _ = env.step(act)
-            assert done is False
+            obs, rew, terminated, truncated, _ = env.step(act)
+            assert terminated is False
+            assert truncated is False
             if t > episode_length:
                 expected_obs = episode_length
                 expected_rew = -1
@@ -161,8 +164,9 @@ def test_obs_cast(dtype: np.dtype, episode_length: int = 5):
     assert obs == 0
     for t in range(1, episode_length + 1):
         act = env.action_space.sample()
-        obs, rew, done, _ = env.step(act)
-        assert done == (t == episode_length)
+        obs, rew, terminated, truncated, _ = env.step(act)
+        assert terminated == (t == episode_length)
+        assert truncated is False
         assert obs.dtype == dtype
         assert obs == t
         assert rew == t * 10.0

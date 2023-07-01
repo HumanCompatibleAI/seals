@@ -1,6 +1,6 @@
 """Simple diagnostic environments."""
 
-import gym
+import gymnasium as gym
 
 gym.register(
     id="seals/Branching-v0",

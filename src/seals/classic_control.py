@@ -2,14 +2,15 @@
 
 import warnings
 
-from gym import spaces
-import gym.envs.classic_control
 import numpy as np
+from gymnasium import spaces
+from gymnasium.envs import classic_control
+
 
 from seals import util
 
 
-class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
+class FixedHorizonCartPole(classic_control.CartPoleEnv):
     """Fixed-length variant of CartPole-v1.
 
     Reward is 1.0 whenever the CartPole is an "ok" state (i.e. the pole is upright
@@ -20,7 +21,7 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
     """
 
     def __init__(self):
-        """Builds FixedHorizonCartPole, modifying observation_space from Gym parent."""
+        """Builds FixedHorizonCartPole, modifying observation_space from gym parent."""
         super().__init__()
 
         high = [

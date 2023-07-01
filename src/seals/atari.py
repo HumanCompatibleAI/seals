@@ -2,7 +2,8 @@
 
 from typing import Dict, Iterable, Optional
 
-import gym
+import gymnasium as gym
+from gymnasium.envs.registration import EnvSpec
 
 from seals.util import (
     AutoResetWrapper,
@@ -37,7 +38,7 @@ def _get_score_region(atari_env_id: str) -> Optional[MaskedRegionSpecifier]:
 
 def make_atari_env(atari_env_id: str, masked: bool) -> gym.Env:
     """Fixed-length, optionally masked-score variant of a given Atari environment."""
-    env = AutoResetWrapper(gym.make(atari_env_id))
+    env: gym.Env = AutoResetWrapper(gym.make(atari_env_id))
 
     if masked:
         score_region = _get_score_region(atari_env_id)
@@ -59,15 +60,15 @@ def _not_ram_or_det(env_id: str) -> bool:
     after_slash = slash_separated[-1]
     hyphen_separated = after_slash.split("-")
     assert len(hyphen_separated) > 1
-    not_ram = not ("ram" in hyphen_separated[1])
-    not_deterministic = not ("Deterministic" in env_id)
+    not_ram = "ram" not in hyphen_separated[1]
+    not_deterministic = "Deterministic" not in env_id
     return not_ram and not_deterministic
 
 
-def _supported_atari_env(gym_spec: gym.envs.registration.EnvSpec) -> bool:
+def _supported_atari_env(gym_spec: EnvSpec) -> bool:
     """Checks if a gym Atari environment is one of the ones we will support."""
     is_atari = gym_spec.entry_point == "gym.envs.atari:AtariEnv"
-    v5_and_plain = gym_spec.id.endswith("-v5") and not ("NoFrameskip" in gym_spec.id)
+    v5_and_plain = gym_spec.id.endswith("-v5") and "NoFrameskip" not in gym_spec.id
     v4_and_no_frameskip = gym_spec.id.endswith("-v4") and "NoFrameskip" in gym_spec.id
     return (
         is_atari
@@ -76,7 +77,7 @@ def _supported_atari_env(gym_spec: gym.envs.registration.EnvSpec) -> bool:
     )
 
 
-def _seals_name(gym_spec: gym.envs.registration.EnvSpec, masked: bool) -> str:
+def _seals_name(gym_spec: EnvSpec, masked: bool) -> str:
     """Makes a Gym ID for an Atari environment in the seals namespace."""
     slash_separated = gym_spec.id.split("/")
     name = "seals/" + slash_separated[-1]
@@ -88,7 +89,7 @@ def _seals_name(gym_spec: gym.envs.registration.EnvSpec, masked: bool) -> str:
 
 
 def register_atari_envs(
-    gym_atari_env_specs: Iterable[gym.envs.registration.EnvSpec],
+    gym_atari_env_specs: Iterable[EnvSpec],
 ) -> None:
     """Register masked and unmasked wrapped gym Atari environments."""
 
