@@ -15,9 +15,10 @@ class FixedHorizonCartPole(classic_control.CartPoleEnv):
 
     Reward is 1.0 whenever the CartPole is an "ok" state (i.e. the pole is upright
     and the cart is on the screen). Otherwise reward is 0.0.
-
-    Done is always False. (Though note that by default, this environment is wrapped
-    in `TimeLimit` with max steps 500.)
+    
+    Terminated is always False. 
+    By default, this environment is wrapped in 'TimeLimit' with max steps 500
+    Truncation is handled by that.  
     """
 
     def __init__(self):
@@ -33,9 +34,10 @@ class FixedHorizonCartPole(classic_control.CartPoleEnv):
         high = np.array(high)
         self.observation_space = spaces.Box(-high, high, dtype=np.float32)
 
-    def reset(self):
+    def reset(self, seed=None, options={}):
         """Reset for FixedHorizonCartPole."""
-        return super().reset().astype(np.float32)
+        observation, info = super().reset(seed=seed, options=options)
+        return observation.astype(np.float32), info
 
     def step(self, action):
         """Step function for FixedHorizonCartPole."""
@@ -56,7 +58,7 @@ class FixedHorizonCartPole(classic_control.CartPoleEnv):
         )
 
         rew = 1.0 if state_ok else 0.0
-        return np.array(self.state, dtype=np.float32), rew, False, {}
+        return np.array(self.state, dtype=np.float32), rew, False, False, {}
 
 
 def mountain_car():
