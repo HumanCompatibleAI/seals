@@ -1,7 +1,7 @@
 """Base environment classes."""
 
 import abc
-from typing import Any, Generic, Optional, Tuple, TypeVar
+from typing import Any, Generic, Optional, Tuple, TypeVar, Dict, Union
 
 import gymnasium as gym
 import numpy as np
@@ -79,9 +79,9 @@ class ResettablePOMDP(
     def reset(
         self,
         *,
-        seed: int | None = None,
-        options: dict[str, Any] | None = None,
-    ) -> tuple[ObsType, dict[str, Any]]:  # type: ignore
+        seed: Union[int, None] = None,
+        options: Union[Dict[str, Any], None]= None,
+    ) -> Tuple[ObsType, Dict[str, Any]]:  # type: ignore
         """Reset episode and return initial observation."""
         if options is not None:
             raise ValueError("Options not supported.")
@@ -139,8 +139,8 @@ class ExposePOMDPStateWrapper(
         self._observation_space = env.state_space
 
     def reset(
-        self, seed: int | None = None, options: dict[str, Any] | None = None
-    ) -> Tuple[StateType, dict[str, Any]]:
+        self, seed: Union[int, None] = None, options: Union[Dict[str, Any], None]= None
+    ) -> Tuple[StateType, Dict[str, Any]]:
         """Reset environment and return initial state."""
         _, info = self.env.reset(seed=seed, options=options)
         return self.env.state, info
@@ -325,7 +325,7 @@ class BaseTabularModelPOMDP(
 
 
 ObsEntryType = TypeVar(
-    "ObsEntryType", bound=np.floating[Any] | np.integer[Any], covariant=True
+    "ObsEntryType", bound=Union[np.floating, np.integer], covariant=True
 )
 
 
@@ -399,7 +399,7 @@ class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray], Generic[ObsEntryType]
         return self.observation_matrix.shape[1]
 
     @property
-    def obs_dtype(self) -> np.dtype[ObsEntryType]:
+    def obs_dtype(self) -> np.dtype: 
         """Data type of observation vectors (e.g. np.float32)."""
         return self.observation_matrix.dtype
 

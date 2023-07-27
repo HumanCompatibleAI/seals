@@ -11,7 +11,7 @@ from seals.testing import envs
 
 ENV_NAMES: List[str] = [
     env_spec.id
-    for env_spec in registration.registry.all()
+    for env_spec in registration.registry.values()
     if env_spec.id.startswith("seals/")
 ]
 

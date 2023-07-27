@@ -1,7 +1,7 @@
 """Miscellaneous utilities."""
 
 from dataclasses import dataclass
-from typing import Any, Generic, List, Optional, Sequence, SupportsFloat, Tuple, Union
+from typing import Any, Generic, List, Optional, Sequence, SupportsFloat, Tuple, Union, Dict
 
 import gymnasium as gym
 import numpy as np
@@ -43,7 +43,7 @@ class AutoResetWrapper(
 
     def step(
         self, action: WrapperActType
-    ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
+    ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
         """When done=True, returns done=False, then reset depending on flag.
 
         Depending on whether we are discarding the terminal observation,
@@ -58,7 +58,7 @@ class AutoResetWrapper(
 
     def _step_pad(
         self, action: WrapperActType
-    ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
+    ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
         """When done=True, return done=False instead and return the terminal obs.
 
         The agent will then usually be asked to perform an action based on
@@ -87,7 +87,7 @@ class AutoResetWrapper(
 
     def _step_discard(
         self, action: WrapperActType
-    ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
+    ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
         """When done=True, returns done=False instead and automatically resets.
 
         When an automatic reset happens, the observation from reset is returned,
@@ -158,7 +158,7 @@ class MaskScoreWrapper(
 
     def step(
         self, action: ActType
-    ) -> tuple[npt.NDArray, SupportsFloat, bool, bool, dict[str, Any]]:
+    ) -> Tuple[npt.NDArray, SupportsFloat, bool, bool, Dict[str, Any]]:
         """Returns (obs, rew, terminated, truncated, info) with masked obs."""
         obs, rew, terminated, truncated, info = self.env.step(action)
         return self._mask_obs(obs), rew, terminated, truncated, info
