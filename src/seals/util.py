@@ -188,9 +188,10 @@ class ObsCastWrapper(gym.Wrapper):
         super().__init__(env)
         self.dtype = dtype
 
-    def reset(self):
+    def reset(self, seed=None):
         """Returns reset observation, cast to self.dtype."""
-        return super().reset().astype(self.dtype)
+        obs, info = super().reset(seed=seed)
+        return obs.astype(self.dtype), info
 
     def step(self, action):
         """Returns (obs, rew, terminated, truncated, info) with obs cast to self.dtype."""
