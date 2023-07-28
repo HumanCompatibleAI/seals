@@ -95,9 +95,10 @@ def get_rollout(env: gym.Env, actions: Iterable[Any]) -> Rollout:
       actions: the actions to perform.
 
     Returns:
-      A sequence of 4-tuples (obs, rew, terminated, truncated, info).
+      A sequence of 5-tuples (obs, rew, terminated, truncated, info).
     """
-    ret: List[Step] = [(env.reset(), None, False, False, {})]
+    obs, info = env.reset()
+    ret: List[Step] = [(obs, None, False, False, {})]
     for act in actions:
         ret.append(env.step(act))
     return ret
@@ -338,10 +339,10 @@ class CountingEnv(gym.Env):
         self.episode_length = episode_length
         self.timestep = None
 
-    def reset(self):
+    def reset(self, seed=None, options={}):
         """Reset method for CountingEnv."""
         t, self.timestep = 0, 1
-        return np.array(t, dtype=self.observation_space.dtype)
+        return np.array(t, dtype=self.observation_space.dtype), {}
 
     def step(self, action):
         """Step method for CountingEnv."""

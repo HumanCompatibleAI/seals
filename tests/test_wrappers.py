@@ -22,7 +22,7 @@ def test_auto_reset_wrapper_pad(episode_length=3, n_steps=100, n_manual_reset=2)
     )
 
     for _ in range(n_manual_reset):
-        obs = env.reset()
+        obs, info = env.reset()
         assert obs == 0
 
         # We count the number of episodes, so we can sanity check the padding.
@@ -75,7 +75,7 @@ def test_auto_reset_wrapper_discard(episode_length=3, n_steps=100, n_manual_rese
     )
 
     for _ in range(n_manual_reset):
-        obs = env.reset()
+        obs, info = env.reset()
         assert obs == 0
 
         for t in range(1, n_steps + 1):
@@ -159,7 +159,7 @@ def test_obs_cast(dtype: np.dtype, episode_length: int = 5):
     env = envs.CountingEnv(episode_length=episode_length)
     env = util.ObsCastWrapper(env, dtype)
 
-    obs = env.reset()
+    obs, info = env.reset()
     assert obs.dtype == dtype
     assert obs == 0
     for t in range(1, episode_length + 1):
