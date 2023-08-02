@@ -79,9 +79,9 @@ class ResettablePOMDP(
     def reset(
         self,
         *,
-        seed: Union[int, None] = None,
-        options: Union[Dict[str, Any], None]= None,
-    ) -> Tuple[ObsType, Dict[str, Any]]:  # type: ignore
+        seed: Optional[int] = None,
+        options: Optional[Dict[str, Any]] = None,
+    ) -> Tuple[ObsType, Dict[str, Any]]:
         """Reset episode and return initial observation."""
         if options is not None:
             raise ValueError("Options not supported.")
@@ -90,7 +90,7 @@ class ResettablePOMDP(
         self.state = self.initial_state()
         self._n_actions_taken = 0
         obs = self.obs_from_state(self.state)
-        info: dict[str, Any] = dict()
+        info: Dict[str, Any] = dict()
         return obs, info
 
     def step(self, action: ActType) -> Tuple[ObsType, float, bool, bool, dict]:
@@ -139,7 +139,7 @@ class ExposePOMDPStateWrapper(
         self._observation_space = env.state_space
 
     def reset(
-        self, seed: Union[int, None] = None, options: Union[Dict[str, Any], None]= None
+        self, seed: Optional[int] = None, options: Optional[Dict[str, Any]] = None
     ) -> Tuple[StateType, Dict[str, Any]]:
         """Reset environment and return initial state."""
         _, info = self.env.reset(seed=seed, options=options)
@@ -399,7 +399,7 @@ class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray], Generic[ObsEntryType]
         return self.observation_matrix.shape[1]
 
     @property
-    def obs_dtype(self) -> np.dtype: 
+    def obs_dtype(self) -> np.dtype:
         """Data type of observation vectors (e.g. np.float32)."""
         return self.observation_matrix.dtype
 
