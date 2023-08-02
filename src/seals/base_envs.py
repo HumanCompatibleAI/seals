@@ -71,7 +71,7 @@ class ResettablePOMDP(
 
     @state.setter
     def state(self, state: StateType):
-        """Set current state."""
+        """Set the current state."""
         if state not in self.state_space:
             raise ValueError(f"{state} not in {self.state_space}")
         self._cur_state = state
@@ -82,7 +82,7 @@ class ResettablePOMDP(
         seed: Optional[int] = None,
         options: Optional[Dict[str, Any]] = None,
     ) -> Tuple[ObsType, Dict[str, Any]]:
-        """Reset episode and return initial observation."""
+        """Reset the episode and return initial observation."""
         if options is not None:
             raise ValueError("Options not supported.")
 

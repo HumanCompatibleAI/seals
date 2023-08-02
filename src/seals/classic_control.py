@@ -13,12 +13,12 @@ from seals import util
 class FixedHorizonCartPole(classic_control.CartPoleEnv):
     """Fixed-length variant of CartPole-v1.
 
-    Reward is 1.0 whenever the CartPole is an "ok" state (i.e. the pole is upright
-    and the cart is on the screen). Otherwise reward is 0.0.
-    
-    Terminated is always False. 
-    By default, this environment is wrapped in 'TimeLimit' with max steps 500
-    Truncation is handled by that.  
+    Reward is 1.0 whenever the CartPole is an "ok" state (i.e., the pole is upright
+    and the cart is on the screen). Otherwise, reward is 0.0.
+
+    Terminated is always False.
+    By default, this environment is wrapped in 'TimeLimit' with max steps 500,
+    Truncation is handled by that.
     """
 
     def __init__(self):
