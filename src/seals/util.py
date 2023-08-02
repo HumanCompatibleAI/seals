@@ -146,7 +146,8 @@ class MaskScoreWrapper(
         super().__init__(env)
         self.fill_value = np.array(fill_value, env.observation_space.dtype)
 
-        assert env.observation_space.shape is not None
+        if env.observation_space.shape is None:
+            raise ValueError("Observation space must have a shape.")
         self.mask = np.ones(env.observation_space.shape, dtype=bool)
         for r in score_regions:
             if r.x[0] >= r.x[1] or r.y[0] >= r.y[1]:

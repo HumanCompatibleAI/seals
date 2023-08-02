@@ -84,7 +84,7 @@ class ResettablePOMDP(
     ) -> Tuple[ObsType, Dict[str, Any]]:
         """Reset the episode and return initial observation."""
         if options is not None:
-            raise ValueError("Options not supported.")
+            raise NotImplementedError("Options not supported.")
 
         super().reset(seed=seed)
         self.state = self.initial_state()
@@ -96,7 +96,7 @@ class ResettablePOMDP(
     def step(self, action: ActType) -> Tuple[ObsType, float, bool, bool, dict]:
         """Transition state using given action."""
         if self._cur_state is None or self._n_actions_taken is None:
-            raise ValueError("Need to call reset() before first step()")
+            raise RuntimeError("Need to call reset() before first step()")
         if action not in self.action_space:
             raise ValueError(f"{action} not in {self.action_space}")
 
@@ -117,7 +117,7 @@ class ResettablePOMDP(
         """Random state."""
         rand_state = self._np_random
         if rand_state is None:
-            raise ValueError("Need to call reset() before accessing rand_state")
+            raise RuntimeError("Need to call reset() before accessing rand_state")
         return rand_state
 
 
