@@ -18,7 +18,7 @@ class FixedHorizonCartPole(classic_control.CartPoleEnv):
 
     Terminated is always False.
     By default, this environment is wrapped in 'TimeLimit' with max steps 500,
-    Truncation is handled by that.
+    which sets `truncated` to true after that many steps.
     """
 
     def __init__(self):
