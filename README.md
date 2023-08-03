@@ -7,35 +7,35 @@
 
 **Status**: early beta.
 
-_seals_, the Suite of Environments for Algorithms that Learn Specifications, is a toolkit for
+*seals*, the Suite of Environments for Algorithms that Learn Specifications, is a toolkit for
 evaluating specification learning algorithms, such as reward or imitation learning. The
 environments are compatible with [Gym](https://github.com/openai/gym), but are designed
 to test algorithms that learn from user data, without requiring a procedurally specified
 reward function.
 
-There are two types of environments in _seals_:
+There are two types of environments in *seals*:
 
-- **Diagnostic Tasks** which test individual facets of algorithm performance in isolation.
-- **Renovated Environments**, adaptations of widely-used benchmarks such as MuJoCo continuous
-  control tasks and Atari games to be suitable for specification learning benchmarks. In particular,
-  we remove any side-channel sources of reward information from MuJoCo tasks, and give Atari games constant-length episodes (although most Atari environments have observations that include the score).
+  - **Diagnostic Tasks** which test individual facets of algorithm performance in isolation.
+  - **Renovated Environments**, adaptations of widely-used benchmarks such as MuJoCo continuous
+      control tasks and Atari games to be suitable for specification learning benchmarks. In particular, 
+      we remove any side-channel sources of reward information from MuJoCo tasks, and give Atari games constant-length episodes (although most Atari environments have observations that include the score).
 
-_seals_ is under active development and we intend to add more categories of tasks soon.
-
+*seals* is under active development and we intend to add more categories of tasks soon.
+ 
 You may also be interested in our sister project [imitation](https://github.com/humancompatibleai/imitation/),
 providing implementations of a variety of imitation and reward learning algorithms.
 
-Check out our [documentation](https://seals.readthedocs.io/en/latest/) for more information about _seals_.
+Check out our [documentation](https://seals.readthedocs.io/en/latest/) for more information about *seals*.
 
 # Quickstart
 
 To install the latest release from PyPI, run:
-
+ 
 ```bash
 pip install seals
 ```
 
-All _seals_ environments are available in the Gym registry. Simply import it and then use as you
+All *seals* environments are available in the Gym registry. Simply import it and then use as you
 would with your usual RL or specification learning algroithm:
 
 ```python
@@ -86,7 +86,7 @@ for type checking.
 ## Workflow
 
 Trivial changes (e.g. typo fixes) may be made directly by maintainers. Any non-trivial changes
-must be proposed in a PR and approved by at least one maintainer. PRs must pass the continuous
+must be proposed in a PR and approved by at least one maintainer. PRs must pass the continuous 
 integration tests (CircleCI linting, type checking, unit tests and CodeCov) to be merged.
 
 It is often helpful to open an issue before proposing a PR, to allow for discussion of the design
