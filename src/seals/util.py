@@ -275,14 +275,6 @@ class AbsorbAfterDoneWrapper(gym.Wrapper):
         return obs, rew, False, False, info
 
 
-def make_env_no_wrappers(env_name: str, **kwargs) -> gym.Env:
-    """Gym sometimes wraps envs in TimeLimit before returning from gymnasium.make().
-
-    This helper method builds directly from spec to avoid this wrapper.
-    """
-    return gym.spec(env_name).make(**kwargs)
-
-
 def get_gym_max_episode_steps(env_name: str) -> Optional[int]:
     """Get the `max_episode_steps` attribute associated with a gym Spec."""
     return gym.spec(env_name).max_episode_steps

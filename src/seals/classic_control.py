@@ -3,6 +3,8 @@
 import warnings
 
 import numpy as np
+
+import gymnasium as gym
 from gymnasium import spaces
 from gymnasium.envs import classic_control
 
@@ -71,7 +73,7 @@ def mountain_car():
 
     Done is always returned on timestep 200 only.
     """
-    env = util.make_env_no_wrappers("MountainCar-v0")
+    env = gym.make("MountainCar-v0")
     env = util.ObsCastWrapper(env, dtype=np.float32)
     env = util.AbsorbAfterDoneWrapper(env)
     return env
