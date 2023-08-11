@@ -143,7 +143,7 @@ setup(
         "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE],
         "docs": DOCS_REQUIRE,
         "test": TESTS_REQUIRE,
-        # We'd like to specify `gym[mujoco]`, but this is a no-op when Gym is already
+        # We'd like to specify `gymnasium[mujoco]`, but this is a no-op when Gym is already
         # installed. See https://github.com/pypa/pip/issues/4957 for issue.
         "mujoco": ["mujoco", "imageio"],
         "atari": ATARI_REQUIRE,
