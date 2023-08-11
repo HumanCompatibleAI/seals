@@ -10,9 +10,8 @@ from seals.atari import SCORE_REGIONS, _get_score_region, _seals_name, make_atar
 from seals.testing import envs
 
 ENV_NAMES: List[str] = [
-    env_spec.id
-    for env_spec in registration.registry.values()
-    if env_spec.id.startswith("seals/")
+    env_id for env_id in registration.registry.keys()
+    if env_id.startswith("seals/")
 ]
 
 
