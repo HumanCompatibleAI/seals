@@ -249,28 +249,26 @@ class AbsorbAfterDoneWrapper(gym.Wrapper):
         `rew` depend on initialization arguments. `info` is always an empty dictionary.
         """
         if not self.at_absorb_state:
-            inner_obs, inner_rew, terminated, truncated, inner_info = self.env.step(
+            obs, rew, terminated, truncated, info = self.env.step(
                 action
             )
-            if terminated:
+            if terminated or truncated:
                 # Initialize the artificial absorb state, which we will repeatedly use
                 # starting on the next call to `step()`.
                 self.at_absorb_state = True
 
                 if self.absorb_obs_default is None:
-                    self.absorb_obs_this_episode = inner_obs
+                    self.absorb_obs_this_episode = obs
                 else:
                     self.absorb_obs_this_episode = self.absorb_obs_default
-            obs, rew, info = inner_obs, inner_rew, inner_info
         else:
             assert self.absorb_obs_this_episode is not None
             assert self.absorb_reward is not None
             obs = self.absorb_obs_this_episode
             rew = self.absorb_reward
             info = {}
-            truncated = False
 
-        return obs, rew, False, truncated, info
+        return obs, rew, False, False, info
 
 
 def make_env_no_wrappers(env_name: str, **kwargs) -> gym.Env:
