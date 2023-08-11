@@ -42,7 +42,8 @@ class FixedHorizonCartPole(classic_control.CartPoleEnv):
     def step(self, action):
         """Step function for FixedHorizonCartPole."""
         with warnings.catch_warnings():
-            # Filter out CartPoleEnv warning for calling step() beyond done=True.
+            # Filter out CartPoleEnv warning for calling step() beyond
+            # terminated=True or truncated=True
             warnings.filterwarnings("ignore", ".*You are calling.*")
             super().step(action)
 

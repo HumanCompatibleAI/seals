@@ -212,7 +212,7 @@ def _is_mujoco_env(env: gym.Env) -> bool:
 
 def test_rollout_schema(
     env: gym.Env,
-    steps_after_done: int = 10,
+    steps_after_terminated: int = 10,
     max_steps: int = 10_000,
     check_episode_ends: bool = True,
 ) -> None:
@@ -220,12 +220,12 @@ def test_rollout_schema(
 
     Args:
         env: The environment to test.
-        steps_after_done: The number of steps to take after `done` is True, the nominal
-            episode termination. This is an abuse of the Gym API, but we would like the
-            environments to handle this case gracefully.
-        max_steps: Test fails if we do not get `done` after this many timesteps.
+        steps_after_terminated: The number of steps to take after `terminated` is True,
+            the nominal episode termination. This is an abuse of the Gym API,
+            but we would like the environments to handle this case gracefully.
+        max_steps: Test fails if we do not get `terminated` after this many timesteps.
         check_episode_ends: Check that episode ends after `max_steps` steps, and that
-            steps taken after `done` is true are of the correct type.
+            steps taken after `terminated` is true are of the correct type.
 
     Raises:
         AssertionError if test fails.
@@ -243,7 +243,7 @@ def test_rollout_schema(
     if check_episode_ends:
         assert terminated, "did not get to end of episode"
 
-        for _ in range(steps_after_done):
+        for _ in range(steps_after_terminated):
             _sample_and_check(env, obs_space)
 
 

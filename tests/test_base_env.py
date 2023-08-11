@@ -102,7 +102,7 @@ def test_expose_pomdp_state_wrapper():
     assert state in env.state_space
 
     action = env.action_space.sample()
-    next_state, reward, done, info = wrapped_env.step(action)
+    next_state, reward, terminated, truncated, info = wrapped_env.step(action)
     assert next_state == env.state
     assert next_state in env.state_space
 

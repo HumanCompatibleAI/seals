@@ -32,7 +32,7 @@ def test_auto_reset_wrapper_pad(episode_length=3, n_steps=100, n_manual_reset=2)
             act = env.action_space.sample()
             obs, rew, terminated, truncated, info = env.step(act)
 
-            # AutoResetWrapper overrides all done signals.
+            # AutoResetWrapper overrides all terminated and truncated signals.
             assert terminated is False
             assert truncated is False
 

@@ -12,7 +12,8 @@ from gymnasium.core import ActType, ObsType, WrapperActType, WrapperObsType
 class AutoResetWrapper(
     gym.Wrapper, Generic[WrapperObsType, WrapperActType, ObsType, ActType]
 ):
-    """Hides done=True and auto-resets at the end of each episode.
+    """Hides terminated=True and truncated=True and auto-resets at the end of each
+    episode.
 
     Depending on the flag 'discard_terminal_observation', either discards the terminal
     observation or pads with an additional 'reset transition'. The former is the default
@@ -44,7 +45,8 @@ class AutoResetWrapper(
     def step(
         self, action: WrapperActType
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
-        """When done=True, returns done=False, then reset depending on flag.
+        """When terminated or truncated, resets the environment and returns False
+        for terminated and truncated.
 
         Depending on whether we are discarding the terminal observation,
         either resets the environment and discards,
@@ -59,7 +61,8 @@ class AutoResetWrapper(
     def _step_pad(
         self, action: WrapperActType
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
-        """When done=True, return done=False instead and return the terminal obs.
+        """When terminated or truncated, return False for both instead and return the
+        terminal obs.
 
         The agent will then usually be asked to perform an action based on
         the terminal observation. In the next step, this final action will be ignored
@@ -81,25 +84,24 @@ class AutoResetWrapper(
             return reset_obs, self.reset_reward, False, False, info
 
         obs, rew, terminated, truncated, info = self.env.step(action)
-        if terminated:
-            self.previous_done = True
-        return obs, rew, False, truncated, info
+        self.previous_done = terminated or truncated
+        return obs, rew, False, False, info
 
     def _step_discard(
         self, action: WrapperActType
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
-        """When done=True, returns done=False instead and automatically resets.
+        """When terminated or truncated, return False for both and automatically reset.
 
         When an automatic reset happens, the observation from reset is returned,
         and the overridden observation is stored in
         `info["terminal_observation"]`.
         """
         obs, rew, terminated, truncated, info = self.env.step(action)
-        if terminated:
+        if terminated or truncated:
             info["terminal_observation"] = obs
             obs, reset_info_dict = self.env.reset()
             info["reset_info_dict"] = reset_info_dict
-        return obs, rew, False, truncated, info
+        return obs, rew, False, False, info
 
 
 @dataclass
@@ -203,8 +205,9 @@ class ObsCastWrapper(gym.Wrapper):
 class AbsorbAfterDoneWrapper(gym.Wrapper):
     """Transition into absorbing state instead of episode termination.
 
-    When the environment being wrapped returns `done=True`, we return an absorbing
-    observation. This wrapper always returns `done=False`.
+    When the environment being wrapped returns `terminated=True` or `truncated=True`,
+    we return an absorbing observation.
+    This wrapper always returns `terminated=False` and `truncated=False`.
 
     A convenient way to add absorbing states to environments like MountainCar.
     """
@@ -238,15 +241,16 @@ class AbsorbAfterDoneWrapper(gym.Wrapper):
     def step(self, action):
         """Advance the environment by one step.
 
-        This wrapped `step()` always returns done=False.
+        This wrapped `step()` always returns terminated=False and truncated=False.
 
-        After the first done is returned by the underlying Env, we enter an artificial
-        absorb state.
+        After the first time either terminated or truncated is returned by the
+        underlying Env, we enter an artificial absorb state.
 
         In this artificial absorb state, we stop calling
         `self.env.step(action)` (i.e. the `action` argument is entirely ignored) and
-        we return fixed values for obs, rew, done, and info. The values of `obs` and
-        `rew` depend on initialization arguments. `info` is always an empty dictionary.
+        we return fixed values for obs, rew, terminated, truncated, and info.
+        The values of `obs` and `rew` depend on initialization arguments.
+        `info` is always an empty dictionary.
         """
         if not self.at_absorb_state:
             obs, rew, terminated, truncated, info = self.env.step(
