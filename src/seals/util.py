@@ -168,8 +168,8 @@ class MaskScoreWrapper(
 
     def reset(self, **kwargs):
         """Returns masked reset observation."""
-        obs = self.env.reset(**kwargs)
-        return self._mask_obs(obs)
+        obs, info = self.env.reset(**kwargs)
+        return self._mask_obs(obs), info
 
 
 class ObsCastWrapper(gym.Wrapper):
