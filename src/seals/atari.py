@@ -67,7 +67,7 @@ def _not_ram_or_det(env_id: str) -> bool:
 
 def _supported_atari_env(gym_spec: EnvSpec) -> bool:
     """Checks if a gym Atari environment is one of the ones we will support."""
-    is_atari = gym_spec.entry_point == "gym.envs.atari:AtariEnv"
+    is_atari = gym_spec.entry_point == "shimmy.atari_env:AtariEnv"
     v5_and_plain = gym_spec.id.endswith("-v5") and "NoFrameskip" not in gym_spec.id
     v4_and_no_frameskip = gym_spec.id.endswith("-v4") and "NoFrameskip" in gym_spec.id
     return (
