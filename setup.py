@@ -91,6 +91,7 @@ ATARI_REQUIRE = [
     "ale-py==0.7.4",
     "pillow",
     "autorom[accept-rom-license]~=0.4.2",
+    "shimmy[atari] >=0.1.0,<1.0",
 ]
 TESTS_REQUIRE = [
     # remove pin once https://github.com/nedbat/coveragepy/issues/881 fixed
