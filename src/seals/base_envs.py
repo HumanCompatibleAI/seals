@@ -435,6 +435,7 @@ class TabularModelMDP(BaseTabularModelPOMDP[DiscreteSpaceInt]):
             horizon=horizon,
             initial_state_dist=initial_state_dist,
         )
+        self.observation_space = self.state_space
 
     def obs_from_state(self, state: DiscreteSpaceInt) -> DiscreteSpaceInt:
         """Identity since observation == state in an MDP."""
