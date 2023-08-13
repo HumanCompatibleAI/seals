@@ -157,10 +157,7 @@ def test_seed(
     env.action_space.seed(0)
     actions = [env.action_space.sample() for _ in range(rollout_len)]
     # With the same seed, should always get the same result
-    seeds = env.reset(seed=42)
-    # output of env.seed should be a list, but atari environments return a tuple.
-    assert isinstance(seeds, (list, tuple))
-    assert len(seeds) > 0
+    env.reset(seed=42)
     rollout_a = get_rollout(env, actions)
 
     env.reset(seed=42)
