@@ -291,7 +291,7 @@ def test_render(env: gym.Env, raises_fn) -> None:
     """
     env.reset(seed=0)  # make sure environment is in consistent state
 
-    render_modes = env.metadata["render.modes"]
+    render_modes = env.metadata["render_modes"]
     if not render_modes:
         # No modes supported -- render() should fail.
         with raises_fn(NotImplementedError):
