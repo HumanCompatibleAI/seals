@@ -231,7 +231,7 @@ def test_rollout_schema(
         AssertionError if test fails.
     """
     obs_space = env.observation_space
-    obs, _ = env.reset()
+    obs, _ = env.reset(seed=0)
     _check_obs(obs, obs_space)
 
     terminated = False
@@ -289,7 +289,7 @@ def test_render(env: gym.Env, raises_fn) -> None:
             `env.metadata["render.modes"]` is empty; (c) `env.render(mode="rgb_array")`
             returns different values at the same time step.
     """
-    env.reset()  # make sure environment is in consistent state
+    env.reset(seed=0)  # make sure environment is in consistent state
 
     render_modes = env.metadata["render.modes"]
     if not render_modes:

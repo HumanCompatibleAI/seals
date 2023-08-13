@@ -35,7 +35,7 @@ def test_base_envs():
 
     envs.test_premature_step(env, skip_fn=pytest.skip, raises_fn=pytest.raises)
 
-    env.reset()
+    env.reset(seed=0)
     assert env.n_actions_taken == 0
     env.step(env.action_space.sample())
     assert env.n_actions_taken == 1
@@ -86,7 +86,7 @@ def test_tabular_env_validation():
         transition_matrix=np.zeros((3, 1, 3)),
         reward_matrix=np.zeros((3,)),
     )
-    env.reset()
+    env.reset(seed=0)
     with pytest.raises(ValueError, match=r".*not in.*"):
         env.step(4)
 
@@ -97,7 +97,7 @@ def test_expose_pomdp_state_wrapper():
     wrapped_env = base_envs.ExposePOMDPStateWrapper(env)
 
     assert wrapped_env.observation_space == env.state_space
-    state = wrapped_env.reset()
+    state, _ = wrapped_env.reset(seed=0)
     assert state == env.state
     assert state in env.state_space
 
