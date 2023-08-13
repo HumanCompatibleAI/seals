@@ -203,7 +203,7 @@ def _sample_and_check(env: gym.Env, obs_space: gym.Space) -> Tuple[bool, bool]:
     assert isinstance(terminated, bool)
     assert isinstance(truncated, bool)
     assert isinstance(info, dict)
-    return terminated, truncated
+    return terminated or truncated
 
 
 def _is_mujoco_env(env: gym.Env) -> bool:
@@ -234,14 +234,14 @@ def test_rollout_schema(
     obs, _ = env.reset(seed=0)
     _check_obs(obs, obs_space)
 
-    terminated = False
+    done = False
     for _ in range(max_steps):
-        terminated, _ = _sample_and_check(env, obs_space)
-        if terminated:
+        done = _sample_and_check(env, obs_space)
+        if done:
             break
 
     if check_episode_ends:
-        assert terminated, "did not get to end of episode"
+        assert done, "did not get to end of episode"
 
         for _ in range(steps_after_terminated):
             _sample_and_check(env, obs_space)
