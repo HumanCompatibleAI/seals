@@ -1,6 +1,6 @@
 """Smoke tests for all environments."""
 
-from typing import List
+from typing import List, Union
 
 import gymnasium as gym
 from gymnasium.envs import registration
@@ -165,8 +165,10 @@ class TestEnvs:
             if mode == "rgb_array" and not is_mujoco_env(env):
                 # The render should not change without calling `step()`.
                 # MuJoCo rendering fails this check, ignore -- not much we can do.
-                r1 = env.render()
-                r2 = env.render()
+                r1: Union[np.ndarray, List[np.ndarray], None] = env.render()
+                r2: Union[np.ndarray, List[np.ndarray], None] = env.render()
+                assert r1 is not None
+                assert r2 is not None
                 assert np.allclose(r1, r2)
             else:
                 env.render()

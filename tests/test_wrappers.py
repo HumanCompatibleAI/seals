@@ -157,8 +157,10 @@ def test_obs_cast(dtype: np.dtype, episode_length: int = 5):
     Test uses CountingEnv with small integers, which can be represented in
     all the specified dtypes without any loss of precision.
     """
-    env = envs.CountingEnv(episode_length=episode_length)
-    env = util.ObsCastWrapper(env, dtype)
+    env = util.ObsCastWrapper(
+        envs.CountingEnv(episode_length=episode_length),
+        dtype,
+    )
 
     obs, info = env.reset()
     assert obs.dtype == dtype

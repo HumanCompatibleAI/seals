@@ -5,14 +5,13 @@ from typing import Any, Dict, Generic, Optional, Tuple, TypeVar, Union
 
 import gymnasium as gym
 from gymnasium import spaces
+from gymnasium.core import ActType, ObsType
 import numpy as np
 import numpy.typing as npt
 
 from seals import util
 
 StateType = TypeVar("StateType")
-ObsType = TypeVar("ObsType")
-ActType = TypeVar("ActType")
 
 
 class ResettablePOMDP(
@@ -162,7 +161,7 @@ class ResettableMDP(
     """ABC for MDPs that are resettable."""
 
     @property
-    def observation_space(self) -> spaces.Space[StateType]:
+    def observation_space(self):
         """Observation space."""
         return self.state_space
 
@@ -333,7 +332,6 @@ class BaseTabularModelPOMDP(
 ObsEntryType = TypeVar(
     "ObsEntryType",
     bound=Union[np.floating, np.integer],
-    covariant=True,
 )
 
 
@@ -390,7 +388,7 @@ class TabularModelPOMDP(BaseTabularModelPOMDP[np.ndarray], Generic[ObsEntryType]
             low=min_val,
             high=max_val,
             shape=(self.obs_dim,),
-            dtype=self.obs_dtype,
+            dtype=self.obs_dtype,  # type: ignore
         )
 
     def obs_from_state(self, state: DiscreteSpaceInt) -> npt.NDArray[ObsEntryType]:

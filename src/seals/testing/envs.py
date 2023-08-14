@@ -12,15 +12,15 @@ from typing import (
     Iterator,
     List,
     Mapping,
-    Optional,
     Sequence,
+    SupportsFloat,
     Tuple,
 )
 
 import gymnasium as gym
 import numpy as np
 
-Step = Tuple[Any, Optional[float], bool, bool, Mapping[str, Any]]
+Step = Tuple[Any, SupportsFloat, bool, bool, Mapping[str, Any]]
 Rollout = Sequence[Step]
 """A sequence of 5-tuples (obs, rew, terminated, truncated, info) as returned by
 `get_rollout`."""
@@ -99,7 +99,7 @@ def get_rollout(env: gym.Env, actions: Iterable[Any]) -> Rollout:
       A sequence of 5-tuples (obs, rew, terminated, truncated, info).
     """
     obs, info = env.reset()
-    ret: List[Step] = [(obs, None, False, False, {})]
+    ret: List[Step] = [(obs, 0, False, False, {})]
     for act in actions:
         ret.append(env.step(act))
     return ret
@@ -192,7 +192,7 @@ def _check_obs(obs: np.ndarray, obs_space: gym.Space) -> None:
     assert obs in obs_space
 
 
-def _sample_and_check(env: gym.Env, obs_space: gym.Space) -> Tuple[bool, bool]:
+def _sample_and_check(env: gym.Env, obs_space: gym.Space) -> bool:
     """Sample from env and check return value is of valid type."""
     act = env.action_space.sample()
     obs, rew, terminated, truncated, info = env.step(act)

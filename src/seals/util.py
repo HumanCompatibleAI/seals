@@ -21,7 +21,7 @@ import numpy.typing as npt
 
 class AutoResetWrapper(
     gym.Wrapper,
-    Generic[WrapperObsType, WrapperActType, ObsType, ActType],
+    Generic[WrapperObsType, WrapperActType, ObsType, ActType],  # type: ignore
 ):
     """Hides terminated truncated and auto-resets at the end of each episode.
 
@@ -132,7 +132,7 @@ MaskedRegionSpecifier = List[BoxRegion]
 
 class MaskScoreWrapper(
     gym.Wrapper[npt.NDArray, ActType, npt.NDArray, ActType],
-    Generic[ActType],
+    Generic[ActType],  # type: ignore
 ):
     """Mask a list of box-shaped regions in the observation to hide reward info.
 
