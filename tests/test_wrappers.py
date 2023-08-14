@@ -13,9 +13,9 @@ def test_auto_reset_wrapper_pad(episode_length=3, n_steps=100, n_manual_reset=2)
     AutoResetWrapper that pads trajectory with an extra transition containing the
     terminal observations.
     Also check that calls to .reset() do not interfere with automatic resets.
-    Due to the padding, the number of steps counted inside the environment and the number
-    of steps performed outside the environment, i.e., the number of actions performed,
-    will differ. This test checks that this difference is consistent.
+    Due to the padding, the number of steps counted inside the environment and the
+    number of steps performed outside the environment, i.e., the number of actions
+    performed, will differ. This test checks that this difference is consistent.
     """
     env = util.AutoResetWrapper(
         envs.CountingEnv(episode_length=episode_length),

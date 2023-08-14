@@ -33,7 +33,6 @@ class ResettablePOMDP(
 
     def __init__(self):
         """Build resettable (PO)MDP."""
-
         self._cur_state = None
         self._n_actions_taken = None
 

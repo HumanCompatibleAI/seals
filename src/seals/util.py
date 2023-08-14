@@ -22,8 +22,7 @@ import numpy.typing as npt
 class AutoResetWrapper(
     gym.Wrapper, Generic[WrapperObsType, WrapperActType, ObsType, ActType],
 ):
-    """Hides terminated=True and truncated=True and auto-resets at the end of each
-    episode.
+    """Hides terminated truncated and auto-resets at the end of each episode.
 
     Depending on the flag 'discard_terminal_observation', either discards the terminal
     observation or pads with an additional 'reset transition'. The former is the default
@@ -55,8 +54,9 @@ class AutoResetWrapper(
     def step(
         self, action: WrapperActType,
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
-        """When terminated or truncated, resets the environment and returns False
-        for terminated and truncated.
+        """When terminated or truncated, resets the environment.
+
+        Always returns False for terminated and truncated.
 
         Depending on whether we are discarding the terminal observation,
         either resets the environment and discards,
@@ -71,8 +71,9 @@ class AutoResetWrapper(
     def _step_pad(
         self, action: WrapperActType,
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
-        """When terminated or truncated, return False for both instead and return the
-        terminal obs.
+        """When terminated or truncated, resets the environment.
+
+        Always returns False for terminated and truncated.
 
         The agent will then usually be asked to perform an action based on
         the terminal observation. In the next step, this final action will be ignored
@@ -207,7 +208,7 @@ class ObsCastWrapper(gym.Wrapper):
         return obs.astype(self.dtype), info
 
     def step(self, action):
-        """Returns (obs, rew, terminated, truncated, info) with obs cast to self.dtype."""
+        """Returns (obs, rew, terminated, truncated, info) with obs cast to dtype."""
         obs, rew, terminated, truncated, info = super().step(action)
         return obs.astype(self.dtype), rew, terminated, truncated, info
 

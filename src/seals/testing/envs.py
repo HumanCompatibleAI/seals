@@ -22,7 +22,8 @@ import numpy as np
 
 Step = Tuple[Any, Optional[float], bool, bool, Mapping[str, Any]]
 Rollout = Sequence[Step]
-"""A sequence of 4-tuples (obs, rew, terminated, truncated, info) as returned by `get_rollout`."""
+"""A sequence of 5-tuples (obs, rew, terminated, truncated, info) as returned by 
+`get_rollout`."""
 
 
 def make_env_fixture(
@@ -204,6 +205,7 @@ def _sample_and_check(env: gym.Env, obs_space: gym.Space) -> Tuple[bool, bool]:
 
 
 def is_mujoco_env(env: gym.Env) -> bool:
+    """True if `env` is a MuJoCo environment."""
     return hasattr(env, "sim") and hasattr(env, "model")
 
 

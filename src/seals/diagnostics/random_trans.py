@@ -72,7 +72,7 @@ class RandomTransitionEnv(TabularModelPOMDP):
             n_states=n_states,
             rand_state=rand_gen,
         )
-        
+
         self.reward_weights = rand_gen.normal(
             0, 1, size=(observation_matrix.shape[-1],),
         )
