@@ -20,7 +20,7 @@ import numpy.typing as npt
 
 
 class AutoResetWrapper(
-    gym.Wrapper, Generic[WrapperObsType, WrapperActType, ObsType, ActType]
+    gym.Wrapper, Generic[WrapperObsType, WrapperActType, ObsType, ActType],
 ):
     """Hides terminated=True and truncated=True and auto-resets at the end of each
     episode.
@@ -53,7 +53,7 @@ class AutoResetWrapper(
         self.previous_done = False  # Whether the previous step returned done=True.
 
     def step(
-        self, action: WrapperActType
+        self, action: WrapperActType,
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
         """When terminated or truncated, resets the environment and returns False
         for terminated and truncated.
@@ -69,7 +69,7 @@ class AutoResetWrapper(
             return self._step_pad(action)
 
     def _step_pad(
-        self, action: WrapperActType
+        self, action: WrapperActType,
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
         """When terminated or truncated, return False for both instead and return the
         terminal obs.
@@ -98,7 +98,7 @@ class AutoResetWrapper(
         return obs, rew, False, False, info
 
     def _step_discard(
-        self, action: WrapperActType
+        self, action: WrapperActType,
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
         """When terminated or truncated, return False for both and automatically reset.
 
@@ -170,7 +170,7 @@ class MaskScoreWrapper(
         return np.where(self.mask, obs, self.fill_value)
 
     def step(
-        self, action: ActType
+        self, action: ActType,
     ) -> Tuple[npt.NDArray, SupportsFloat, bool, bool, Dict[str, Any]]:
         """Returns (obs, rew, terminated, truncated, info) with masked obs."""
         obs, rew, terminated, truncated, info = self.env.step(action)
@@ -263,9 +263,7 @@ class AbsorbAfterDoneWrapper(gym.Wrapper):
         `info` is always an empty dictionary.
         """
         if not self.at_absorb_state:
-            obs, rew, terminated, truncated, info = self.env.step(
-                action
-            )
+            obs, rew, terminated, truncated, info = self.env.step(action)
             if terminated or truncated:
                 # Initialize the artificial absorb state, which we will repeatedly use
                 # starting on the next call to `step()`.
