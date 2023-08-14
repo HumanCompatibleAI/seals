@@ -120,6 +120,7 @@ class TestEnvs:
                 "seals/KingKong-Unmasked-v5",
                 "seals/Koolaid-Unmasked-v5",
                 "seals/NameThisGame-Unmasked-v5",
+                "seals/Casino-Unmasked-v5",
             ]
             rollout_len = 100 if env_name not in slow_random_envs else 400
             num_seeds = 2 if env_name in ATARI_NO_FRAMESKIP_ENVS else 10
