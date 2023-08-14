@@ -316,7 +316,7 @@ class BaseTabularModelPOMDP(
         # Construct lazily to save memory in algorithms that don't need features.
         if self._feature_matrix is None:
             n_states = self.state_space.n
-            self._feature_matrix = np.eye(int(n_states))
+            self._feature_matrix = np.eye(n_states)
         return self._feature_matrix
 
     @property
