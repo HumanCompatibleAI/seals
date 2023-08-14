@@ -23,9 +23,9 @@ class FixedHorizonCartPole(classic_control.CartPoleEnv):
     which sets `truncated` to true after that many steps.
     """
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """Builds FixedHorizonCartPole, modifying observation_space from gym parent."""
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
         high = [
             np.finfo(np.float32).max,  # x axis
@@ -64,7 +64,7 @@ class FixedHorizonCartPole(classic_control.CartPoleEnv):
         return np.array(self.state, dtype=np.float32), rew, False, False, {}
 
 
-def mountain_car():
+def mountain_car(*args, **kwargs):
     """Fixed-length variant of MountainCar-v0.
 
     In the event of early episode completion (i.e., the car reaches the
@@ -73,7 +73,7 @@ def mountain_car():
 
     Done is always returned on timestep 200 only.
     """
-    env = gym.make("MountainCar-v0")
+    env = gym.make("MountainCar-v0", *args, **kwargs)
     env = util.ObsCastWrapper(env, dtype=np.float32)
     env = util.AbsorbAfterDoneWrapper(env)
     return env

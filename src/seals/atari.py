@@ -36,9 +36,9 @@ def _get_score_region(atari_env_id: str) -> Optional[MaskedRegionSpecifier]:
     return SCORE_REGIONS.get(basename)
 
 
-def make_atari_env(atari_env_id: str, masked: bool) -> gym.Env:
+def make_atari_env(atari_env_id: str, masked: bool, *args, **kwargs) -> gym.Env:
     """Fixed-length, optionally masked-score variant of a given Atari environment."""
-    env: gym.Env = AutoResetWrapper(gym.make(atari_env_id))
+    env: gym.Env = AutoResetWrapper(gym.make(atari_env_id, *args, **kwargs))
 
     if masked:
         score_region = _get_score_region(atari_env_id)
