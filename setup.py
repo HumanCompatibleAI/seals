@@ -88,7 +88,7 @@ def get_readme() -> str:
 
 ATARI_REQUIRE = [
     "opencv-python",
-    "ale-py==0.7.4",
+    "ale-py~=0.8.1",
     "pillow",
     "autorom[accept-rom-license]~=0.4.2",
     "shimmy[atari] >=0.1.0,<1.0",
