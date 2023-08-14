@@ -31,9 +31,9 @@ gym.register(
 
 for env_base in ["Ant", "HalfCheetah", "Hopper", "Humanoid", "Swimmer", "Walker2d"]:
     gym.register(
-        id=f"seals/{env_base}-v0",
+        id=f"seals/{env_base}-v1",
         entry_point=f"seals.mujoco:{env_base}Env",
-        max_episode_steps=util.get_gym_max_episode_steps(f"{env_base}-v3"),
+        max_episode_steps=util.get_gym_max_episode_steps(f"{env_base}-v4"),
     )
 
 # Atari
