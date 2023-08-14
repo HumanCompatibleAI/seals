@@ -22,7 +22,7 @@ import numpy as np
 
 Step = Tuple[Any, Optional[float], bool, bool, Mapping[str, Any]]
 Rollout = Sequence[Step]
-"""A sequence of 5-tuples (obs, rew, terminated, truncated, info) as returned by 
+"""A sequence of 5-tuples (obs, rew, terminated, truncated, info) as returned by
 `get_rollout`."""
 
 
