@@ -20,6 +20,7 @@ def test_mask_score_wrapper_enforces_spec():
 
 def test_sample_distribution():
     """Test util.sample_distribution."""
+    np.random.seed(0)
     distr_size = 5
     distr = np.random.random((distr_size,))
     distr /= distr.sum()
