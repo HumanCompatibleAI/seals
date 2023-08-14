@@ -117,6 +117,10 @@ TESTS_REQUIRE = [
     "pytype",
     "stable-baselines3>=0.9.0",
     "setuptools_scm~=7.0.5",
+    # We'd like to specify `gymnasium[classic-control]`, but this is a no-op when
+    # gymnasium is already installed. See https://github.com/pypa/pip/issues/4957 for
+    # issue.
+    "pygame>=2.1.3",
     *ATARI_REQUIRE,
 ]
 DOCS_REQUIRE = [
@@ -144,8 +148,8 @@ setup(
         "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE],
         "docs": DOCS_REQUIRE,
         "test": TESTS_REQUIRE,
-        # We'd like to specify `gymnasium[mujoco]`, but this is a no-op when Gym is already
-        # installed. See https://github.com/pypa/pip/issues/4957 for issue.
+        # We'd like to specify `gymnasium[mujoco]`, but this is a no-op when gymnasium
+        # is already installed. See https://github.com/pypa/pip/issues/4957 for issue.
         "mujoco": ["mujoco", "imageio"],
         "atari": ATARI_REQUIRE,
     },
