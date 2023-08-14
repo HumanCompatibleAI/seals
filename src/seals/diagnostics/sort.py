@@ -1,7 +1,7 @@
 """Environment to sort a list using swap actions."""
 
-import numpy as np
 from gymnasium import spaces
+import numpy as np
 
 from seals import base_envs
 

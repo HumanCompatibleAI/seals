@@ -7,6 +7,7 @@ so the tests in this file focus on features unique to classes in `base_envs`.
 import gymnasium as gym
 import numpy as np
 import pytest
+
 from seals import base_envs
 from seals.testing import envs
 

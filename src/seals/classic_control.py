@@ -2,12 +2,10 @@
 
 import warnings
 
-import numpy as np
-
 import gymnasium as gym
 from gymnasium import spaces
 from gymnasium.envs import classic_control
-
+import numpy as np
 
 from seals import util
 

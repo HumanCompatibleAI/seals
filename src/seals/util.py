@@ -1,12 +1,22 @@
 """Miscellaneous utilities."""
 
 from dataclasses import dataclass
-from typing import Any, Generic, List, Optional, Sequence, SupportsFloat, Tuple, Union, Dict
+from typing import (
+    Any,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    Sequence,
+    SupportsFloat,
+    Tuple,
+    Union,
+)
 
 import gymnasium as gym
+from gymnasium.core import ActType, ObsType, WrapperActType, WrapperObsType
 import numpy as np
 import numpy.typing as npt
-from gymnasium.core import ActType, ObsType, WrapperActType, WrapperObsType
 
 
 class AutoResetWrapper(

@@ -5,6 +5,7 @@ import collections
 import gymnasium as gym
 import numpy as np
 import pytest
+
 from seals import GYM_ATARI_ENV_SPECS, util
 
 

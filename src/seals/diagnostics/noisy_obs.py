@@ -1,7 +1,7 @@
 """Environment testing for robustness to noise."""
 
-import numpy as np
 from gymnasium import spaces
+import numpy as np
 
 from seals import base_envs, util
 

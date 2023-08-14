@@ -1,12 +1,12 @@
 """Base environment classes."""
 
 import abc
-from typing import Any, Generic, Optional, Tuple, TypeVar, Dict, Union
+from typing import Any, Dict, Generic, Optional, Tuple, TypeVar, Union
 
 import gymnasium as gym
+from gymnasium import spaces
 import numpy as np
 import numpy.typing as npt
-from gymnasium import spaces
 
 from seals import util
 

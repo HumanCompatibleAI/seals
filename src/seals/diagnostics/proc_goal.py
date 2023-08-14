@@ -1,7 +1,7 @@
 """Large gridworld with random agent and goal position."""
 
-import numpy as np
 from gymnasium import spaces
+import numpy as np
 
 from seals import base_envs, util
 

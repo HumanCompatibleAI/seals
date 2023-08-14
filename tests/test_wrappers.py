@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+
 from seals import util
 from seals.testing import envs
 

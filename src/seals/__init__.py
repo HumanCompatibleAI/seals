@@ -4,8 +4,8 @@ from importlib import metadata
 
 import gymnasium as gym
 
-import seals.diagnostics  # noqa: F401
 from seals import atari, util
+import seals.diagnostics  # noqa: F401
 
 try:
     __version__ = metadata.version("seals")
