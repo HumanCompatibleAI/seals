@@ -13,8 +13,7 @@ from seals.testing import envs
 from seals.testing.envs import is_mujoco_env
 
 ENV_NAMES: List[str] = [
-    env_id for env_id in registration.registry.keys()
-    if env_id.startswith("seals/")
+    env_id for env_id in registration.registry.keys() if env_id.startswith("seals/")
 ]
 
 

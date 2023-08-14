@@ -16,7 +16,9 @@ ActType = TypeVar("ActType")
 
 
 class ResettablePOMDP(
-    gym.Env[ObsType, ActType], abc.ABC, Generic[StateType, ObsType, ActType],
+    gym.Env[ObsType, ActType],
+    abc.ABC,
+    Generic[StateType, ObsType, ActType],
 ):
     """ABC for POMDPs that are resettable.
 
@@ -138,7 +140,9 @@ class ExposePOMDPStateWrapper(
         self._observation_space = env.state_space
 
     def reset(
-        self, seed: Optional[int] = None, options: Optional[Dict[str, Any]] = None,
+        self,
+        seed: Optional[int] = None,
+        options: Optional[Dict[str, Any]] = None,
     ) -> Tuple[StateType, Dict[str, Any]]:
         """Reset environment and return initial state."""
         _, info = self.env.reset(seed=seed, options=options)
@@ -179,7 +183,8 @@ DiscreteSpaceInt = np.int64
 #  so in theory it should not be instantiated directly.
 #  Not sure why this is not raising an error?
 class BaseTabularModelPOMDP(
-    ResettablePOMDP[DiscreteSpaceInt, ObsType, DiscreteSpaceInt], Generic[ObsType],
+    ResettablePOMDP[DiscreteSpaceInt, ObsType, DiscreteSpaceInt],
+    Generic[ObsType],
 ):
     """Base class for tabular environments with known dynamics.
 
@@ -278,7 +283,9 @@ class BaseTabularModelPOMDP(
         )
 
     def transition(
-        self, state: DiscreteSpaceInt, action: DiscreteSpaceInt,
+        self,
+        state: DiscreteSpaceInt,
+        action: DiscreteSpaceInt,
     ) -> DiscreteSpaceInt:
         """Samples from transition distribution."""
         return DiscreteSpaceInt(
@@ -324,7 +331,9 @@ class BaseTabularModelPOMDP(
 
 
 ObsEntryType = TypeVar(
-    "ObsEntryType", bound=Union[np.floating, np.integer], covariant=True,
+    "ObsEntryType",
+    bound=Union[np.floating, np.integer],
+    covariant=True,
 )
 
 

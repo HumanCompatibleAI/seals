@@ -20,7 +20,8 @@ import numpy.typing as npt
 
 
 class AutoResetWrapper(
-    gym.Wrapper, Generic[WrapperObsType, WrapperActType, ObsType, ActType],
+    gym.Wrapper,
+    Generic[WrapperObsType, WrapperActType, ObsType, ActType],
 ):
     """Hides terminated truncated and auto-resets at the end of each episode.
 
@@ -52,7 +53,8 @@ class AutoResetWrapper(
         self.previous_done = False  # Whether the previous step returned done=True.
 
     def step(
-        self, action: WrapperActType,
+        self,
+        action: WrapperActType,
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
         """When terminated or truncated, resets the environment.
 
@@ -69,7 +71,8 @@ class AutoResetWrapper(
             return self._step_pad(action)
 
     def _step_pad(
-        self, action: WrapperActType,
+        self,
+        action: WrapperActType,
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
         """When terminated or truncated, resets the environment.
 
@@ -99,7 +102,8 @@ class AutoResetWrapper(
         return obs, rew, False, False, info
 
     def _step_discard(
-        self, action: WrapperActType,
+        self,
+        action: WrapperActType,
     ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
         """When terminated or truncated, return False for both and automatically reset.
 
@@ -171,7 +175,8 @@ class MaskScoreWrapper(
         return np.where(self.mask, obs, self.fill_value)
 
     def step(
-        self, action: ActType,
+        self,
+        action: ActType,
     ) -> Tuple[npt.NDArray, SupportsFloat, bool, bool, Dict[str, Any]]:
         """Returns (obs, rew, terminated, truncated, info) with masked obs."""
         obs, rew, terminated, truncated, info = self.env.step(action)
