@@ -17,6 +17,7 @@ class NewEnv(base_envs.TabularModelMDP):
 
     def __init__(self):
         """Build environment."""
+        np.random.seed(0)
         nS = 3
         nA = 2
         transition_matrix = np.random.random((nS, nA, nS))
