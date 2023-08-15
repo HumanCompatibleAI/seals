@@ -267,7 +267,7 @@ class BaseTabularModelPOMDP(
         return DiscreteSpaceInt(
             util.sample_distribution(
                 self.initial_state_dist,
-                random=self.rand_state,
+                random=self.np_random,
             ),
         )
 
@@ -280,7 +280,7 @@ class BaseTabularModelPOMDP(
         return DiscreteSpaceInt(
             util.sample_distribution(
                 self.transition_matrix[state, action],
-                random=self.rand_state,
+                random=self.np_random,
             ),
         )
 
