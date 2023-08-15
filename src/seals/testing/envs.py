@@ -89,10 +89,10 @@ def matches_list(env_name: str, patterns: Iterable[str]) -> bool:
 
 
 def get_rollout(env: gym.Env, actions: Iterable[Any]) -> Rollout:
-    """Performs sequence of actions `actions` in `env`.
+    """Performs a sequence of actions `actions` in `env`.
 
     Args:
-      env: the environment to rollout in.
+      env: the environment to roll out in.
       actions: the actions to perform.
 
     Returns:
