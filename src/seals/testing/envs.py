@@ -99,7 +99,7 @@ def get_rollout(env: gym.Env, actions: Iterable[Any]) -> Rollout:
       A sequence of 5-tuples (obs, rew, terminated, truncated, info).
     """
     obs, info = env.reset()
-    ret: List[Step] = [(obs, 0, False, False, {})]
+    ret: List[Step] = [(obs, 0, False, False, info)]
     for act in actions:
         ret.append(env.step(act))
     return ret
