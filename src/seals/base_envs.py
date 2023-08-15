@@ -5,13 +5,16 @@ from typing import Any, Dict, Generic, Optional, Tuple, TypeVar, Union
 
 import gymnasium as gym
 from gymnasium import spaces
-from gymnasium.core import ActType, ObsType
 import numpy as np
 import numpy.typing as npt
 
 from seals import util
 
+# Note: we redefine the type vars from gymnasium.core here, because pytype does not
+# recognize them as valid type vars if we import them from gymnasium.core.
 StateType = TypeVar("StateType")
+ActType = TypeVar("ActType")
+ObsType = TypeVar("ObsType")
 
 
 class ResettablePOMDP(

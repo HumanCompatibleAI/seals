@@ -10,18 +10,25 @@ from typing import (
     Sequence,
     SupportsFloat,
     Tuple,
+    TypeVar,
     Union,
 )
 
 import gymnasium as gym
-from gymnasium.core import ActType, ObsType, WrapperActType, WrapperObsType
 import numpy as np
 import numpy.typing as npt
+
+# Note: we redefine the type vars from gymnasium.core here, because pytype does not
+# recognize them as valid type vars if we import them from gymnasium.core.
+WrapperObsType = TypeVar("WrapperObsType")
+WrapperActType = TypeVar("WrapperActType")
+ObsType = TypeVar("ObsType")
+ActType = TypeVar("ActType")
 
 
 class AutoResetWrapper(
     gym.Wrapper,
-    Generic[WrapperObsType, WrapperActType, ObsType, ActType],  # type: ignore
+    Generic[WrapperObsType, WrapperActType, ObsType, ActType],
 ):
     """Hides terminated truncated and auto-resets at the end of each episode.
 
@@ -132,7 +139,7 @@ MaskedRegionSpecifier = List[BoxRegion]
 
 class MaskScoreWrapper(
     gym.Wrapper[npt.NDArray, ActType, npt.NDArray, ActType],
-    Generic[ActType],  # type: ignore
+    Generic[ActType],
 ):
     """Mask a list of box-shaped regions in the observation to hide reward info.
 
