@@ -195,7 +195,7 @@ class MaskScoreWrapper(
         return self._mask_obs(obs), info
 
 
-class ObsCastWrapper(gym.Wrapper):
+class ObsCastWrapper(gym.ObservationWrapper):
     """Cast observations to specified dtype.
 
     Some external environments return observations of a different type than the
@@ -214,15 +214,9 @@ class ObsCastWrapper(gym.Wrapper):
         super().__init__(env)
         self.dtype = dtype
 
-    def reset(self, seed=None):
-        """Returns reset observation, cast to self.dtype."""
-        obs, info = super().reset(seed=seed)
-        return obs.astype(self.dtype), info
-
-    def step(self, action):
-        """Returns (obs, rew, terminated, truncated, info) with obs cast to dtype."""
-        obs, rew, terminated, truncated, info = super().step(action)
-        return obs.astype(self.dtype), rew, terminated, truncated, info
+    def observation(self, obs):
+        """Returns observation cast to self.dtype."""
+        return obs.astype(self.dtype)
 
 
 class AbsorbAfterDoneWrapper(gym.Wrapper):
