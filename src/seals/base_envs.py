@@ -116,7 +116,6 @@ class ResettablePOMDP(
         return obs, reward, terminated, truncated, infos
 
 
-
 class ExposePOMDPStateWrapper(
     gym.Wrapper[StateType, ActType, ObsType, ActType],
     Generic[StateType, ObsType, ActType],
@@ -268,7 +267,7 @@ class BaseTabularModelPOMDP(
         return DiscreteSpaceInt(
             util.sample_distribution(
                 self.initial_state_dist,
-                random=self.np_random,
+                random=self.rand_state,
             ),
         )
 
@@ -281,7 +280,7 @@ class BaseTabularModelPOMDP(
         return DiscreteSpaceInt(
             util.sample_distribution(
                 self.transition_matrix[state, action],
-                random=self.np_random,
+                random=self.rand_state,
             ),
         )
 
