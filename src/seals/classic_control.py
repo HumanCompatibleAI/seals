@@ -1,5 +1,6 @@
 """Adaptation of classic Gym environments for specification learning algorithms."""
 
+from typing import Any, Dict, Optional
 import warnings
 
 import gymnasium as gym
@@ -34,7 +35,11 @@ class FixedHorizonCartPole(classic_control.CartPoleEnv):
         high = np.array(high)
         self.observation_space = spaces.Box(-high, high, dtype=np.float32)
 
-    def reset(self, seed=None, options={}):
+    def reset(
+        self,
+        seed: Optional[int] = None,
+        options: Optional[Dict[str, Any]] = None,
+    ):
         """Reset for FixedHorizonCartPole."""
         observation, info = super().reset(seed=seed, options=options)
         return observation.astype(np.float32), info
