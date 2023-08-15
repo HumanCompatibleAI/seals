@@ -168,11 +168,6 @@ class ResettableMDP(
         """Observation space."""
         return self.state_space
 
-    @observation_space.setter
-    def observation_space(self, space: spaces.Space[StateType]):
-        """Set observation space."""
-        self.state_space = space
-
     def obs_from_state(self, state: StateType) -> StateType:
         """Identity since observation == state in an MDP."""
         return state
