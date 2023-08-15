@@ -52,6 +52,9 @@ def test_base_envs():
     with pytest.raises(ValueError, match=r".*not in.*"):
         env.state = bad_state  # type: ignore
 
+    with pytest.raises(NotImplementedError, match=r"Options not supported.*"):
+        env.reset(options={"option": "value"})
+
 
 def test_tabular_env_validation():
     """Test input validation for base_envs.TabularModelEnv."""
