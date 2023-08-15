@@ -40,11 +40,11 @@ class ProcGoalEnv(base_envs.ResettableMDP):
 
     def initial_state(self) -> np.ndarray:
         """Samples random agent position and random goal."""
-        pos = self.rand_state.integers(low=-self._bounds, high=self._bounds, size=(2,))
+        pos = self.np_random.integers(low=-self._bounds, high=self._bounds, size=(2,))
 
-        x_dist = self.rand_state.integers(self._distance)
+        x_dist = self.np_random.integers(self._distance)
         y_dist = self._distance - x_dist
-        random_signs = 2 * self.rand_state.integers(2, size=2) - 1
+        random_signs = 2 * self.np_random.integers(2, size=2) - 1
         goal = pos + random_signs * (x_dist, y_dist)
 
         return np.concatenate([pos, goal]).astype(self.observation_space.dtype)

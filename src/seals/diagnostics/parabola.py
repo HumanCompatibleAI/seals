@@ -40,7 +40,7 @@ class ParabolaEnv(base_envs.ResettableMDP):
 
     def initial_state(self) -> np.ndarray:
         """Get state by sampling a random parabola."""
-        a, b, c = -1 + 2 * self.rand_state.random((3,))
+        a, b, c = -1 + 2 * self.np_random.random((3,))
         x, y = 0, c
         return np.array([x, y, a, b, c], dtype=self.state_space.dtype)
 

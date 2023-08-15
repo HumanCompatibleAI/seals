@@ -115,13 +115,6 @@ class ResettablePOMDP(
         infos = {"old_state": old_state, "new_state": self._cur_state}
         return obs, reward, terminated, truncated, infos
 
-    @property
-    def rand_state(self) -> np.random.Generator:
-        """Random state."""
-        rand_state = self._np_random
-        if rand_state is None:
-            raise RuntimeError("Need to call reset() before accessing rand_state")
-        return rand_state
 
 
 class ExposePOMDPStateWrapper(
@@ -275,7 +268,7 @@ class BaseTabularModelPOMDP(
         return DiscreteSpaceInt(
             util.sample_distribution(
                 self.initial_state_dist,
-                random=self.rand_state,
+                random=self.np_random,
             ),
         )
 
@@ -288,7 +281,7 @@ class BaseTabularModelPOMDP(
         return DiscreteSpaceInt(
             util.sample_distribution(
                 self.transition_matrix[state, action],
-                random=self.rand_state,
+                random=self.np_random,
             ),
         )
 

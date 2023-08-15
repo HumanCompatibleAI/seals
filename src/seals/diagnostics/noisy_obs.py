@@ -52,7 +52,7 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
         """Returns one of the grid's corners."""
         n = self._size
         corners = np.array([[0, 0], [n - 1, 0], [0, n - 1], [n - 1, n - 1]])
-        return corners[self.rand_state.integers(4)]
+        return corners[self.np_random.integers(4)]
 
     def reward(self, state: np.ndarray, action: int, new_state: np.ndarray) -> float:
         """Returns  +1.0 reward if state is the goal and 0.0 otherwise."""
@@ -69,5 +69,5 @@ class NoisyObsEnv(base_envs.ResettablePOMDP):
 
     def obs_from_state(self, state: np.ndarray) -> np.ndarray:
         """Returns (x, y) concatenated with Gaussian noise."""
-        noise_vector = self.rand_state.normal(size=self._noise_length)
+        noise_vector = self.np_random.normal(size=self._noise_length)
         return np.concatenate([state, noise_vector]).astype(np.float32)
