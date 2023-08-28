@@ -162,7 +162,7 @@ def test_obs_cast(dtype: np.dtype, episode_length: int = 5):
         dtype,
     )
 
-    obs, info = env.reset()
+    obs, _ = env.reset()
     assert obs.dtype == dtype
     assert obs == 0
     for t in range(1, episode_length + 1):
