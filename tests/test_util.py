@@ -21,13 +21,12 @@ def test_mask_score_wrapper_enforces_spec():
 
 def test_sample_distribution():
     """Test util.sample_distribution."""
-    np.random.seed(0)
     distr_size = 5
     distr = np.random.random((distr_size,))
     distr /= distr.sum()
 
     n_samples = 1000
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(0)
     sample_count = collections.Counter(
         util.sample_distribution(distr, rng) for _ in range(n_samples)
     )
