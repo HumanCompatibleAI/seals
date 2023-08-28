@@ -94,9 +94,8 @@ ATARI_REQUIRE = [
     "shimmy[atari] >=0.1.0,<1.0",
 ]
 TESTS_REQUIRE = [
-    # remove pin once https://github.com/nedbat/coveragepy/issues/881 fixed
     "black",
-    "coverage==4.5.4",
+    "coverage~=4.5.4",
     "codecov",
     "codespell",
     "darglint>=1.5.6",
@@ -117,10 +116,7 @@ TESTS_REQUIRE = [
     "pytype",
     "stable-baselines3>=0.9.0",
     "setuptools_scm~=7.0.5",
-    # We'd like to specify `gymnasium[classic-control]`, but this is a no-op when
-    # gymnasium is already installed. See https://github.com/pypa/pip/issues/4957 for
-    # issue.
-    "pygame>=2.1.3",
+    "gymnasium[classic-control]",
     *ATARI_REQUIRE,
 ]
 DOCS_REQUIRE = [
@@ -148,9 +144,7 @@ setup(
         "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE],
         "docs": DOCS_REQUIRE,
         "test": TESTS_REQUIRE,
-        # We'd like to specify `gymnasium[mujoco]`, but this is a no-op when gymnasium
-        # is already installed. See https://github.com/pypa/pip/issues/4957 for issue.
-        "mujoco": ["mujoco", "imageio"],
+        "mujoco": ["gymnasium[mujoco]"],
         "atari": ATARI_REQUIRE,
     },
     url="https://github.com/HumanCompatibleAI/benchmark-environments",
