@@ -116,7 +116,7 @@ TESTS_REQUIRE = [
     "pytype",
     "stable-baselines3>=0.9.0",
     "setuptools_scm~=7.0.5",
-    "gymnasium[classic-control]",
+    "gymnasium[classic-control,mujoco]",
     *ATARI_REQUIRE,
 ]
 DOCS_REQUIRE = [
