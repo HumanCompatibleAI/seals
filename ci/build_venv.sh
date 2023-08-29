@@ -9,4 +9,5 @@ fi
 
 virtualenv -p python3.8 ${venv}
 source ${venv}/bin/activate
+pip install --upgrade pip  # Ensure we have the newest pip
 pip install .[cpu,docs,mujoco,test]
