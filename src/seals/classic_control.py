@@ -1,27 +1,30 @@
 """Adaptation of classic Gym environments for specification learning algorithms."""
 
+from typing import Any, Dict, Optional
 import warnings
 
-from gym import spaces
-import gym.envs.classic_control
+import gymnasium as gym
+from gymnasium import spaces
+from gymnasium.envs import classic_control
 import numpy as np
 
 from seals import util
 
 
-class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
+class FixedHorizonCartPole(classic_control.CartPoleEnv):
     """Fixed-length variant of CartPole-v1.
 
-    Reward is 1.0 whenever the CartPole is an "ok" state (i.e. the pole is upright
-    and the cart is on the screen). Otherwise reward is 0.0.
+    Reward is 1.0 whenever the CartPole is an "ok" state (i.e., the pole is upright
+    and the cart is on the screen). Otherwise, reward is 0.0.
 
-    Done is always False. (Though note that by default, this environment is wrapped
-    in `TimeLimit` with max steps 500.)
+    Terminated is always False.
+    By default, this environment is wrapped in 'TimeLimit' with max steps 500,
+    which sets `truncated` to true after that many steps.
     """
 
-    def __init__(self):
-        """Builds FixedHorizonCartPole, modifying observation_space from Gym parent."""
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        """Builds FixedHorizonCartPole, modifying observation_space from gym parent."""
+        super().__init__(*args, **kwargs)
 
         high = [
             np.finfo(np.float32).max,  # x axis
@@ -32,14 +35,20 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
         high = np.array(high)
         self.observation_space = spaces.Box(-high, high, dtype=np.float32)
 
-    def reset(self):
+    def reset(
+        self,
+        seed: Optional[int] = None,
+        options: Optional[Dict[str, Any]] = None,
+    ):
         """Reset for FixedHorizonCartPole."""
-        return super().reset().astype(np.float32)
+        observation, info = super().reset(seed=seed, options=options)
+        return observation.astype(np.float32), info
 
     def step(self, action):
         """Step function for FixedHorizonCartPole."""
         with warnings.catch_warnings():
-            # Filter out CartPoleEnv warning for calling step() beyond done=True.
+            # Filter out CartPoleEnv warning for calling step() beyond
+            # terminated=True or truncated=True
             warnings.filterwarnings("ignore", ".*You are calling.*")
             super().step(action)
 
@@ -55,10 +64,10 @@ class FixedHorizonCartPole(gym.envs.classic_control.CartPoleEnv):
         )
 
         rew = 1.0 if state_ok else 0.0
-        return np.array(self.state, dtype=np.float32), rew, False, {}
+        return np.array(self.state, dtype=np.float32), rew, False, False, {}
 
 
-def mountain_car():
+def mountain_car(*args, **kwargs):
     """Fixed-length variant of MountainCar-v0.
 
     In the event of early episode completion (i.e., the car reaches the
@@ -67,7 +76,7 @@ def mountain_car():
 
     Done is always returned on timestep 200 only.
     """
-    env = util.make_env_no_wrappers("MountainCar-v0")
+    env = gym.make("MountainCar-v0", *args, **kwargs)
     env = util.ObsCastWrapper(env, dtype=np.float32)
     env = util.AbsorbAfterDoneWrapper(env)
     return env

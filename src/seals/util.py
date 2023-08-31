@@ -1,14 +1,36 @@
 """Miscellaneous utilities."""
 
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    Sequence,
+    SupportsFloat,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
-import gym
+import gymnasium as gym
 import numpy as np
+import numpy.typing as npt
+
+# Note: we redefine the type vars from gymnasium.core here, because pytype does not
+# recognize them as valid type vars if we import them from gymnasium.core.
+WrapperObsType = TypeVar("WrapperObsType")
+WrapperActType = TypeVar("WrapperActType")
+ObsType = TypeVar("ObsType")
+ActType = TypeVar("ActType")
 
 
-class AutoResetWrapper(gym.Wrapper):
-    """Hides done=True and auto-resets at the end of each episode.
+class AutoResetWrapper(
+    gym.Wrapper,
+    Generic[WrapperObsType, WrapperActType, ObsType, ActType],
+):
+    """Hides terminated truncated and auto-resets at the end of each episode.
 
     Depending on the flag 'discard_terminal_observation', either discards the terminal
     observation or pads with an additional 'reset transition'. The former is the default
@@ -37,8 +59,13 @@ class AutoResetWrapper(gym.Wrapper):
         self.reset_reward = reset_reward
         self.previous_done = False  # Whether the previous step returned done=True.
 
-    def step(self, action):
-        """When done=True, returns done=False, then reset depending on flag.
+    def step(
+        self,
+        action: WrapperActType,
+    ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
+        """When terminated or truncated, resets the environment.
+
+        Always returns False for terminated and truncated.
 
         Depending on whether we are discarding the terminal observation,
         either resets the environment and discards,
@@ -50,8 +77,13 @@ class AutoResetWrapper(gym.Wrapper):
         else:
             return self._step_pad(action)
 
-    def _step_pad(self, action):
-        """When done=True, return done=False instead and return the terminal obs.
+    def _step_pad(
+        self,
+        action: WrapperActType,
+    ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
+        """When terminated or truncated, resets the environment.
+
+        Always returns False for terminated and truncated.
 
         The agent will then usually be asked to perform an action based on
         the terminal observation. In the next step, this final action will be ignored
@@ -67,26 +99,31 @@ class AutoResetWrapper(gym.Wrapper):
         """
         if self.previous_done:
             self.previous_done = False
+            reset_obs, reset_info_dict = self.env.reset()
+            info = {"reset_info_dict": reset_info_dict}
             # This transition will only reset the environment, the action is ignored.
-            return self.env.reset(), self.reset_reward, False, {}
+            return reset_obs, self.reset_reward, False, False, info
 
-        obs, rew, done, info = self.env.step(action)
-        if done:
-            self.previous_done = True
-        return obs, rew, False, info
+        obs, rew, terminated, truncated, info = self.env.step(action)
+        self.previous_done = terminated or truncated
+        return obs, rew, False, False, info
 
-    def _step_discard(self, action):
-        """When done=True, returns done=False instead and automatically resets.
+    def _step_discard(
+        self,
+        action: WrapperActType,
+    ) -> Tuple[ObsType, SupportsFloat, bool, bool, Dict[str, Any]]:
+        """When terminated or truncated, return False for both and automatically reset.
 
         When an automatic reset happens, the observation from reset is returned,
         and the overridden observation is stored in
         `info["terminal_observation"]`.
         """
-        obs, rew, done, info = self.env.step(action)
-        if done:
+        obs, rew, terminated, truncated, info = self.env.step(action)
+        if terminated or truncated:
             info["terminal_observation"] = obs
-            obs = self.env.reset()
-        return obs, rew, False, info
+            obs, reset_info_dict = self.env.reset()
+            info["reset_info_dict"] = reset_info_dict
+        return obs, rew, False, False, info
 
 
 @dataclass
@@ -100,7 +137,10 @@ class BoxRegion:
 MaskedRegionSpecifier = List[BoxRegion]
 
 
-class MaskScoreWrapper(gym.Wrapper):
+class MaskScoreWrapper(
+    gym.Wrapper[npt.NDArray, ActType, npt.NDArray, ActType],
+    Generic[ActType],
+):
     """Mask a list of box-shaped regions in the observation to hide reward info.
 
     Intended for environments whose observations are raw pixels (like Atari
@@ -130,27 +170,32 @@ class MaskScoreWrapper(gym.Wrapper):
         super().__init__(env)
         self.fill_value = np.array(fill_value, env.observation_space.dtype)
 
+        if env.observation_space.shape is None:
+            raise ValueError("Observation space must have a shape.")  # pragma: no cover
         self.mask = np.ones(env.observation_space.shape, dtype=bool)
         for r in score_regions:
             if r.x[0] >= r.x[1] or r.y[0] >= r.y[1]:
                 raise ValueError('Invalid region: "x" and "y" must be increasing.')
             self.mask[r.x[0] : r.x[1], r.y[0] : r.y[1]] = 0
 
-    def _mask_obs(self, obs):
+    def _mask_obs(self, obs) -> npt.NDArray:
         return np.where(self.mask, obs, self.fill_value)
 
-    def step(self, action):
-        """Returns (obs, rew, done, info) with masked obs."""
-        obs, rew, done, info = self.env.step(action)
-        return self._mask_obs(obs), rew, done, info
+    def step(
+        self,
+        action: ActType,
+    ) -> Tuple[npt.NDArray, SupportsFloat, bool, bool, Dict[str, Any]]:
+        """Returns (obs, rew, terminated, truncated, info) with masked obs."""
+        obs, rew, terminated, truncated, info = self.env.step(action)
+        return self._mask_obs(obs), rew, terminated, truncated, info
 
     def reset(self, **kwargs):
         """Returns masked reset observation."""
-        obs = self.env.reset(**kwargs)
-        return self._mask_obs(obs)
+        obs, info = self.env.reset(**kwargs)
+        return self._mask_obs(obs), info
 
 
-class ObsCastWrapper(gym.Wrapper):
+class ObsCastWrapper(gym.ObservationWrapper):
     """Cast observations to specified dtype.
 
     Some external environments return observations of a different type than the
@@ -169,21 +214,17 @@ class ObsCastWrapper(gym.Wrapper):
         super().__init__(env)
         self.dtype = dtype
 
-    def reset(self):
-        """Returns reset observation, cast to self.dtype."""
-        return super().reset().astype(self.dtype)
-
-    def step(self, action):
-        """Returns (obs, rew, done, info) with obs cast to self.dtype."""
-        obs, rew, done, info = super().step(action)
-        return obs.astype(self.dtype), rew, done, info
+    def observation(self, obs):
+        """Returns observation cast to self.dtype."""
+        return obs.astype(self.dtype)
 
 
 class AbsorbAfterDoneWrapper(gym.Wrapper):
     """Transition into absorbing state instead of episode termination.
 
-    When the environment being wrapped returns `done=True`, we return an absorbing
-    observation. This wrapper always returns `done=False`.
+    When the environment being wrapped returns `terminated=True` or `truncated=True`,
+    we return an absorbing observation.
+    This wrapper always returns `terminated=False` and `truncated=False`.
 
     A convenient way to add absorbing states to environments like MountainCar.
     """
@@ -217,28 +258,28 @@ class AbsorbAfterDoneWrapper(gym.Wrapper):
     def step(self, action):
         """Advance the environment by one step.
 
-        This wrapped `step()` always returns done=False.
+        This wrapped `step()` always returns terminated=False and truncated=False.
 
-        After the first done is returned by the underlying Env, we enter an artificial
-        absorb state.
+        After the first time either terminated or truncated is returned by the
+        underlying Env, we enter an artificial absorb state.
 
         In this artificial absorb state, we stop calling
         `self.env.step(action)` (i.e. the `action` argument is entirely ignored) and
-        we return fixed values for obs, rew, done, and info. The values of `obs` and
-        `rew` depend on initialization arguments. `info` is always an empty dictionary.
+        we return fixed values for obs, rew, terminated, truncated, and info.
+        The values of `obs` and `rew` depend on initialization arguments.
+        `info` is always an empty dictionary.
         """
         if not self.at_absorb_state:
-            inner_obs, inner_rew, done, inner_info = self.env.step(action)
-            if done:
+            obs, rew, terminated, truncated, info = self.env.step(action)
+            if terminated or truncated:
                 # Initialize the artificial absorb state, which we will repeatedly use
                 # starting on the next call to `step()`.
                 self.at_absorb_state = True
 
                 if self.absorb_obs_default is None:
-                    self.absorb_obs_this_episode = inner_obs
+                    self.absorb_obs_this_episode = obs
                 else:
                     self.absorb_obs_this_episode = self.absorb_obs_default
-            obs, rew, info = inner_obs, inner_rew, inner_info
         else:
             assert self.absorb_obs_this_episode is not None
             assert self.absorb_reward is not None
@@ -246,25 +287,17 @@ class AbsorbAfterDoneWrapper(gym.Wrapper):
             rew = self.absorb_reward
             info = {}
 
-        return obs, rew, False, info
-
-
-def make_env_no_wrappers(env_name: str, **kwargs) -> gym.Env:
-    """Gym sometimes wraps envs in TimeLimit before returning from gym.make().
-
-    This helper method builds directly from spec to avoid this wrapper.
-    """
-    return gym.envs.registry.env_specs[env_name].make(**kwargs)
+        return obs, rew, False, False, info
 
 
 def get_gym_max_episode_steps(env_name: str) -> Optional[int]:
     """Get the `max_episode_steps` attribute associated with a gym Spec."""
-    return gym.envs.registry.env_specs[env_name].max_episode_steps
+    return gym.spec(env_name).max_episode_steps
 
 
 def sample_distribution(
     p: np.ndarray,
-    random: np.random.RandomState,
+    random: np.random.Generator,
 ) -> int:
     """Samples an integer with probabilities given by p."""
     return random.choice(np.arange(len(p)), p=p)

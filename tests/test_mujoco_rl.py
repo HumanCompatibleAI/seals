@@ -2,7 +2,7 @@
 
 from typing import Tuple
 
-import gym
+import gymnasium as gym
 import pytest
 import stable_baselines3
 from stable_baselines3.common import evaluation
@@ -35,9 +35,9 @@ def test_fixed_env_model_as_good_as_gym_env_model(env_base: str):  # pragma: no 
     """Compare original and modified MuJoCo v3 envs."""
     train_timesteps = 200000
 
-    gym_reward, _ = _eval_env(f"{env_base}-v3", total_timesteps=train_timesteps)
+    gym_reward, _ = _eval_env(f"{env_base}-v4", total_timesteps=train_timesteps)
     fixed_reward, _ = _eval_env(
-        f"seals/{env_base}-v0",
+        f"seals/{env_base}-v1",
         total_timesteps=train_timesteps,
     )
 

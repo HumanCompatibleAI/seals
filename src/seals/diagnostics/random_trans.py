@@ -46,7 +46,7 @@ class RandomTransitionEnv(TabularModelPOMDP):
         """
         # this generator is ONLY for constructing the MDP, not for controlling
         # random outcomes during rollouts
-        rand_gen = np.random.RandomState(generator_seed)
+        rand_gen = np.random.default_rng(generator_seed)
 
         if random_obs:
             if obs_dim is None:
@@ -72,7 +72,8 @@ class RandomTransitionEnv(TabularModelPOMDP):
             n_states=n_states,
             rand_state=rand_gen,
         )
-        self.reward_weights = rand_gen.randn(observation_matrix.shape[-1])
+
+        self.reward_weights = rand_gen.normal(size=(observation_matrix.shape[-1],))
         reward_matrix = observation_matrix @ self.reward_weights
         super().__init__(
             transition_matrix=transition_matrix,
@@ -87,7 +88,7 @@ class RandomTransitionEnv(TabularModelPOMDP):
         n_states,
         n_actions,
         max_branch_factor,
-        rand_state: Optional[np.random.RandomState] = None,
+        rand_state: Optional[np.random.Generator] = None,
     ) -> np.ndarray:
         """Make a 'random' transition matrix.
 
@@ -110,14 +111,14 @@ class RandomTransitionEnv(TabularModelPOMDP):
             of transitioning to `next_s` after taking action `a` in state `s`.
         """
         if rand_state is None:
-            rand_state = np.random.RandomState()
+            rand_state = np.random.default_rng()
         assert rand_state is not None
         out_mat = np.zeros((n_states, n_actions, n_states), dtype="float32")
         for start_state in range(n_states):
             for action in range(n_actions):
                 # uniformly sample a number of successors in [1,max_branch_factor]
                 # for this action
-                successors = rand_state.randint(1, max_branch_factor + 1)
+                successors = rand_state.integers(1, max_branch_factor + 1)
                 next_states = rand_state.choice(
                     n_states,
                     size=(successors,),
@@ -133,7 +134,7 @@ class RandomTransitionEnv(TabularModelPOMDP):
     def make_random_state_dist(
         n_avail: int,
         n_states: int,
-        rand_state: Optional[np.random.RandomState] = None,
+        rand_state: Optional[np.random.Generator] = None,
     ) -> np.ndarray:
         """Make a random initial state distribution over n_states.
 
@@ -152,7 +153,7 @@ class RandomTransitionEnv(TabularModelPOMDP):
             ValueError: If `n_avail` is not in the range `(0, n_states]`.
         """  # noqa: DAR402
         if rand_state is None:
-            rand_state = np.random.RandomState()
+            rand_state = np.random.default_rng()
         assert rand_state is not None
         assert 0 < n_avail <= n_states
         init_dist = np.zeros((n_states,))
@@ -168,7 +169,7 @@ class RandomTransitionEnv(TabularModelPOMDP):
         n_states: int,
         is_random: bool,
         obs_dim: Optional[int] = None,
-        rand_state: Optional[np.random.RandomState] = None,
+        rand_state: Optional[np.random.Generator] = None,
     ) -> np.ndarray:
         """Makes an observation matrix with a single observation for each state.
 
@@ -179,7 +180,7 @@ class RandomTransitionEnv(TabularModelPOMDP):
                         If `False`, are unique one-hot vectors for each state.
             obs_dim (int or NoneType): Must be `None` if `is_random == False`.
                     Otherwise, this must be set to the size of the random vectors.
-            rand_state (np.random.RandomState): Random number generator.
+            rand_state (np.random.Generator): Random number generator.
 
         Returns:
             A matrix of shape `(n_states, obs_dim if is_random else n_states)`.
@@ -188,7 +189,7 @@ class RandomTransitionEnv(TabularModelPOMDP):
             ValueError: If ``is_random == False`` and ``obs_dim is not None``.
         """
         if rand_state is None:
-            rand_state = np.random.RandomState()
+            rand_state = np.random.default_rng()
         assert rand_state is not None
         if is_random:
             if obs_dim is None:

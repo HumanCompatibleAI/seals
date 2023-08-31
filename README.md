@@ -39,7 +39,7 @@ All *seals* environments are available in the Gym registry. Simply import it and
 would with your usual RL or specification learning algroithm:
 
 ```python
-import gym
+import gymnasium as gym
 import seals
 
 env = gym.make('seals/CartPole-v0')

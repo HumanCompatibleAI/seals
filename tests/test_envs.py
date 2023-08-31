@@ -1,19 +1,19 @@
 """Smoke tests for all environments."""
 
-from typing import List
+from typing import List, Union
 
-import gym
-from gym.envs import registration
+import gymnasium as gym
+from gymnasium.envs import registration
+import numpy as np
 import pytest
 
 import seals  # noqa: F401 required for env registration
 from seals.atari import SCORE_REGIONS, _get_score_region, _seals_name, make_atari_env
 from seals.testing import envs
+from seals.testing.envs import is_mujoco_env
 
 ENV_NAMES: List[str] = [
-    env_spec.id
-    for env_spec in registration.registry.all()
-    if env_spec.id.startswith("seals/")
+    env_id for env_id in registration.registry.keys() if env_id.startswith("seals/")
 ]
 
 
@@ -120,6 +120,7 @@ class TestEnvs:
                 "seals/KingKong-Unmasked-v5",
                 "seals/Koolaid-Unmasked-v5",
                 "seals/NameThisGame-Unmasked-v5",
+                "seals/Casino-Unmasked-v5",
             ]
             rollout_len = 100 if env_name not in slow_random_envs else 400
             num_seeds = 2 if env_name in ATARI_NO_FRAMESKIP_ENVS else 10
@@ -149,6 +150,31 @@ class TestEnvs:
         else:
             envs.test_rollout_schema(env)
 
-    def test_render(self, env: gym.Env):
-        """Tests `render()` supports modes specified in environment metadata."""
-        envs.test_render(env, raises_fn=pytest.raises)
+    def test_render_modes(self, env_name: str):
+        """Tests that all render modes specifeid in the metadata work.
+
+        Note: we only check that no exception is thrown.
+        There is no test to see if something reasonable is rendered.
+        """
+        for mode in gym.make(env_name).metadata["render_modes"]:
+            # GIVEN
+            env = gym.make(env_name, render_mode=mode)
+            env.reset(seed=0)
+
+            # WHEN
+            if mode == "rgb_array" and not is_mujoco_env(env):
+                # The render should not change without calling `step()`.
+                # MuJoCo rendering fails this check, ignore -- not much we can do.
+                r1: Union[np.ndarray, List[np.ndarray], None] = env.render()
+                r2: Union[np.ndarray, List[np.ndarray], None] = env.render()
+                assert r1 is not None
+                assert r2 is not None
+                assert np.allclose(r1, r2)
+            else:
+                env.render()
+
+            # THEN
+            # no error raised
+
+            # CLEANUP
+            env.close()

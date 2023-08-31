@@ -88,14 +88,14 @@ def get_readme() -> str:
 
 ATARI_REQUIRE = [
     "opencv-python",
-    "ale-py==0.7.4",
+    "ale-py~=0.8.1",
     "pillow",
     "autorom[accept-rom-license]~=0.4.2",
+    "shimmy[atari] >=0.1.0,<1.0",
 ]
 TESTS_REQUIRE = [
-    # remove pin once https://github.com/nedbat/coveragepy/issues/881 fixed
     "black",
-    "coverage==4.5.4",
+    "coverage~=4.5.4",
     "codecov",
     "codespell",
     "darglint>=1.5.6",
@@ -115,11 +115,8 @@ TESTS_REQUIRE = [
     "pytest-xdist",
     "pytype",
     "stable-baselines3>=0.9.0",
-    # TODO(adam): remove pyglet pin once Gym upgraded to >0.21
-    # Workaround for https://github.com/openai/gym/issues/2986
-    # Discussed in https://github.com/HumanCompatibleAI/imitation/pull/603
-    "pyglet==1.5.27",
     "setuptools_scm~=7.0.5",
+    "gymnasium[classic-control,mujoco]",
     *ATARI_REQUIRE,
 ]
 DOCS_REQUIRE = [
@@ -140,16 +137,14 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     package_data={"seals": ["py.typed"]},
-    install_requires=["gym", "numpy"],
+    install_requires=["gymnasium", "numpy"],
     tests_require=TESTS_REQUIRE,
     extras_require={
         # recommended packages for development
         "dev": ["ipdb", "jupyter", *TESTS_REQUIRE, *DOCS_REQUIRE],
         "docs": DOCS_REQUIRE,
         "test": TESTS_REQUIRE,
-        # We'd like to specify `gym[mujoco]`, but this is a no-op when Gym is already
-        # installed. See https://github.com/pypa/pip/issues/4957 for issue.
-        "mujoco": ["mujoco_py>=1.50, <2.0", "imageio"],
+        "mujoco": ["gymnasium[mujoco]"],
         "atari": ATARI_REQUIRE,
     },
     url="https://github.com/HumanCompatibleAI/benchmark-environments",

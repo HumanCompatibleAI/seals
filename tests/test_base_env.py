@@ -4,7 +4,7 @@ Note base_envs is also tested indirectly via smoke tests in `test_envs`,
 so the tests in this file focus on features unique to classes in `base_envs`.
 """
 
-import gym
+import gymnasium as gym
 import numpy as np
 import pytest
 
@@ -17,11 +17,12 @@ class NewEnv(base_envs.TabularModelMDP):
 
     def __init__(self):
         """Build environment."""
+        np.random.seed(0)
         nS = 3
         nA = 2
-        transition_matrix = np.random.rand(nS, nA, nS)
+        transition_matrix = np.random.random((nS, nA, nS))
         transition_matrix /= transition_matrix.sum(axis=2)[:, :, None]
-        reward_matrix = np.random.rand(nS)
+        reward_matrix = np.random.random((nS,))
         super().__init__(
             transition_matrix=transition_matrix,
             reward_matrix=reward_matrix,
@@ -36,7 +37,7 @@ def test_base_envs():
 
     envs.test_premature_step(env, skip_fn=pytest.skip, raises_fn=pytest.raises)
 
-    env.reset()
+    env.reset(seed=0)
     assert env.n_actions_taken == 0
     env.step(env.action_space.sample())
     assert env.n_actions_taken == 1
@@ -50,6 +51,9 @@ def test_base_envs():
     bad_state = "not a state"
     with pytest.raises(ValueError, match=r".*not in.*"):
         env.state = bad_state  # type: ignore
+
+    with pytest.raises(NotImplementedError, match=r"Options not supported.*"):
+        env.reset(options={"option": "value"})
 
 
 def test_tabular_env_validation():
@@ -87,7 +91,7 @@ def test_tabular_env_validation():
         transition_matrix=np.zeros((3, 1, 3)),
         reward_matrix=np.zeros((3,)),
     )
-    env.reset()
+    env.reset(seed=0)
     with pytest.raises(ValueError, match=r".*not in.*"):
         env.step(4)
 
@@ -98,12 +102,12 @@ def test_expose_pomdp_state_wrapper():
     wrapped_env = base_envs.ExposePOMDPStateWrapper(env)
 
     assert wrapped_env.observation_space == env.state_space
-    state = wrapped_env.reset()
+    state, _ = wrapped_env.reset(seed=0)
     assert state == env.state
     assert state in env.state_space
 
     action = env.action_space.sample()
-    next_state, reward, done, info = wrapped_env.step(action)
+    next_state, reward, terminated, truncated, info = wrapped_env.step(action)
     assert next_state == env.state
     assert next_state in env.state_space
 

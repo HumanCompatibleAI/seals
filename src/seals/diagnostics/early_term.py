@@ -53,7 +53,7 @@ class EarlyTerminationEnv(base_envs.TabularModelMDP):
             reward_matrix=reward_matrix,
         )
 
-    def terminal(self, state: int, n_actions_taken: int) -> bool:
+    def terminal(self, state: base_envs.DiscreteSpaceInt, n_actions_taken: int) -> bool:
         """Returns True if (and only if) in state 2."""
         return bool(state == 2)
 

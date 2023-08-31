@@ -1,6 +1,6 @@
 """Environment to sort a list using swap actions."""
 
-from gym import spaces
+from gymnasium import spaces
 import numpy as np
 
 from seals import base_envs
@@ -21,10 +21,9 @@ class SortEnv(base_envs.ResettableMDP):
         """
         self._length = length
 
-        super().__init__(
-            state_space=spaces.Box(low=0, high=1.0, shape=(length,)),
-            action_space=spaces.MultiDiscrete([length, length]),
-        )
+        super().__init__()
+        self.state_space = spaces.Box(low=0, high=1.0, shape=(length,))
+        self.action_space = spaces.MultiDiscrete([length, length])
 
     def terminal(self, state: np.ndarray, n_actions_taken: int) -> bool:
         """Always returns False."""
@@ -32,7 +31,7 @@ class SortEnv(base_envs.ResettableMDP):
 
     def initial_state(self):
         """Sample random vector uniformly in [0, 1]**L."""
-        sample = self.rand_state.random(size=self._length)
+        sample = self.np_random.random(size=self._length)
         return sample.astype(self.state_space.dtype)
 
     def reward(
@@ -42,6 +41,7 @@ class SortEnv(base_envs.ResettableMDP):
         new_state: np.ndarray,
     ) -> float:
         """Rewards fully sorted lists, and new correct positions."""
+        del action
         # This is not meant to be a potential shaping in the formal sense,
         # as it changes the trajectory returns (since we do not return
         # a fixed-potential state at termination).
