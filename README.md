@@ -9,7 +9,7 @@
 
 *seals*, the Suite of Environments for Algorithms that Learn Specifications, is a toolkit for
 evaluating specification learning algorithms, such as reward or imitation learning. The
-environments are compatible with [Gym](https://github.com/openai/gym), but are designed
+environments are compatible with [Gymnasium](https://gymnasium.farama.org/), but are designed
 to test algorithms that learn from user data, without requiring a procedurally specified
 reward function.
 
@@ -35,7 +35,7 @@ To install the latest release from PyPI, run:
 pip install seals
 ```
 
-All *seals* environments are available in the Gym registry. Simply import it and then use as you
+All *seals* environments are available in the Gymnasium registry. Simply import it and then use as you
 would with your usual RL or specification learning algroithm:
 
 ```python
